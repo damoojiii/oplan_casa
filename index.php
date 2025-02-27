@@ -1,4 +1,5 @@
 <?php
+    session_start();
     include 'connection.php';
     date_default_timezone_set("Asia/Manila");
 
@@ -8,17 +9,33 @@
         $visitReason = $_POST['visitReason'];
         $time = date("Y-m-d H:i:s");
 
+        // Handle photo upload
+        if (!empty($_POST['photoData'])) {
+            $photoData = $_POST['photoData'];
+            $photoData = str_replace("data:image/png;base64,", "", $photoData);
+            $photoData = base64_decode($photoData);
+            $fileName = "uploads/" . uniqid() . ".png";
+            file_put_contents($fileName, $photoData);
+        } else {
+            $fileName = null; // No photo uploaded
+        }
+
         // Insert into database
-        $sql = "INSERT INTO visitors (fullName, gender, reason, time) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO visitors (fullName, gender, reason, time, photo) VALUES (?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssss", $fullName, $gender, $visitReason, $time);
+        $stmt->bind_param("sssss", $fullName, $gender, $visitReason, $time, $fileName);
 
         if ($stmt->execute()) {
-            echo "<script>alert('Visitor added successfully!'); window.location.href='index.php';</script>";
+            $_SESSION['message'] = "Visitor added successfully!";
+            $_SESSION['message_type'] = "success";
         } else {
-            echo "Error: " . $stmt->error;
+            $_SESSION['message'] = "Error: " . $stmt->error;
+            $_SESSION['message_type'] = "danger";
         }
+
         $stmt->close();
+        header("Location: index.php");
+        exit();
     }
 ?>
 
@@ -28,8 +45,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Visitor's Log</title>
-    <!-- Bootstrap 5 CSS -->
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Script -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
     <style>
         body {
@@ -93,6 +113,17 @@
         .empty-row td {
             height: 41px;
         }
+
+        #camera-container, #captured-photo {
+            display: none; /* Hidden initially */
+            margin-top: 10px;
+        }
+        video, img {
+            width: 100%;
+            max-width: 300px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -112,7 +143,7 @@
         <div class="card p-4">
             <h4 class="mb-3">Visitor’s Log</h4>
             
-            <form id="visitorForm" method="POST">
+            <form id="visitorForm" method="POST" enctype="multipart/form-data">
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label for="fullName" class="form-label">Full Name</label>
@@ -135,6 +166,25 @@
                             <option value="Female">Female</option>
                         </select>
                     </div>
+
+                    <!-- Capture Photo Section -->
+                    <div class="col-md-4">
+                        <label class="form-label">Capture Photo</label><br>
+                        <button type="button" id="openCamera" class="btn btn-primary">Open Camera</button>
+                    </div>
+
+                    <!-- Camera Preview -->
+                    <div class="col-md-4" id="camera-container">
+                        <video id="video" autoplay></video>
+                        <button type="button" id="capturePhoto" class="btn btn-warning mt-2">Capture</button>
+                    </div>
+
+                    <!-- Captured Image Preview -->
+                    <div class="col-md-4" id="captured-photo">
+                        <img id="photoPreview">
+                        <input type="hidden" id="photoData" name="photoData">
+                    </div>
+
                     <div class="col-md-2 d-flex align-items-end">
                         <button type="submit" class="btn btn-success w-100">Submit</button>
                     </div>
@@ -190,6 +240,38 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let video = document.getElementById("video");
+        let photoPreview = document.getElementById("photoPreview");
+        let photoData = document.getElementById("photoData");
+
+        $("#openCamera").click(function () {
+            $("#camera-container").show();
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                    video.srcObject = stream;
+                })
+                .catch(function (err) {
+                    alert("Camera access denied: " + err);
+                });
+        });
+
+        $("#capturePhoto").click(function () {
+            let canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            let ctx = canvas.getContext("2d");
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            let imageData = canvas.toDataURL("image/png"); // Convert to Base64
+            photoPreview.src = imageData;
+            photoData.value = imageData;
+            
+            $("#camera-container").hide();
+            $("#captured-photo").show();
+        });
+    </script>
 
 </body>
 </html>
