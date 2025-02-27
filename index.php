@@ -41,6 +41,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -50,82 +51,88 @@
 
     <!-- Script -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
     <style>
-        body {
-            background: url('img/casabg.jpg') no-repeat center center/cover;
-            height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
+    body {
+        background: url('img/casabg.jpg') no-repeat center center/cover;
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
 
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #5D9C5933;
-            z-index: 1;
-        }
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #5D9C5933;
+        z-index: 1;
+    }
 
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            color: white;
-            padding: 15px 20px;
-            padding-left: 90px;
-            padding-right: 90px;
-            display: flex;
-            align-items: center;
-            z-index: 10;
-        }
+    .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        color: white;
+        padding: 15px 20px;
+        padding-left: 90px;
+        padding-right: 90px;
+        display: flex;
+        align-items: center;
+        z-index: 10;
+    }
 
-        .logo {
-            height: 50px;
-            width: 50px;  
-            border-radius: 50%;
-            object-fit: cover;
-        }
+    .logo {
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
 
-        .header h4 {
-            margin: 0;
-        }
+    .header h4 {
+        margin: 0;
+    }
 
-        .card {
-            position: relative;
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            z-index: 10;
-        }
+    .card {
+        position: relative;
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        z-index: 10;
+    }
 
-        .table {
-            margin-top: 20px;
-        }
+    .table {
+        margin-top: 20px;
+    }
 
-        .empty-row td {
-            height: 41px;
-        }
+    .empty-row td {
+        height: 41px;
+    }
 
-        #camera-container, #captured-photo {
-            display: none; /* Hidden initially */
-            margin-top: 10px;
-        }
-        video, img {
-            width: 100%;
-            max-width: 300px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-        }
+    #camera-container,
+    #captured-photo {
+        display: none;
+        /* Hidden initially */
+        margin-top: 10px;
+    }
+
+    video,
+    img {
+        width: 100%;
+        max-width: 300px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+    }
     </style>
 </head>
+
 <body>
     <div class="overlay"></div>
 
@@ -138,16 +145,17 @@
         <button class="btn btn-success">Login</button>
     </div>
 
-    
+
     <div class="container mt-5">
         <div class="card p-4">
             <h4 class="mb-3">Visitor’s Log</h4>
-            
+
             <form id="visitorForm" method="POST" enctype="multipart/form-data">
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label for="fullName" class="form-label">Full Name</label>
-                        <input type="text" id="fullName" name="fullName" class="form-control" placeholder="Enter your Full Name" required>
+                        <input type="text" id="fullName" name="fullName" class="form-control"
+                            placeholder="Enter your Full Name" required>
                     </div>
                     <div class="col-md-4">
                         <label for="visitReason" class="form-label">Purpose for Visit</label>
@@ -171,6 +179,9 @@
                     <div class="col-md-4">
                         <label class="form-label">Capture Photo</label><br>
                         <button type="button" id="openCamera" class="btn btn-primary">Open Camera</button>
+                        <div id="liveness-instructions" class="mt-2 text-muted" style="display: none;">
+                            Please turn your head slightly left and right
+                        </div>
                     </div>
 
                     <!-- Camera Preview -->
@@ -191,7 +202,7 @@
                 </div>
             </form>
 
-            
+
             <table class="table table-bordered text-center">
                 <thead class="bg-success text-white">
                     <tr>
@@ -242,36 +253,117 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        let video = document.getElementById("video");
-        let photoPreview = document.getElementById("photoPreview");
-        let photoData = document.getElementById("photoData");
+    let video = document.getElementById("video");
+    let photoPreview = document.getElementById("photoPreview");
+    let photoData = document.getElementById("photoData");
 
-        $("#openCamera").click(function () {
+    $("#openCamera").click(function() {
+        $("#camera-container").show();
+        navigator.mediaDevices.getUserMedia({
+                video: true
+            })
+            .then(function(stream) {
+                video.srcObject = stream;
+            })
+            .catch(function(err) {
+                alert("Camera access denied: " + err);
+            });
+    });
+
+    $("#capturePhoto").click(function() {
+        if (!isLivenessConfirmed) {
+            alert("Please perform liveness check first");
+            return;
+        }
+        let canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        let ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        let imageData = canvas.toDataURL("image/png"); // Convert to Base64
+        photoPreview.src = imageData;
+        photoData.value = imageData;
+
+        $("#camera-container").hide();
+        $("#captured-photo").show();
+    });
+
+    // Load face-api models
+    Promise.all([
+        faceapi.nets.tinyFaceDetector.loadFromUri('models'),
+        faceapi.nets.faceLandmark68Net.loadFromUri('models')
+    ]).then(startCamera);
+
+    let faceMovementHistory = [];
+    let isLivenessConfirmed = false;
+
+    async function startCamera() {
+        $("#openCamera").click(async function() {
+            $("#liveness-instructions").show();
             $("#camera-container").show();
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function (stream) {
-                    video.srcObject = stream;
-                })
-                .catch(function (err) {
-                    alert("Camera access denied: " + err);
-                });
-        });
 
-        $("#capturePhoto").click(function () {
-            let canvas = document.createElement("canvas");
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            let ctx = canvas.getContext("2d");
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: true
+            });
+            video.srcObject = stream;
 
-            let imageData = canvas.toDataURL("image/png"); // Convert to Base64
-            photoPreview.src = imageData;
-            photoData.value = imageData;
-            
-            $("#camera-container").hide();
-            $("#captured-photo").show();
+            // Start face detection loop
+            detectLiveness();
         });
+    }
+
+    async function detectLiveness() {
+        const detection = await faceapi.detectSingleFace(
+            video,
+            new faceapi.TinyFaceDetectorOptions()
+        ).withFaceLandmarks();
+
+        if (detection) {
+            // Track head rotation using landmarks
+            const landmarks = detection.landmarks;
+            const nose = landmarks.getNose();
+            const leftEye = landmarks.getLeftEye();
+            const rightEye = landmarks.getRightEye();
+
+            // Simple head movement detection
+            trackHeadMovement(nose[0].x);
+
+            // Blink detection
+            const leftEyeHeight = faceapi.euclideanDistance(leftEye[1], leftEye[5]);
+            const rightEyeHeight = faceapi.euclideanDistance(rightEye[1], rightEye[5]);
+
+            if (leftEyeHeight < 5 && rightEyeHeight < 5) {
+                // Eyes appear closed
+                faceMovementHistory.push('blink');
+            }
+        }
+
+        if (!isLivenessConfirmed) {
+            setTimeout(() => detectLiveness(), 100);
+        }
+    }
+
+    function trackHeadMovement(xPosition) {
+        faceMovementHistory.push(xPosition);
+
+        // Keep only last 20 positions
+        if (faceMovementHistory.length > 20) {
+            faceMovementHistory.shift();
+        }
+
+        // Check for sufficient movement variation
+        const min = Math.min(...faceMovementHistory);
+        const max = Math.max(...faceMovementHistory);
+
+        if ((max - min) > 50 && faceMovementHistory.includes('blink')) {
+            isLivenessConfirmed = true;
+            $("#liveness-instructions").html("Liveness confirmed! You can now take photo");
+            $("#capturePhoto").prop("disabled", false);
+        }
+    }
     </script>
 
 </body>
+
 </html>
