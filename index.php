@@ -4,14 +4,23 @@
     date_default_timezone_set("Asia/Manila");
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $fullName = $_POST['fullName'];
-        $gender = $_POST['gender'];
-        $visitReason = $_POST['visitReason'];
+        // Check if required fields exist before accessing them
+        $fullName = isset($_POST['fullName']) ? $_POST['fullName'] : null;
+        $gender = isset($_POST['gender']) ? $_POST['gender'] : null;
+        $visitReason = isset($_POST['reason']) ? $_POST['reason'] : null;
         $time = date("Y-m-d H:i:s");
 
+        // Validate inputs to prevent NULL database values
+        if (!$fullName || !$gender || !$visitReason) {
+            $_SESSION['message'] = "Error: Missing required fields!";
+            $_SESSION['message_type'] = "danger";
+            header("Location: index.php");
+            exit();
+        }
+
         // Handle photo upload
-        if (!empty($_POST['photoData'])) {
-            $photoData = $_POST['photoData'];
+        if (!empty($_POST['photo'])) {
+            $photoData = $_POST['photo'];
             $photoData = str_replace("data:image/png;base64,", "", $photoData);
             $photoData = base64_decode($photoData);
             $fileName = "uploads/" . uniqid() . ".png";
@@ -47,9 +56,13 @@
     <title>Visitor's Log</title>
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Script -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
         body {
@@ -124,6 +137,30 @@
             border: 2px solid #ddd;
             border-radius: 5px;
         }
+        .dataTables_paginate {
+            text-align: right !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 8px 12px;
+            margin: 2px;
+            border: 1px solid #28a745;  /* Green border */
+            border-radius: 5px;
+            background-color: white;
+            color: #28a745;
+            transition: 0.3s;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background-color: #28a745; /* Green on hover */
+            color: white;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background-color: #28a745; /* Green for active page */
+            color: white;
+        }
+
     </style>
 </head>
 <body>
@@ -138,8 +175,23 @@
         <button class="btn btn-success">Login</button>
     </div>
 
-    
+    <?php
+        if (isset($_SESSION['message'])) {
+            echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: '" . $_SESSION['message'] . "',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        });
+                    });
+                </script>";
+            unset($_SESSION['message']); 
+        }
+    ?>
     <div class="container mt-5">
+
         <div class="card p-4">
             <h4 class="mb-3">Visitor’s Log</h4>
             
@@ -151,7 +203,7 @@
                     </div>
                     <div class="col-md-4">
                         <label for="visitReason" class="form-label">Purpose for Visit</label>
-                        <select id="visitReason" name="visitReason" class="form-select" required>
+                        <select id="visitReason" name="reason" class="form-select" required> <!-- FIXED -->
                             <option value="" disabled selected>Select Reason</option>
                             <option value="Ocular Visit">Ocular Visit</option>
                             <option value="Business">Business</option>
@@ -167,32 +219,17 @@
                         </select>
                     </div>
 
-                    <!-- Capture Photo Section -->
-                    <div class="col-md-4">
-                        <label class="form-label">Capture Photo</label><br>
-                        <button type="button" id="openCamera" class="btn btn-primary">Open Camera</button>
-                    </div>
-
-                    <!-- Camera Preview -->
-                    <div class="col-md-4" id="camera-container">
-                        <video id="video" autoplay></video>
-                        <button type="button" id="capturePhoto" class="btn btn-warning mt-2">Capture</button>
-                    </div>
-
-                    <!-- Captured Image Preview -->
-                    <div class="col-md-4" id="captured-photo">
-                        <img id="photoPreview">
-                        <input type="hidden" id="photoData" name="photoData">
-                    </div>
+                    <!-- Hidden input to store captured photo -->
+                    <input type="hidden" id="photoData" name="photo">
 
                     <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-success w-100">Submit</button>
+                        <button type="submit" id="submitBtn" class="btn btn-success w-100">Submit</button>
                     </div>
                 </div>
             </form>
 
             
-            <table class="table table-bordered text-center">
+            <table id="visitorTable" class="table table-bordered text-center">
                 <thead class="bg-success text-white">
                     <tr>
                         <th>Visitor No.</th>
@@ -204,12 +241,14 @@
                 </thead>
                 <tbody id="visitorTable">
                     <?php
-                    $sql = "SELECT * FROM visitors ORDER BY visitor_id DESC LIMIT 5"; 
-                    $result = $conn->query($sql);
+                        $currentDate = date("Y-m-d"); // Get today's date
 
-                    $rowCount = 0;
+                        $sql = "SELECT * FROM visitors WHERE DATE(time) = ? ORDER BY visitor_id DESC";
+                        $stmt = $conn->prepare($sql);
+                        $stmt->bind_param("s", $currentDate);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
 
-                    if ($result->num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
                             $formattedTime = date("h:i A", strtotime($row['time']));
                             echo "<tr>
@@ -219,19 +258,7 @@
                                 <td>{$row['reason']}</td>
                                 <td>{$formattedTime}</td>
                             </tr>";
-                            $rowCount++; 
                         }
-                    }
-
-                    for ($i = $rowCount; $i < 5; $i++) {
-                        echo "<tr class='empty-row'>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>";
-                    }
                     ?>
                 </tbody>
             </table>
@@ -242,34 +269,58 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        let video = document.getElementById("video");
-        let photoPreview = document.getElementById("photoPreview");
-        let photoData = document.getElementById("photoData");
+        document.getElementById("visitorForm").addEventListener("submit", function (event) {
+            event.preventDefault(); // Stop immediate submission
 
-        $("#openCamera").click(function () {
-            $("#camera-container").show();
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function (stream) {
-                    video.srcObject = stream;
-                })
-                .catch(function (err) {
-                    alert("Camera access denied: " + err);
-                });
+            // Store form data before redirection
+            localStorage.setItem("fullName", document.getElementById("fullName").value);
+            localStorage.setItem("reason", document.getElementById("visitReason").value);
+            localStorage.setItem("gender", document.getElementById("gender").value);
+
+            // Redirect to camera page
+            window.location.href = "camera.php";
         });
 
-        $("#capturePhoto").click(function () {
-            let canvas = document.createElement("canvas");
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            let ctx = canvas.getContext("2d");
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            let imageData = canvas.toDataURL("image/png"); // Convert to Base64
-            photoPreview.src = imageData;
-            photoData.value = imageData;
+        // When returning from camera.php
+        window.onload = function () {
+            let photoData = localStorage.getItem("photo");
             
-            $("#camera-container").hide();
-            $("#captured-photo").show();
+            if (photoData) {
+                document.getElementById("photoData").value = photoData;
+
+                // Retrieve stored form data
+                document.getElementById("fullName").value = localStorage.getItem("fullName");
+                document.getElementById("visitReason").value = localStorage.getItem("reason");
+                document.getElementById("gender").value = localStorage.getItem("gender");
+
+                // Clear stored data to prevent re-submission issues
+                localStorage.removeItem("photo");
+                localStorage.removeItem("fullName");
+                localStorage.removeItem("reason");
+                localStorage.removeItem("gender");
+
+                // Auto-submit the form
+                document.getElementById("visitorForm").submit();
+            }
+        };
+
+        $(document).ready(function () {
+            $('#visitorTable').DataTable({
+                "paging": true,           // Enable pagination
+                "searching": true,        // Enable search bar
+                "lengthChange": false,    // Hide "Show X entries" dropdown
+                "pageLength": 5,          // Show only 5 rows per page
+                "ordering": false,        // Disable sorting
+                "info": false,            // Hide "Showing X of X entries"
+                "language": {
+                    "paginate": {
+                        "previous": "<i class='fas fa-chevron-left'></i>",
+                        "next": "<i class='fas fa-chevron-right'></i>"
+                    },
+                    "search": "🔍 Search:"
+                },
+                "dom": '<"top"f>rt<"bottom"p><"clear">' // Moves pagination to bottom
+            });
         });
     </script>
 
