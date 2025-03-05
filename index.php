@@ -203,7 +203,7 @@
                     </div>
                     <div class="col-md-4">
                         <label for="visitReason" class="form-label">Purpose for Visit</label>
-                        <select id="visitReason" name="reason" class="form-select" required> <!-- FIXED -->
+                        <select id="visitReason" name="reason" class="form-select" required>
                             <option value="" disabled selected>Select Reason</option>
                             <option value="Ocular Visit">Ocular Visit</option>
                             <option value="Business">Business</option>
@@ -241,7 +241,7 @@
                 </thead>
                 <tbody id="visitorTable">
                     <?php
-                        $currentDate = date("Y-m-d"); // Get today's date
+                        $currentDate = date("Y-m-d");
 
                         $sql = "SELECT * FROM visitors WHERE DATE(time) = ? ORDER BY visitor_id DESC";
                         $stmt = $conn->prepare($sql);
@@ -270,48 +270,42 @@
 
     <script>
         document.getElementById("visitorForm").addEventListener("submit", function (event) {
-            event.preventDefault(); // Stop immediate submission
+            event.preventDefault();
 
-            // Store form data before redirection
             localStorage.setItem("fullName", document.getElementById("fullName").value);
             localStorage.setItem("reason", document.getElementById("visitReason").value);
             localStorage.setItem("gender", document.getElementById("gender").value);
 
-            // Redirect to camera page
             window.location.href = "camera.php";
         });
 
-        // When returning from camera.php
         window.onload = function () {
             let photoData = localStorage.getItem("photo");
             
             if (photoData) {
                 document.getElementById("photoData").value = photoData;
 
-                // Retrieve stored form data
                 document.getElementById("fullName").value = localStorage.getItem("fullName");
                 document.getElementById("visitReason").value = localStorage.getItem("reason");
                 document.getElementById("gender").value = localStorage.getItem("gender");
 
-                // Clear stored data to prevent re-submission issues
                 localStorage.removeItem("photo");
                 localStorage.removeItem("fullName");
                 localStorage.removeItem("reason");
                 localStorage.removeItem("gender");
 
-                // Auto-submit the form
                 document.getElementById("visitorForm").submit();
             }
         };
 
         $(document).ready(function () {
             $('#visitorTable').DataTable({
-                "paging": true,           // Enable pagination
-                "searching": true,        // Enable search bar
-                "lengthChange": false,    // Hide "Show X entries" dropdown
-                "pageLength": 5,          // Show only 5 rows per page
-                "ordering": false,        // Disable sorting
-                "info": false,            // Hide "Showing X of X entries"
+                "paging": true,
+                "searching": true,
+                "lengthChange": false,
+                "pageLength": 5,
+                "ordering": false,
+                "info": false,
                 "language": {
                     "paginate": {
                         "previous": "<i class='fas fa-chevron-left'></i>",
@@ -319,7 +313,7 @@
                     },
                     "search": "🔍 Search:"
                 },
-                "dom": '<"top"f>rt<"bottom"p><"clear">' // Moves pagination to bottom
+                "dom": '<"top"f>rt<"bottom"p><"clear">'
             });
         });
     </script>
