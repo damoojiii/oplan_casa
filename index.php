@@ -65,7 +65,23 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
+        @font-face {
+            font-family: 'Inter';
+            src: url('fonts/Inter/Inter-VariableFont_opsz\,wght.ttf') format('truetype');
+            font-weight: 100 900;
+            font-stretch: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Source';
+            src: url('fonts/Source_Serif_4/static/SourceSerif4-SemiBold.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            
+        }
+
         body {
+            font-family: 'Inter', Arial;
             background: url('img/casabg.jpg') no-repeat center center/cover;
             height: 100vh;
             margin: 0;
@@ -92,12 +108,15 @@
             left: 0;
             width: 100%;
             color: white;
-            padding: 15px 20px;
+            padding-inline: 70px !important;
             padding-left: 90px;
             padding-right: 90px;
             display: flex;
             align-items: center;
             z-index: 10;
+        }
+        .login{
+            padding-inline: 15px;
         }
 
         .logo {
@@ -109,6 +128,12 @@
 
         .header h4 {
             margin: 0;
+            font-family: 'Source';
+        }
+        .visitor{
+            font-family: 'Inter', Arial;
+            font-weight: 400;
+            font-size: 30px;
         }
 
         .card {
@@ -120,7 +145,12 @@
         }
 
         .table {
-            margin-top: 20px;
+            margin-top: 30px !important;
+        }
+        thead, th{
+            background-color: #5D9C59 !important;
+            text-align: center !important;
+            color: #fff !important;
         }
 
         .empty-row td {
@@ -144,23 +174,30 @@
         .dataTables_wrapper .dataTables_paginate .paginate_button {
             padding: 8px 12px;
             margin: 2px;
-            border: 1px solid #28a745;  /* Green border */
+            border: 1px solid #5D9C59;  /* Green border */
             border-radius: 5px;
             background-color: white;
-            color: #28a745;
+            color: #5D9C59;
             transition: 0.3s;
         }
 
         .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-            background-color: #28a745; /* Green on hover */
+            background-color: #5D9C59; /* Green on hover */
             color: white;
         }
 
         .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-            background-color: #28a745; /* Green for active page */
+            background-color: #5D9C59; /* Green for active page */
             color: white;
         }
-
+        .btn-success {
+            --bs-btn-bg: #5D9C59 !important;
+            --bs-btn-border-color: #5D9C59 !important;
+            --bs-btn-hover-bg: #5D9C59 !important;
+        }
+        .input-label{
+            font-size: 15px;
+        }
     </style>
 </head>
 <body>
@@ -172,7 +209,7 @@
             <h4 class="mb-0 ms-3 text-white">Tourism Office - Municipality of Rosario</h4>
         </div>
 
-        <button class="btn btn-success">Login</button>
+        <button class="btn btn-success login">Login</button>
     </div>
 
     <?php
@@ -193,27 +230,27 @@
     <div class="container mt-5">
 
         <div class="card p-4">
-            <h4 class="mb-3">Visitor’s Log</h4>
+            <h4 class="mb-3 visitor"><strong>Visitor’s Log</strong></h4>
             
             <form id="visitorForm" method="POST" enctype="multipart/form-data">
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <label for="fullName" class="form-label">Full Name</label>
+                        <label for="fullName" class="form-label input-label">Full Name</label>
                         <input type="text" id="fullName" name="fullName" class="form-control" placeholder="Enter your Full Name" required>
                     </div>
                     <div class="col-md-4">
-                        <label for="visitReason" class="form-label">Purpose for Visit</label>
+                        <label for="visitReason" class="form-label input-label">Purpose for Visit</label>
                         <select id="visitReason" name="reason" class="form-select" required>
-                            <option value="" disabled selected>Select Reason</option>
+                            <option value="" disabled selected hidden>Select Reason</option>
                             <option value="Ocular Visit">Ocular Visit</option>
                             <option value="Business">Business</option>
                             <option value="Tourism">Tourism</option>
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <label for="gender" class="form-label">Gender</label>
+                        <label for="gender" class="form-label input-label">Gender</label>
                         <select id="gender" name="gender" class="form-select" required>
-                            <option value="" disabled selected>Select Gender</option>
+                            <option value="" disabled selected hidden>Select Gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
                         </select>
@@ -230,7 +267,7 @@
 
             
             <table id="visitorTable" class="table table-bordered text-center">
-                <thead class="bg-success text-white">
+                <thead class="text-white">
                     <tr>
                         <th>Visitor No.</th>
                         <th>Visitor Name</th>
@@ -301,7 +338,7 @@
         $(document).ready(function () {
             $('#visitorTable').DataTable({
                 "paging": true,
-                "searching": true,
+                "searching": false,
                 "lengthChange": false,
                 "pageLength": 5,
                 "ordering": false,
