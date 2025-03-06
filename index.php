@@ -209,7 +209,7 @@
             <h4 class="mb-0 ms-3 text-white">Tourism Office - Municipality of Rosario</h4>
         </div>
 
-        <button class="btn btn-success login">Login</button>
+        <a href="login.php"><button class="btn btn-success login">Login</button></a>
     </div>
 
     <?php
