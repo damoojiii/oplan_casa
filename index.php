@@ -164,6 +164,8 @@
         video, img {
             width: 100%;
             max-width: 300px;
+            height: 300px;
+            object-fit: cover;
             border: 2px solid #ddd;
             border-radius: 5px;
         }
@@ -300,40 +302,85 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="modal fade" id="photoModal" tabindex="-1" aria-labelledby="photoModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="photoModalLabel">Take Visitor Photo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <video id="video" width="100%" height="auto" autoplay></video><br>
+                        <button id="captureBtn" class="btn btn-primary mt-2">Capture Photo</button>
+                        
+                        <div id="photoPreviewContainer" class="mt-3" style="display: none;">
+                            <img id="photoPreview" class="img-fluid rounded shadow" src="" alt="Captured Photo">
+                            <div class="mt-3">
+                                <button class="btn btn-secondary" id="retakePhoto"><i class="fa-solid fa-rotate-right"></i> Retake</button>
+                                <button class="btn btn-success" id="confirmPhoto"><i class="fa-solid fa-check"></i> Confirm & Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        document.getElementById("visitorForm").addEventListener("submit", function (event) {
+        const video = document.getElementById("video");
+        const captureBtn = document.getElementById("captureBtn");
+        const photoPreviewContainer = document.getElementById("photoPreviewContainer");
+        const photoPreview = document.getElementById("photoPreview");
+        const retakePhotoBtn = document.getElementById("retakePhoto");
+        const confirmPhotoBtn = document.getElementById("confirmPhoto");
+        const photoDataInput = document.getElementById("photoData");
+        const visitorForm = document.getElementById("visitorForm");
+
+        document.getElementById("submitBtn").addEventListener("click", function (event) {
             event.preventDefault();
 
-            localStorage.setItem("fullName", document.getElementById("fullName").value);
-            localStorage.setItem("reason", document.getElementById("visitReason").value);
-            localStorage.setItem("gender", document.getElementById("gender").value);
-
-            window.location.href = "camera.php";
+            new bootstrap.Modal(document.getElementById("photoModal")).show();
+            
+            navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => { video.srcObject = stream; })
+            .catch(err => alert("Camera access denied: " + err));
         });
 
-        window.onload = function () {
-            let photoData = localStorage.getItem("photo");
-            
-            if (photoData) {
-                document.getElementById("photoData").value = photoData;
+        // Capture Photo
+        captureBtn.addEventListener("click", function () {
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext("2d");
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-                document.getElementById("fullName").value = localStorage.getItem("fullName");
-                document.getElementById("visitReason").value = localStorage.getItem("reason");
-                document.getElementById("gender").value = localStorage.getItem("gender");
+            const imageData = canvas.toDataURL("image/png");
+            photoDataInput.value = imageData;
+            photoPreview.src = imageData;
+            photoPreviewContainer.style.display = "block";
 
-                localStorage.removeItem("photo");
-                localStorage.removeItem("fullName");
-                localStorage.removeItem("reason");
-                localStorage.removeItem("gender");
+            captureBtn.style.display = "none";
+        });
 
-                document.getElementById("visitorForm").submit();
+        // Retake
+        retakePhotoBtn.addEventListener("click", function () {
+            photoPreviewContainer.style.display = "none";
+            photoDataInput.value = "";
+        });
+
+        // Confirm Photo & Submit Form
+        confirmPhotoBtn.addEventListener("click", function () {
+            if (photoDataInput.value) {
+            new bootstrap.Modal(document.getElementById("photoModal")).hide();
+            visitorForm.submit();
+            } else {
+            alert("Please capture a photo before confirming.");
             }
-        };
+        });
 
         $(document).ready(function () {
             $('#visitorTable').DataTable({
