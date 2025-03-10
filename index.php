@@ -13,7 +13,8 @@
         // Validate inputs to prevent NULL database values
         if (!$fullName || !$gender || !$visitReason) {
             $_SESSION['message'] = "Error: Missing required fields!";
-            $_SESSION['message_type'] = "danger";
+            $_SESSION['message_type'] = "Error";
+            $_SESSION['icon'] = "error";
             header("Location: index.php");
             exit();
         }
@@ -36,10 +37,10 @@
 
         if ($stmt->execute()) {
             $_SESSION['message'] = "Visitor added successfully!";
-            $_SESSION['message_type'] = "success";
+            $_SESSION['message_type'] = "Success";
         } else {
             $_SESSION['message'] = "Error: " . $stmt->error;
-            $_SESSION['message_type'] = "danger";
+            $_SESSION['message_type'] = "Error";
         }
 
         $stmt->close();
@@ -219,9 +220,9 @@
             echo "<script>
                     document.addEventListener('DOMContentLoaded', function() {
                         Swal.fire({
-                            title: 'Success!',
+                            title: '". $_SESSION['message_type'] ."',
                             text: '" . $_SESSION['message'] . "',
-                            icon: 'success',
+                            icon: '". $_SESSION['icon'] ."',
                             confirmButtonText: 'OK'
                         });
                     });

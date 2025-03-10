@@ -14,8 +14,18 @@
     
     <style>
         @font-face {
-            font-family: 'nautigal';
-            src: url(font/TheNautigal-Regular.ttf);
+            font-family: 'Inter';
+            src: url('fonts/Inter/Inter-VariableFont_opsz\,wght.ttf') format('truetype');
+            font-weight: 100 900;
+            font-stretch: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Karla';
+            src: url('fonts/Karla/Karla-VariableFont_wght.ttf') format('truetype');
+            font-weight: 100 900;
+            font-stretch: normal;
+            font-style: normal;
         }
         *, *::before, *::after {
             box-sizing: border-box;
@@ -24,19 +34,14 @@
             margin: 0;
         }
         body {
-        font-family: Arial, sans-serif;
-        background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
         }
 
         #sidebar .font-logo {
             font-family: 'nautigal';
             font-size: 20px !important;
         }
-        .font-logo-mobile{
-            font-family: 'nautigal';
-            font-size: 30px;
-        }
-
         #sidebar {
             width: 250px;
             position: fixed;
@@ -44,7 +49,7 @@
             height: 100vh;
             overflow-y: auto; 
             transition: transform 0.3s ease;
-            background: linear-gradient(45deg,rgb(29, 69, 104),#19315D);
+            background: #273E26;
             z-index: 199;
         }
 
@@ -53,7 +58,7 @@
             top: 0;
             left: 0;
             right: 0; 
-            width: calc(100% - 250px);
+            width: 100%;
             height: 50px;
             transition: margin-left 0.3s ease;
             align-items: center;
@@ -83,6 +88,7 @@
         }
 
         #sidebar .nav-link {
+            font-family: 'Karla';
             color: #fff;
             padding: 10px;
             border-radius: 4px;
@@ -113,15 +119,13 @@
             font-size: 7px;
             text-align: justify;
         }
-
+        .main-menu{
+            font-family: 'Karla';
+            margin-bottom: 10px;
+        }
         #sidebar .nav-link:hover, #sidebar .nav-link.active {
             background-color: #fff !important;
             color: #000 !important;
-        }
-
-        .dropdown-menu {
-            width: 100%;
-            background-color: #001A3E;
         }
 
         .dropdown-item {
@@ -141,7 +145,6 @@
         <button id="hamburger" class="btn btn-primary" onclick="toggleSidebar()">
             ☰
         </button>
-        <span class="text-white ms-3 font-logo-mobile">Tourism Office - Municipality of Rosario</span>
     </header>
 
     <!-- Sidebar -->
@@ -150,56 +153,27 @@
             <span class="font-logo">Tourism Office - Municipality of Rosario</span>
         </a>
         <hr>
+        <div class="text-white main-menu">Main Menu</div>
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
-                <a href="admin_dashboard.php" class="nav-link active text-white">Dashboard</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white d-flex justify-content-between align-items-center p-2 drop" href="#manageReservations" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="manageReservations">
-                    Manage Reservations
-                    <span class="caret-icon">
-                        <i class="fa-solid fa-caret-down"></i>
-                    </span>
-                </a>
-                <ul class="collapse list-unstyled ms-3" id="manageReservations">
-                    <li><a class="nav-link text-white" href="pending_reservation.php">Pending Reservations</a></li>
-                    <li><a class="nav-link text-white" href="approved_reservation.php">Approved Reservations</a></li>
-                </ul>
+                <a href="admin-dashboard.php" class="nav-link active text-white"><i class="fa-brands fa-flipboard"></i> Dashboard</a>
             </li>
             <li>
-                <a href="admin_notifications.php" class="nav-link text-white target">Notifications</a>
+                <a href="#.php" class="nav-link text-white target"><i class="fa-solid fa-user-group"></i> Visitor's List</a>
             </li>
             <li>
-                <a href="admin_home_chat.php" class="nav-link text-white chat">Chat with Customer</a>
+                <a href="#.php" class="nav-link text-white chat"><i class="fa-solid fa-bus"></i> Scheduled Field Trips</a>
             </li>
             <li>
-                <a href="reservation_history.php" class="nav-link text-white">Reservation History</a>
+                <a href="#.php" class="nav-link text-white"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
             </li>
             <li>
-                <a href="feedback.php" class="nav-link text-white">Guest Feedback</a>
-            </li>
-            <li>
-                <a href="cancellationformtbl.php" class="nav-link text-white">Cancellations</a>
-            </li>
-            <li>
-                <a href="account_lists.php" class="nav-link text-white">Account List</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white d-flex justify-content-between align-items-center drop" href="#settingsCollapse" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="settingsCollapse">
-                    Settings
-                    <span class="caret-icon">
-                        <i class="fa-solid fa-caret-down"></i>
-                    </span>
-                </a>
-                <ul class="collapse list-unstyled ms-3" id="settingsCollapse">
-                    <li><a class="nav-link text-white" href="account_settings.php">Account Settings</a></li>
-                    <li><a class="nav-link text-white" href="homepage_settings.php">Content Manager</a></li>
-                </ul>
+                <a href="feedback.php" class="nav-link text-white"><i class="fa-solid fa-gear"></i> Settings</a>
             </li>
         </ul>
         <hr>
         <div class ="logout">
-            <a href="logout.php" class="nav-link text-white">Log out</a>
+            <a href="logout.php" class="nav-link text-white"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log out</a>
         </div>
     </div>
 

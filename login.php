@@ -3,6 +3,7 @@
     include 'connection.php';
     date_default_timezone_set("Asia/Manila");
 
+    
 ?>
 
 <!DOCTYPE html>
@@ -10,16 +11,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Visitor's Log</title>
+    <title>Login Page</title>
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    
 
     <!-- Script -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.js"></script>
     
     <style>
         @font-face {
@@ -101,6 +106,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: auto;
+            z-index: 1000;
         }
 
         .container {
@@ -120,9 +126,25 @@
             font-size: 0.9rem;
             color: #fff;
         }
+
         h2{
             font-family: 'Source';
             font-weight: 400;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .bi-eye-slash, .bi-eye {
+            font-size: 17px;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            z-index: 1000;
+            color: black;
         }
     </style>
 </head>
@@ -132,14 +154,14 @@
     <div class="header d-flex align-items-center justify-content-between p-3">
         <div class="d-flex align-items-center">
             <img src="img/rosariologo.png" alt="Municipality Logo" class="logo">
-            <h4 class="mb-0 ms-3 text-white">Tourism Office - Municipality of Rosario</h4>
+            <h4 class="mb-0 ms-3 text-white">Tourism Office - M unicipality of Rosario</h4>
         </div>
     </div>
-
+        
     <div class="main">
         <div class="login-container">
             <h2 class="text-center mb-4">Admin</h2>
-            <form method="POST" action="">
+            <form method="POST" action="#">
                 <div class="mb-3">
                     <label for="email" class="form-label">Email or Username</label>
                     <input type="email" class="form-control" id="email" name="email" required>
@@ -149,7 +171,11 @@
                         <label for="password" class="form-label">Password</label>
                         <p class="text-center list-unstyle forgot"><a href="forgot_password.php">Forgot Password</a></p>
                     </div>
-                    <input type="password" class="form-control" id="password" name="password" required>
+                    <!-- Password field with toggle visibility -->
+                    <div class="password-wrapper">
+                        <input type="password" class="form-control" id="password" name="password" required>
+                        <i class="bi bi-eye" id="togglePassword"></i>
+                    </div>
                 </div>
                 <button type="submit" name="login" class="btn btn-primary w-100">Login</button>
             </form>
@@ -158,6 +184,23 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Get the password input and the icon element
+        const passwordInput = document.getElementById('password');
+        const togglePasswordIcon = document.getElementById('togglePassword');
+
+        // Toggle the password visibility when the eye icon is clicked
+        togglePasswordIcon.addEventListener('click', function () {
+            // Check if the password input is of type "password"
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+
+            // Toggle the eye icon based on the input type
+            this.classList.toggle('bi-eye');
+            this.classList.toggle('bi-eye-slash');
+        });
+    </script>
 
 </body>
 </html>
