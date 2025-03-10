@@ -3,7 +3,42 @@
     include 'connection.php';
     date_default_timezone_set("Asia/Manila");
 
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
+
+        // Get the form data and sanitize it
+        $email_or_username = mysqli_real_escape_string($conn, $_POST['email']);
+        $password = mysqli_real_escape_string($conn, $_POST['password']);
     
+        // Query to check if the email/username exists
+        $sql = "SELECT userID, email, username, password FROM users WHERE email = ? OR username = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $email_or_username, $email_or_username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        // If a user is found
+        if ($result->num_rows > 0) {
+            $user = $result->fetch_assoc();
+    
+            // Verify the password using password_verify
+            if (password_verify($password, $user['password'])) {
+                // Password is correct, start the session
+                $_SESSION['userID'] = $user['userID'];
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['username'] = $user['username'];
+    
+                // Redirect to a logged-in page or dashboard
+                header("Location: admin-dashboard.php");
+                exit();
+            } else {
+                // Invalid password
+                $error_message = "Invalid password.";
+            }
+        } else {
+            // User not found
+            $error_message = "No user found with that email/username.";
+        }
+    }    
 ?>
 
 <!DOCTYPE html>
@@ -164,7 +199,7 @@
             <form method="POST" action="#">
                 <div class="mb-3">
                     <label for="email" class="form-label">Email or Username</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
+                    <input type="text" class="form-control" id="email" name="email" required>
                 </div>
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center">
