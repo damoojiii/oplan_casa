@@ -203,6 +203,89 @@
                 out</a>
         </div>
     </div>
+    <div id="main-content" class="container mt-1">
+        <div class="container-fluid">
+            <h2 class="mt-3">Hello, Admin!</h2>
+            <p>Lorem ipsum dolor</p>
+            
+            <div class="row">
+                <!-- Left Column -->
+                <div class="col-md-8">
+                    <!-- Statistic Cards -->
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h3>0</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h3>0</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h3>0</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Upcoming Schedules -->
+                    <div class="card mt-3">
+                        <div class="card-header">Upcoming Schedules</div>
+                        <div class="card-body">
+                            <ul>
+                                <li>School Name High School - Feb 23, 2025 <span class="text-success">Ongoing</span></li>
+                                <li>School Name High School - Feb 26, 2025 <span class="text-primary">Upcoming</span></li>
+                                <li>School Name High School - Feb 28, 2025 <span class="text-danger">Cancelled</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Visitor Chart -->
+                    <div class="card mt-3">
+                        <div class="card-header">Visitor Chart</div>
+                        <div class="card-body">
+                            <canvas id="visitorChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Appointed Field Trips Bar Chart -->
+                    <div class="card mt-3">
+                        <div class="card-header">Appointed Field Trips</div>
+                        <div class="card-body">
+                            <canvas id="fieldTripsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Column -->
+                <div class="col-md-4">
+                    <!-- Reason for Visit Pie Chart -->
+                    <div class="card">
+                        <div class="card-header">Reason for Visit</div>
+                        <div class="card-body">
+                            <canvas id="reasonChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Calendar -->
+                    <div class="card mt-3">
+                        <div class="card-header">February 2025</div>
+                        <div class="card-body">
+                            <div id="calendar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Add this right after the <body> tag -->
     <div class="loader-wrapper">
         <div class="loader">
@@ -287,18 +370,18 @@
 
     <!-- Add this JavaScript at the end of your existing script section -->
     <script>
-    window.addEventListener('load', function() {
-        const loaderWrapper = document.querySelector('.loader-wrapper');
-        // Add slight delay for smooth transition
-        setTimeout(() => {
-            loaderWrapper.classList.add('hidden');
-        }, 500);
+        window.addEventListener('load', function() {
+            const loaderWrapper = document.querySelector('.loader-wrapper');
+            // Add slight delay for smooth transition
+            setTimeout(() => {
+                loaderWrapper.classList.add('hidden');
+            }, 500);
 
-        // Remove loader after animation
-        setTimeout(() => {
-            loaderWrapper.style.display = 'none';
-        }, 1000);
-    });
+            // Remove loader after animation
+            setTimeout(() => {
+                loaderWrapper.style.display = 'none';
+            }, 1000);
+        });
     </script>
 
     <div id="main-content" class="container mt-1">
@@ -307,26 +390,35 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script>
-    document.getElementById('hamburger').addEventListener('click', function() {
-        const sidebar = document.getElementById('sidebar');
-        sidebar.classList.toggle('show');
+        document.getElementById('hamburger').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('show');
 
-        const navbar = document.getElementById('header');
-        navbar.classList.toggle('shifted');
+            const navbar = document.getElementById('header');
+            navbar.classList.toggle('shifted');
 
-        const mainContent = document.getElementById('main-content');
-        mainContent.classList.toggle('shifted');
-    });
-
-    document.querySelectorAll('.collapse').forEach(collapse => {
-        collapse.addEventListener('show.bs.collapse', () => {
-            collapse.style.height = collapse.scrollHeight + 'px';
+            const mainContent = document.getElementById('main-content');
+            mainContent.classList.toggle('shifted');
         });
+
+        document.querySelectorAll('.collapse').forEach(collapse => {
+            collapse.addEventListener('show.bs.collapse', () => {
+                collapse.style.height = collapse.scrollHeight + 'px';
+            });
+
+            collapse.addEventListener('hidden.bs.collapse', () => {
+                collapse.style.height = '0px';
+            });
+        });
+
+        const ctx1 = document.getElementById('visitorChart').getContext('2d');
+        new Chart(ctx1, { type: 'line', data: { labels: [0,1,2,3,4], datasets: [{ data: [2000, 3000, 1000, 4000, 2500], borderColor: 'blue' }] }});
         
-        collapse.addEventListener('hidden.bs.collapse', () => {
-            collapse.style.height = '0px';
-        });
-    });
+        const ctx2 = document.getElementById('reasonChart').getContext('2d');
+        new Chart(ctx2, { type: 'doughnut', data: { labels: ['A', 'B', 'C'], datasets: [{ data: [418, 994, 547], backgroundColor: ['#d9534f', '#5bc0de', '#5cb85c'] }] }});
+        
+        const ctx3 = document.getElementById('fieldTripsChart').getContext('2d');
+        new Chart(ctx3, { type: 'bar', data: { labels: [0,1,2,3,4,5,6,7,8,9], datasets: [{ data: [1500, 3200, 2000, 1800, 3000, 5000], backgroundColor: 'orange' }] }});
     </script>
 </body>
 

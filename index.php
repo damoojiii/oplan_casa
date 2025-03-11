@@ -361,7 +361,7 @@
                     <div class="col-md-4">
                         <label for="city" class="form-label input-label">City/Municipality</label>
                         <select id="city" name="city" class="form-select" required>
-                            <option value="" disabled selected hidden>Select City</option>
+                            <option value="" disabled selected>Select City</option>
                         </select>
                     </div>
 
