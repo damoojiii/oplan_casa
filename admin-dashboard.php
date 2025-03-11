@@ -302,11 +302,8 @@
     </script>
 
     <div id="main-content" class="container mt-1">
-
     </div>
 
-
-    </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script>
@@ -325,6 +322,7 @@
         collapse.addEventListener('show.bs.collapse', () => {
             collapse.style.height = collapse.scrollHeight + 'px';
         });
+        
         collapse.addEventListener('hidden.bs.collapse', () => {
             collapse.style.height = '0px';
         });
