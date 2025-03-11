@@ -157,7 +157,7 @@
         <div class="text-white main-menu">Main Menu</div>
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
-                <a href="admin-dashboard.php" class="nav-link active text-white"><i class="fa-brands fa-flipboard"></i> Dashboard</a>
+                <a href="admin-dashboard.php" class="nav-link text-white"><i class="fa-brands fa-flipboard"></i> Dashboard</a>
             </li>
             <li>
                 <a href="#.php" class="nav-link text-white target"><i class="fa-solid fa-user-group"></i> Visitor's List</a>
@@ -169,7 +169,7 @@
                 <a href="#.php" class="nav-link text-white"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
             </li>
             <li>
-                <a href="settings.php" class="nav-link text-white"><i class="fa-solid fa-gear"></i> Settings</a>
+                <a href="settings.php" class="nav-link active text-white"><i class="fa-solid fa-gear"></i> Settings</a>
             </li>
         </ul>
         <hr>

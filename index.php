@@ -6,12 +6,13 @@
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Check if required fields exist before accessing them
         $fullName = isset($_POST['fullName']) ? $_POST['fullName'] : null;
+        $city = isset($_POST['city']) ? $_POST['city'] : null;
         $gender = isset($_POST['gender']) ? $_POST['gender'] : null;
         $visitReason = isset($_POST['reason']) ? $_POST['reason'] : null;
         $time = date("Y-m-d H:i:s");
 
         // Validate inputs to prevent NULL database values
-        if (!$fullName || !$gender || !$visitReason) {
+        if (!$fullName || !$city || !$gender || !$visitReason) {
             $_SESSION['message'] = "Error: Missing required fields!";
             $_SESSION['message_type'] = "Error";
             $_SESSION['icon'] = "error";
@@ -31,9 +32,9 @@
         }
 
         // Insert into database
-        $sql = "INSERT INTO visitors (fullName, gender, reason, time, photo) VALUES (?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO visitors (fullName, city, gender, reason, time, photo) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sssss", $fullName, $gender, $visitReason, $time, $fileName);
+        $stmt->bind_param("ssssss", $fullName, $city, $gender, $visitReason, $time, $fileName);
 
         if ($stmt->execute()) {
             $_SESSION['message'] = "Visitor added successfully!";
@@ -60,6 +61,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" href="img/rosariologo.png">
 
     <!-- Script -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -261,6 +263,17 @@
                         <div id="fullNameError" class="text-danger" style="display: none;">Full Name can only contain
                             letters and spaces, no numbers or special characters.</div>
                     </div>
+                    <div class="col-md-4">
+                        <label for="city" class="form-label input-label">City/Municipality</label>
+                        <select id="city" name="city" class="form-select" required>
+                            <option value="" disabled selected hidden>Select City</option>
+                            <option value="Rosario">Rosario</option>
+                            <option value="Batangas City">Biringan</option>
+                            <option value="Lipa">Kayo na bahala</option>
+                            <option value="Tanauan">Lagay niyo nalang sa database</option>
+                            <option value="Other">tong mga city</option>
+                        </select>
+                    </div>
 
                     <div class="col-md-4">
                         <label for="visitReason" class="form-label input-label">Purpose for Visit</label>
@@ -295,6 +308,7 @@
                     <tr>
                         <th>Visitor No.</th>
                         <th>Visitor Name</th>
+                        <th>City</th>
                         <th>Gender</th>
                         <th>Purpose for Visit</th>
                         <th>Time</th>
@@ -315,6 +329,7 @@
                             echo "<tr>
                                 <td>{$row['visitor_id']}</td>
                                 <td>{$row['fullName']}</td>
+                                <td>{$row['city']}</td>
                                 <td>{$row['gender']}</td>
                                 <td>{$row['reason']}</td>
                                 <td>{$formattedTime}</td>
@@ -437,7 +452,7 @@
         function validateFullName() {
             const name = fullNameInput.value.trim();
             const nameRegex =
-            /^[A-Za-z\s]+$/; // Regex to allow only letters and spaces (no numbers or special characters)
+                /^[A-Za-z\s]+$/; // Regex to allow only letters and spaces (no numbers or special characters)
 
             if (name === "") {
                 fullNameError.textContent = " Name is required.";
@@ -473,7 +488,7 @@
 
             if (inputValue !== cleanedValue) {
                 fullNameInput.value =
-                cleanedValue; // Update the input value to remove invalid characters
+                    cleanedValue; // Update the input value to remove invalid characters
             }
 
             // Dynamically validate the input on every keystroke
