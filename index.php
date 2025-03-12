@@ -351,21 +351,23 @@
 
             <form id="visitorForm" method="POST" enctype="multipart/form-data">
                 <div class="row g-3">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label for="fullName" class="form-label input-label">Full Name</label>
                         <input type="text" id="fullName" name="fullName" class="form-control"
                             placeholder="Enter your Full Name" required>
                         <div id="fullNameError" class="text-danger" style="display: none;">Full Name can only contain
                             letters and spaces, no numbers or special characters.</div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-2">
                         <label for="city" class="form-label input-label">City/Municipality</label>
                         <select id="city" name="city" class="form-select" required>
                             <option value="" disabled selected>Select City</option>
+                            <option value="" >Rosario</option>
+                            <option value="" >Tanza</option>
                         </select>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label for="visitReason" class="form-label input-label">Purpose for Visit</label>
                         <select id="visitReason" name="reason" class="form-select" required>
                             <option value="" disabled selected hidden>Select Reason</option>
