@@ -405,27 +405,31 @@
                     </tr>
                 </thead>
                 <tbody id="visitorTable">
-                    <?php
-                        $currentDate = date("Y-m-d");
+                <?php
+                    $currentDate = date("Y-m-d");
 
-                        $sql = "SELECT * FROM visitors WHERE DATE(time) = ? ORDER BY visitor_id DESC";
-                        $stmt = $conn->prepare($sql);
-                        $stmt->bind_param("s", $currentDate);
-                        $stmt->execute();
-                        $result = $stmt->get_result();
+                    $sql = "SELECT visitor_id, fullName, city, gender, reason, time, RANK() OVER (ORDER BY time ASC) AS daily_counter
+                            FROM visitors 
+                            WHERE DATE(time) = ? 
+                            ORDER BY time ASC";
 
-                        while ($row = $result->fetch_assoc()) {
-                            $formattedTime = date("h:i A", strtotime($row['time']));
-                            echo "<tr>
-                                <td>{$row['visitor_id']}</td>
-                                <td>{$row['fullName']}</td>
-                                <td>{$row['city']}</td>
-                                <td>{$row['gender']}</td>
-                                <td>{$row['reason']}</td>
-                                <td>{$formattedTime}</td>
-                            </tr>";
-                        }
-                    ?>
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("s", $currentDate);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+
+                    while ($row = $result->fetch_assoc()) {
+                        $formattedTime = date("h:i A", strtotime($row['time']));
+                        echo "<tr>
+                            <td>{$row['daily_counter']}</td>
+                            <td>" . ucwords(strtolower($row['fullName'])) . "</td>
+                            <td>{$row['city']}</td>
+                            <td>{$row['gender']}</td>
+                            <td>{$row['reason']}</td>
+                            <td>{$formattedTime}</td>
+                        </tr>";
+                    }
+                ?>
                 </tbody>
             </table>
         </div>
@@ -438,9 +442,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body text-center">
-                        <!-- Horizontal layout using Bootstrap flex utilities -->
                         <div class="d-flex flex-row align-items-center">
-                            <!-- Left Side: Camera Preview -->
                             <div class="flex-grow-1 text-center">
                                 <video id="video" class="rounded shadow" style="width: 100%; height: auto;" autoplay></video>
                                 <button id="captureBtn" class="btn btn-primary mt-2 w-100">
@@ -448,7 +450,6 @@
                                 </button>
                             </div>
 
-                            <!-- Right Side: Captured Photo Preview -->
                             <div id="photoPreviewContainer" class="ms-3" style="display: none; width: 50%;">
                                 <img id="photoPreview" class="img-fluid rounded shadow" src="" alt="Captured Photo">
                                 <div class="mt-3 text-center">
