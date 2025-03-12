@@ -361,9 +361,7 @@
                     <div class="col-md-2">
                         <label for="city" class="form-label input-label">City/Municipality</label>
                         <select id="city" name="city" class="form-select" required>
-                            <option value="" disabled selected hidden>Select City</option>
-                            <option value="Rosario" >Rosario</option>
-                            <option value="Tanza" >Tanza</option>
+                            <option value="" disabled selected hidden>Select City/Municipality</option>
                         </select>
                     </div>
 
@@ -433,7 +431,7 @@
         </div>
 
         <div class="modal fade" id="photoModal" tabindex="-1" aria-labelledby="photoModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="photoModalLabel">Take Visitor Photo</h5>
