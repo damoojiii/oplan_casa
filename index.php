@@ -361,9 +361,9 @@
                     <div class="col-md-2">
                         <label for="city" class="form-label input-label">City/Municipality</label>
                         <select id="city" name="city" class="form-select" required>
-                            <option value="" disabled selected>Select City</option>
-                            <option value="" >Rosario</option>
-                            <option value="" >Tanza</option>
+                            <option value="" disabled selected hidden>Select City</option>
+                            <option value="Rosario" >Rosario</option>
+                            <option value="Tanza" >Tanza</option>
                         </select>
                     </div>
 
@@ -433,23 +433,34 @@
         </div>
 
         <div class="modal fade" id="photoModal" tabindex="-1" aria-labelledby="photoModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="photoModalLabel">Take Visitor Photo</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body text-center">
-                        <video id="video" width="100%" height="auto" autoplay></video><br>
-                        <button id="captureBtn" class="btn btn-primary mt-2">Capture Photo</button>
+                        <!-- Horizontal layout using Bootstrap flex utilities -->
+                        <div class="d-flex flex-row align-items-center">
+                            <!-- Left Side: Camera Preview -->
+                            <div class="flex-grow-1 text-center">
+                                <video id="video" class="rounded shadow" style="width: 100%; height: auto;" autoplay></video>
+                                <button id="captureBtn" class="btn btn-primary mt-2 w-100">
+                                    <i class="fa-solid fa-camera"></i> Capture Photo
+                                </button>
+                            </div>
 
-                        <div id="photoPreviewContainer" class="mt-3" style="display: none;">
-                            <img id="photoPreview" class="img-fluid rounded shadow" src="" alt="Captured Photo">
-                            <div class="mt-3">
-                                <button class="btn btn-secondary" id="retakePhoto"><i
-                                        class="fa-solid fa-rotate-right"></i> Retake</button>
-                                <button class="btn btn-success" id="confirmPhoto"><i class="fa-solid fa-check"></i>
-                                    Confirm & Submit</button>
+                            <!-- Right Side: Captured Photo Preview -->
+                            <div id="photoPreviewContainer" class="ms-3" style="display: none; width: 50%;">
+                                <img id="photoPreview" class="img-fluid rounded shadow" src="" alt="Captured Photo">
+                                <div class="mt-3 text-center">
+                                    <button class="btn btn-secondary w-100" id="retakePhoto">
+                                        <i class="fa-solid fa-rotate-right"></i> Retake
+                                    </button>
+                                    <button class="btn btn-success w-100 mt-2" id="confirmPhoto">
+                                        <i class="fa-solid fa-check"></i> Confirm & Submit
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
