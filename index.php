@@ -71,162 +71,162 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        @font-face {
-            font-family: 'Inter';
-            src: url('fonts/Inter/Inter-VariableFont_opsz\,wght.ttf') format('truetype');
-            font-weight: 100 900;
-            font-stretch: normal;
-            font-style: normal;
-        }
+    @font-face {
+        font-family: 'Inter';
+        src: url('fonts/Inter/Inter-VariableFont_opsz\,wght.ttf') format('truetype');
+        font-weight: 100 900;
+        font-stretch: normal;
+        font-style: normal;
+    }
 
-        @font-face {
-            font-family: 'Source';
-            src: url('fonts/Source_Serif_4/static/SourceSerif4-SemiBold.ttf') format('truetype');
-            font-weight: normal;
-            font-style: normal;
+    @font-face {
+        font-family: 'Source';
+        src: url('fonts/Source_Serif_4/static/SourceSerif4-SemiBold.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
 
-        }
+    }
 
-        body {
-            font-family: 'Inter', Arial;
-            background: url('img/casabg.jpg') no-repeat center center/cover;
-            height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
+    body {
+        font-family: 'Inter', Arial;
+        background: url('img/casabg.jpg') no-repeat center center/cover;
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
 
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #5D9C5933;
-            z-index: 1;
-        }
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #5D9C5933;
+        z-index: 1;
+    }
 
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            color: white;
-            padding-inline: 70px !important;
-            padding-left: 90px;
-            padding-right: 90px;
-            display: flex;
-            align-items: center;
-            z-index: 10;
-        }
+    .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        color: white;
+        padding-inline: 70px !important;
+        padding-left: 90px;
+        padding-right: 90px;
+        display: flex;
+        align-items: center;
+        z-index: 10;
+    }
 
-        .login {
-            padding-inline: 15px;
-        }
+    .login {
+        padding-inline: 15px;
+    }
 
-        .logo {
-            height: 50px;
-            width: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
+    .logo {
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
 
-        .header h4 {
-            margin: 0;
-            font-family: 'Source';
-        }
+    .header h4 {
+        margin: 0;
+        font-family: 'Source';
+    }
 
-        .visitor {
-            font-family: 'Inter', Arial;
-            font-weight: 400;
-            font-size: 30px;
-        }
+    .visitor {
+        font-family: 'Inter', Arial;
+        font-weight: 400;
+        font-size: 30px;
+    }
 
-        .card {
-            position: relative;
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            z-index: 10;
-        }
+    .card {
+        position: relative;
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        z-index: 10;
+    }
 
-        .table {
-            margin-top: 30px !important;
-        }
+    .table {
+        margin-top: 30px !important;
+    }
 
-        thead,
-        th {
-            background-color: #5D9C59 !important;
-            text-align: center !important;
-            color: #fff !important;
-        }
+    thead,
+    th {
+        background-color: #5D9C59 !important;
+        text-align: center !important;
+        color: #fff !important;
+    }
 
-        .empty-row td {
-            height: 41px;
-        }
+    .empty-row td {
+        height: 41px;
+    }
 
-        #camera-container,
-        #captured-photo {
-            display: none;
-            margin-top: 10px;
-        }
+    #camera-container,
+    #captured-photo {
+        display: none;
+        margin-top: 10px;
+    }
 
-        video,
-        img {
-            width: 100%;
-            max-width: 300px;
-            height: 300px;
-            object-fit: cover;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-        }
+    video,
+    img {
+        width: 100%;
+        max-width: 300px;
+        height: 300px;
+        object-fit: cover;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+    }
 
-        .dataTables_paginate {
-            text-align: right !important;
-        }
+    .dataTables_paginate {
+        text-align: right !important;
+    }
 
-        .dataTables_wrapper .dataTables_paginate .paginate_button {
-            padding: 8px 12px;
-            margin: 2px;
-            border: 1px solid #5D9C59;
-            border-radius: 5px;
-            background-color: white;
-            color: #5D9C59;
-            transition: 0.3s;
-        }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 8px 12px;
+        margin: 2px;
+        border: 1px solid #5D9C59;
+        border-radius: 5px;
+        background-color: white;
+        color: #5D9C59;
+        transition: 0.3s;
+    }
 
-        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-            background-color: #5D9C59;
-            color: white;
-        }
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background-color: #5D9C59;
+        color: white;
+    }
 
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-            background-color: #5D9C59;
-            color: white;
-        }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background-color: #5D9C59;
+        color: white;
+    }
 
-        .btn-success {
-            --bs-btn-bg: #5D9C59 !important;
-            --bs-btn-border-color: #5D9C59 !important;
-            --bs-btn-hover-bg: #5D9C59 !important;
-        }
+    .btn-success {
+        --bs-btn-bg: #5D9C59 !important;
+        --bs-btn-border-color: #5D9C59 !important;
+        --bs-btn-hover-bg: #5D9C59 !important;
+    }
 
-        .input-label {
-            font-size: 15px;
-        }
+    .input-label {
+        font-size: 15px;
+    }
 
-        #captureBtn {
-            display: block;
-            margin: 0 auto;
-        }
+    #captureBtn {
+        display: block;
+        margin: 0 auto;
+    }
     </style>
 </head>
 
 <body>
-    
+
     <div class="overlay"></div>
     <!-- Add this right after the <body> tag -->
     <div class="loader-wrapper">
@@ -254,8 +254,8 @@
     .loader-logo {
         width: 150px;
         height: 150px;
-        animation: 
-            spin 2s linear infinite, 
+        animation:
+            spin 2s linear infinite,
             bounce 1.5s ease-in-out infinite,
             pulse 1.5s infinite ease-in-out;
         transform-origin: center center;
@@ -268,18 +268,23 @@
         0% {
             transform: rotate(0deg) scale(1);
         }
+
         50% {
             transform: rotate(180deg) scale(1.2);
         }
+
         100% {
             transform: rotate(360deg) scale(1);
         }
     }
 
     @keyframes bounce {
-        0%, 100% {
+
+        0%,
+        100% {
             transform: translateY(0);
         }
+
         50% {
             transform: translateY(-20px);
         }
@@ -289,9 +294,11 @@
         0% {
             opacity: 0.8;
         }
+
         50% {
             opacity: 1;
         }
+
         100% {
             opacity: 0.8;
         }
@@ -301,7 +308,7 @@
         opacity: 0;
         pointer-events: none;
     }
-</style>
+    </style>
 
     <!-- Add this JavaScript at the end of your existing script section -->
     <script>
@@ -327,7 +334,7 @@
 
         <a href="login.php"><button class="btn btn-success login">Login</button></a>
     </div>
-    
+
 
     <?php
         if (isset($_SESSION['message'])) {
@@ -352,16 +359,15 @@
             <form id="visitorForm" method="POST" enctype="multipart/form-data">
                 <div class="row g-3">
                     <div class="col-md-3">
-                        <label for="fullName" class="form-label input-label">Full Name</label>
+                        <label for="fullName" class="form-label input-label">Name</label>
                         <input type="text" id="fullName" name="fullName" class="form-control"
-                            placeholder="Enter your Full Name" required>
-                        <div id="fullNameError" class="text-danger" style="display: none;">Full Name can only contain
-                            letters and spaces, no numbers or special characters.</div>
+                            placeholder="Enter your Name" required>
                     </div>
                     <div class="col-md-2">
                         <label for="city" class="form-label input-label">City/Municipality</label>
                         <select id="city" name="city" class="form-select" required>
                             <option value="" disabled selected hidden>Select City/Municipality</option>
+                            <option value="a">a</option>
                         </select>
                     </div>
 
@@ -405,7 +411,7 @@
                     </tr>
                 </thead>
                 <tbody id="visitorTable">
-                <?php
+                    <?php
                     $currentDate = date("Y-m-d");
 
                     $sql = "SELECT visitor_id, fullName, city, gender, reason, time, RANK() OVER (ORDER BY time ASC) AS daily_counter
@@ -444,7 +450,8 @@
                     <div class="modal-body text-center">
                         <div class="d-flex flex-row align-items-center">
                             <div class="flex-grow-1 text-center">
-                                <video id="video" class="rounded shadow" style="width: 100%; height: auto;" autoplay></video>
+                                <video id="video" class="rounded shadow" style="width: 100%; height: auto;"
+                                    autoplay></video>
                                 <button id="captureBtn" class="btn btn-primary mt-2 w-100">
                                     <i class="fa-solid fa-camera"></i> Capture Photo
                                 </button>
@@ -472,150 +479,167 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            fetch('fetch_cities.php') // Call the PHP script
-                .then(response => response.json()) // Convert response to JSON
-                .then(data => {
-                    const citySelect = document.getElementById("city");
-                    
-                    data.forEach(city => {
-                        let option = document.createElement("option");
-                        option.value = city.city_name;
-                        option.textContent = city.city_name;
-                        citySelect.appendChild(option);
-                    });
-                })
-                .catch(error => console.error("Error fetching cities:", error));
-        });
-        
-        const video = document.getElementById("video");
-        const captureBtn = document.getElementById("captureBtn");
-        const photoPreviewContainer = document.getElementById("photoPreviewContainer");
-        const photoPreview = document.getElementById("photoPreview");
-        const retakePhotoBtn = document.getElementById("retakePhoto");
-        const confirmPhotoBtn = document.getElementById("confirmPhoto");
-        const photoDataInput = document.getElementById("photoData");
-        const visitorForm = document.getElementById("visitorForm");
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('fetch_cities.php') // Call the PHP script
+            .then(response => response.json()) // Convert response to JSON
+            .then(data => {
+                const citySelect = document.getElementById("city");
 
-        document.getElementById("submitBtn").addEventListener("click", function(event) {
-            event.preventDefault();
+                data.forEach(city => {
+                    let option = document.createElement("option");
+                    option.value = city.city_name;
+                    option.textContent = city.city_name;
+                    citySelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error("Error fetching cities:", error));
+    });
 
-            new bootstrap.Modal(document.getElementById("photoModal")).show();
+    const video = document.getElementById("video");
+    const captureBtn = document.getElementById("captureBtn");
+    const photoPreviewContainer = document.getElementById("photoPreviewContainer");
+    const photoPreview = document.getElementById("photoPreview");
+    const retakePhotoBtn = document.getElementById("retakePhoto");
+    const confirmPhotoBtn = document.getElementById("confirmPhoto");
+    const photoDataInput = document.getElementById("photoData");
+    const visitorForm = document.getElementById("visitorForm");
 
-            navigator.mediaDevices.getUserMedia({
-                    video: true
-                })
-                .then(stream => {
-                    video.srcObject = stream;
-                })
-                .catch(err => alert("Camera access denied: " + err));
-        });
+    function validateForm() {
+        const form = document.getElementById('visitorForm');
+        let isValid = true;
 
-        // Capture Photo
-        captureBtn.addEventListener("click", function() {
-            const canvas = document.createElement("canvas");
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const context = canvas.getContext("2d");
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        // Trigger HTML5 validation
+        if (!form.checkValidity()) {
+            form.reportValidity(); // Show native validation messages
+            isValid = false;
+        }
 
-            const imageData = canvas.toDataURL("image/png");
-            photoDataInput.value = imageData;
-            photoPreview.src = imageData;
-            photoPreviewContainer.style.display = "block";
+        // Custom validation for Full Name
+        if (!validateFullName()) {
+            isValid = false;
+        }
 
-            captureBtn.style.display = "none";
-        });
+        return isValid;
+    }
 
-        // Retake
-        retakePhotoBtn.addEventListener("click", function() {
-            photoPreviewContainer.style.display = "none";
-            photoDataInput.value = "";
-            captureBtn.style.display = "block";
-            /* captureBtn.style.margin-left = "auto";
-            captureBtn.style.margin-right = "auto"; */
-        });
+    document.getElementById("submitBtn").addEventListener("click", function(event) {
+        event.preventDefault(); // Prevent default form submission
 
-        // Confirm Photo & Submit Form
-        confirmPhotoBtn.addEventListener("click", function() {
-            if (photoDataInput.value) {
-                new bootstrap.Modal(document.getElementById("photoModal")).hide();
-                visitorForm.submit();
-            } else {
-                alert("Please capture a photo before confirming.");
-            }
-        });
+        // Validate the form before showing the modal
+        if (!validateForm()) {
+            return; // Stop if validation fails
+        }
 
-        $(document).ready(function() {
-            $('#visitorTable').DataTable({
-                "paging": true,
-                "searching": false,
-                "lengthChange": false,
-                "pageLength": 5,
-                "ordering": false,
-                "info": false,
-                "language": {
-                    "paginate": {
-                        "previous": "<i class='fas fa-chevron-left'></i>",
-                        "next": "<i class='fas fa-chevron-right'></i>"
-                    },
-                    "search": "🔍 Search:"
+        // Show the photo modal only if validation passes
+        const photoModal = new bootstrap.Modal(document.getElementById("photoModal"));
+        photoModal.show();
+
+        // Access the camera after modal is shown
+        navigator.mediaDevices.getUserMedia({
+                video: true
+            })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                console.error("Camera access error:", err);
+                alert("Camera access denied. Please allow camera permission to proceed.");
+                photoModal.hide();
+            });
+    });
+    // Capture Photo
+    captureBtn.addEventListener("click", function() {
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext("2d");
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const imageData = canvas.toDataURL("image/png");
+        photoDataInput.value = imageData;
+        photoPreview.src = imageData;
+        photoPreviewContainer.style.display = "block";
+
+        captureBtn.style.display = "none";
+    });
+
+    // Retake
+    retakePhotoBtn.addEventListener("click", function() {
+        photoPreviewContainer.style.display = "none";
+        photoDataInput.value = "";
+        captureBtn.style.display = "block";
+        /* captureBtn.style.margin-left = "auto";
+        captureBtn.style.margin-right = "auto"; */
+    });
+
+    // Confirm Photo & Submit Form
+    confirmPhotoBtn.addEventListener("click", function() {
+        if (photoDataInput.value) {
+            new bootstrap.Modal(document.getElementById("photoModal")).hide();
+            visitorForm.submit();
+        } else {
+            alert("Please capture a photo before confirming.");
+        }
+    });
+
+    $(document).ready(function() {
+        $('#visitorTable').DataTable({
+            "paging": true,
+            "searching": false,
+            "lengthChange": false,
+            "pageLength": 5,
+            "ordering": false,
+            "info": false,
+            "language": {
+                "paginate": {
+                    "previous": "<i class='fas fa-chevron-left'></i>",
+                    "next": "<i class='fas fa-chevron-right'></i>"
                 },
-                "dom": '<"top"f>rt<"bottom"p><"clear">'
-            });
+                "search": "🔍 Search:"
+            },
+            "dom": '<"top"f>rt<"bottom"p><"clear">'
+        });
+    });
+
+    function validateFullName() {
+        const fullNameInput = document.getElementById("fullName");
+        const fullNameError = document.getElementById("fullNameError");
+        const name = fullNameInput.value.trim();
+        const nameRegex = /^[A-Za-z\s]+$/;
+
+        if (name === "" || !nameRegex.test(name)) {
+            fullNameError.style.display = "block";
+            return false;
+        }
+        fullNameError.style.display = "none";
+        return true;
+    }
+    document.addEventListener("DOMContentLoaded", function() {
+
+        // Add an event listener for the form submission
+        const form = document.getElementById("visitorForm");
+        form.addEventListener("submit", function(event) {
+            if (!validateFullName()) {
+                event.preventDefault(); // Prevent form submission if validation fails
+            }
         });
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const fullNameInput = document.getElementById("fullName");
-            const fullNameError = document.getElementById("fullNameError");
+        // Prevent entry of special characters or numbers while typing
+        fullNameInput.addEventListener("input", function(event) {
+            const inputValue = fullNameInput.value;
 
-            // Validate Full Name (no numbers or special characters)
-            function validateFullName() {
-                const name = fullNameInput.value.trim();
-                const nameRegex =
-                    /^[A-Za-z\s]+$/; // Regex to allow only letters and spaces (no numbers or special characters)
+            // Remove any non-alphabetical characters (including numbers and special characters)
+            const cleanedValue = inputValue.replace(/[^A-Za-z\s]/g, "");
 
-                if (name === "") {
-                    fullNameError.textContent = " Name is required.";
-                    fullNameError.style.display = "block";
-                    return false;
-                }
-
-                if (!nameRegex.test(name)) {
-                    fullNameError.textContent =
-                        "Full Name can only contain letters and spaces, no numbers or special characters.";
-                    fullNameError.style.display = "block";
-                    return false;
-                }
-
-                fullNameError.style.display = "none"; // Hide the error message if validation passes
-                return true;
+            if (inputValue !== cleanedValue) {
+                fullNameInput.value =
+                    cleanedValue; // Update the input value to remove invalid characters
             }
 
-            // Add an event listener for the form submission
-            const form = document.getElementById("visitorForm");
-            form.addEventListener("submit", function(event) {
-                if (!validateFullName()) {
-                    event.preventDefault(); // Prevent form submission if validation fails
-                }
-            });
-
-            // Prevent entry of special characters or numbers while typing
-            fullNameInput.addEventListener("input", function(event) {
-                const inputValue = fullNameInput.value;
-
-                // Remove any non-alphabetical characters (including numbers and special characters)
-                const cleanedValue = inputValue.replace(/[^A-Za-z\s]/g, "");
-
-                if (inputValue !== cleanedValue) {
-                    fullNameInput.value =
-                        cleanedValue; // Update the input value to remove invalid characters
-                }
-
-                // Dynamically validate the input on every keystroke
-                validateFullName();
-            });
+            // Dynamically validate the input on every keystroke
+            validateFullName();
         });
+    });
     </script>
 
 </body>
