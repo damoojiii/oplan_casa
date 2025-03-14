@@ -398,7 +398,6 @@
                 </div>
             </form>
 
-
             <table id="visitorTable" class="table table-bordered text-center">
                 <thead class="text-white">
                     <tr>
@@ -417,7 +416,7 @@
                     $sql = "SELECT visitor_id, fullName, city, gender, reason, time, RANK() OVER (ORDER BY time ASC) AS daily_counter
                             FROM visitors 
                             WHERE DATE(time) = ? 
-                            ORDER BY time ASC";
+                            ORDER BY visitor_id DESC";
 
                     $stmt = $conn->prepare($sql);
                     $stmt->bind_param("s", $currentDate);
@@ -479,11 +478,51 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+<<<<<<< HEAD
+        document.getElementById('visitorForm').addEventListener('submit', function(event) {
+            // Get the form fields
+            const fullName = document.getElementById('fullName');
+            const city = document.getElementById('city');
+            const visitReason = document.getElementById('visitReason');
+            const gender = document.getElementById('gender');
+
+            // Check if required fields are empty
+            if (!fullName.value.trim() || !city.value || !visitReason.value || !gender.value) {
+                event.preventDefault(); // Prevent form submission
+                alert('Please fill out all required fields.');
+            }
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('fetch_cities.php') // Call the PHP script
+                .then(response => response.json()) // Convert response to JSON
+                .then(data => {
+                    const citySelect = document.getElementById("city");
+                    
+                    data.forEach(city => {
+                        let option = document.createElement("option");
+                        option.value = city.city_name;
+                        option.textContent = city.city_name;
+                        citySelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Error fetching cities:", error));
+        });
+        
+        const video = document.getElementById("video");
+        const captureBtn = document.getElementById("captureBtn");
+        const photoPreviewContainer = document.getElementById("photoPreviewContainer");
+        const photoPreview = document.getElementById("photoPreview");
+        const retakePhotoBtn = document.getElementById("retakePhoto");
+        const confirmPhotoBtn = document.getElementById("confirmPhoto");
+        const photoDataInput = document.getElementById("photoData");
+        const visitorForm = document.getElementById("visitorForm");
+=======
     document.addEventListener("DOMContentLoaded", function() {
         fetch('fetch_cities.php') // Call the PHP script
             .then(response => response.json()) // Convert response to JSON
             .then(data => {
                 const citySelect = document.getElementById("city");
+>>>>>>> a3208b898cab33e51fd45824d219b7546e5b0554
 
                 data.forEach(city => {
                     let option = document.createElement("option");

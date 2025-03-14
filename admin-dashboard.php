@@ -266,7 +266,7 @@
                     Dashboard</a>
             </li>
             <li>
-                <a href="#.php" class="nav-link text-white target"><i class="fa-solid fa-user-group"></i> Visitor's
+                <a href="visitorslist.php" class="nav-link text-white target"><i class="fa-solid fa-user-group"></i> Visitor's
                     List</a>
             </li>
             <li>

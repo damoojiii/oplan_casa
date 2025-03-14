@@ -10,6 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Tourism</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="icon" href="img/rosariologo.png">
     
@@ -138,6 +139,45 @@
             background-color: #fff !important;
             color: #000 !important;
         }
+
+        .table {
+            margin-top: 30px !important;
+        }
+
+        thead,
+        th {
+            background-color: #5D9C59 !important;
+            text-align: center !important;
+            color: #fff !important;
+        }
+
+        .empty-row td {
+            height: 41px;
+        }
+
+        .dataTables_paginate {
+            text-align: right !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 8px 12px;
+            margin: 2px;
+            border: 1px solid #5D9C59;
+            border-radius: 5px;
+            background-color: white;
+            color: #5D9C59;
+            transition: 0.3s;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background-color: #5D9C59;
+            color: white;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background-color: #5D9C59;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -160,7 +200,7 @@
                 <a href="admin-dashboard.php" class="nav-link text-white"><i class="fa-brands fa-flipboard"></i> Dashboard</a>
             </li>
             <li>
-                <a href="visitorslist.php" class="nav-link text-white target"><i class="fa-solid fa-user-group"></i> Visitor's List</a>
+                <a href="visitorslist.php" class="nav-link text-white active target"><i class="fa-solid fa-user-group"></i> Visitor's List</a>
             </li>
             <li>
                 <a href="#.php" class="nav-link text-white chat"><i class="fa-solid fa-bus"></i> Scheduled Field Trips</a>
@@ -169,7 +209,7 @@
                 <a href="#.php" class="nav-link text-white"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
             </li>
             <li>
-                <a href="settings.php" class="nav-link active text-white"><i class="fa-solid fa-gear"></i> Settings</a>
+                <a href="settings.php" class="nav-link text-white"><i class="fa-solid fa-gear"></i> Settings</a>
             </li>
         </ul>
         <hr>
@@ -179,13 +219,52 @@
     </div>
 
     <div id="main-content" class="container mt-1">
-        
+        <table id="visitorTable" class="table table-bordered text-center">
+            <thead class="text-white">
+                <tr>
+                    <th>Visitor No.</th>
+                    <th>Visitor Name</th>
+                    <th>City</th>
+                    <th>Gender</th>
+                    <th>Purpose for Visit</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody id="visitorTable">
+            <?php
+                $currentDate = date("Y-m-d");
+
+                $sql = "SELECT visitor_id, fullName, city, gender, reason, time, RANK() OVER (ORDER BY time ASC) AS daily_counter
+                        FROM visitors 
+                        WHERE DATE(time) = ? 
+                        ORDER BY visitor_id DESC";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("s", $currentDate);
+                $stmt->execute();
+                $result = $stmt->get_result();
+
+                while ($row = $result->fetch_assoc()) {
+                    $formattedTime = date("h:i A", strtotime($row['time']));
+                    echo "<tr>
+                        <td>{$row['daily_counter']}</td>
+                        <td>" . ucwords(strtolower($row['fullName'])) . "</td>
+                        <td>{$row['city']}</td>
+                        <td>{$row['gender']}</td>
+                        <td>{$row['reason']}</td>
+                        <td>{$formattedTime}</td>
+                    </tr>";
+                }
+            ?>
+            </tbody>
+        </table>
     </div>
 
 
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
         document.getElementById('hamburger').addEventListener('click', function() {
         const sidebar = document.getElementById('sidebar');
@@ -204,6 +283,25 @@
             });
             collapse.addEventListener('hidden.bs.collapse', () => {
                 collapse.style.height = '0px';
+            });
+        });
+
+        $(document).ready(function() {
+            $('#visitorTable').DataTable({
+                "paging": true,
+                "searching": false,
+                "lengthChange": false,
+                "pageLength": 5,
+                "ordering": false,
+                "info": false,
+                "language": {
+                    "paginate": {
+                        "previous": "<i class='fas fa-chevron-left'></i>",
+                        "next": "<i class='fas fa-chevron-right'></i>"
+                    },
+                    "search": "🔍 Search:"
+                },
+                "dom": '<"top"f>rt<"bottom"p><"clear">'
             });
         });
     </script>

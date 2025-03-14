@@ -1,45 +1,4 @@
-<?php
-    session_start();
-    include 'connection.php';
-    date_default_timezone_set("Asia/Manila");
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
-
-        // Get the form data and sanitize it
-        $email_or_username = mysqli_real_escape_string($conn, $_POST['email']);
-        $password = mysqli_real_escape_string($conn, $_POST['password']);
-    
-        // Query to check if the email/username exists
-        $sql = "SELECT userID, email, username, password FROM users WHERE email = ? OR username = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $email_or_username, $email_or_username);
-        $stmt->execute();
-        $result = $stmt->get_result();
-    
-        // If a user is found
-        if ($result->num_rows > 0) {
-            $user = $result->fetch_assoc();
-    
-            // Verify the password using password_verify
-            if (password_verify($password, $user['password'])) {
-                // Password is correct, start the session
-                $_SESSION['userID'] = $user['userID'];
-                $_SESSION['email'] = $user['email'];
-                $_SESSION['username'] = $user['username'];
-    
-                // Redirect to a logged-in page or dashboard
-                header("Location: admin-dashboard.php");
-                exit();
-            } else {
-                // Invalid password
-                $error_message = "Invalid password.";
-            }
-        } else {
-            // User not found
-            $error_message = "No user found with that email/username.";
-        }
-    }    
-?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -54,6 +13,7 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="icon" href="img/rosariologo.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.20/dist/sweetalert2.min.css">
     
 
     <!-- Script -->
@@ -221,6 +181,7 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.20/dist/sweetalert2.all.min.js"></script>
     
     <script>
         // Get the password input and the icon element
@@ -241,3 +202,67 @@
 
 </body>
 </html>
+<?php
+session_start();
+include 'connection.php';
+date_default_timezone_set("Asia/Manila");
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
+
+    // Get the form data and sanitize it
+    $email_or_username = mysqli_real_escape_string($conn, $_POST['email']);
+    $password = mysqli_real_escape_string($conn, $_POST['password']);
+
+    // Query to check if the email/username exists
+    $sql = "SELECT userID, email, username, password FROM users WHERE email = ? OR username = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $email_or_username, $email_or_username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // If a user is found
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+
+        // Verify the password using password_verify
+        if (password_verify($password, $user['password'])) {
+            // Password is correct, start the session
+            $_SESSION['userID'] = $user['userID'];
+            $_SESSION['email'] = $user['email'];
+            $_SESSION['username'] = $user['username'];
+
+            // Redirect to a logged-in page or dashboard
+            echo "<script>
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'You have logged in successfully.',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = 'admin-dashboard.php';
+                    });
+                  </script>";
+        } else {
+            // Invalid password
+            echo "<script>
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Invalid password.',
+                        icon: 'error',
+                        confirmButtonText: 'Try Again'
+                    });
+                  </script>";
+        }
+    } else {
+        // User not found
+        echo "<script>
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'User not found. Please check your email or username.',
+                    icon: 'error',
+                    confirmButtonText: 'Try Again'
+                });
+              </script>";
+    }
+}
+?>
