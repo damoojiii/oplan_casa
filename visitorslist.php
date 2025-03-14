@@ -178,6 +178,13 @@
             background-color: #5D9C59;
             color: white;
         }
+
+        #table-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
     </style>
 </head>
 <body>
@@ -218,54 +225,65 @@
         </div>
     </div>
 
-    <div id="main-content" class="container mt-1">
-        <table id="visitorTable" class="table table-bordered text-center">
-            <thead class="text-white">
-                <tr>
-                    <th>Visitor No.</th>
-                    <th>Visitor Name</th>
-                    <th>City</th>
-                    <th>Gender</th>
-                    <th>Purpose for Visit</th>
-                    <th>Time</th>
-                </tr>
-            </thead>
-            <tbody id="visitorTable">
-            <?php
-                $currentDate = date("Y-m-d");
+    <div id="main-content" class="container mt-1 d-flex justify-content-center">
+        <div id="table-container" class="w-100">
+            <table id="visitorTable" class="table table-bordered text-center">
+                <thead class="bg-dark text-white">
+                    <tr>
+                        <th>Visitor No.</th>
+                        <th>Visitor Name</th>
+                        <th>City</th>
+                        <th>Gender</th>
+                        <th>Purpose for Visit</th>
+                        <th>Time</th>
+                        <th>Action</th> <!-- Added Action Column -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                        $sql = "SELECT visitor_id, fullName, city, gender, reason, time FROM visitors ORDER BY visitor_id ASC";
 
-                $sql = "SELECT visitor_id, fullName, city, gender, reason, time, RANK() OVER (ORDER BY time ASC) AS daily_counter
-                        FROM visitors 
-                        WHERE DATE(time) = ? 
-                        ORDER BY visitor_id DESC";
+                        $stmt = $conn->prepare($sql);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
 
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("s", $currentDate);
-                $stmt->execute();
-                $result = $stmt->get_result();
-
-                while ($row = $result->fetch_assoc()) {
-                    $formattedTime = date("h:i A", strtotime($row['time']));
-                    echo "<tr>
-                        <td>{$row['daily_counter']}</td>
-                        <td>" . ucwords(strtolower($row['fullName'])) . "</td>
-                        <td>{$row['city']}</td>
-                        <td>{$row['gender']}</td>
-                        <td>{$row['reason']}</td>
-                        <td>{$formattedTime}</td>
-                    </tr>";
-                }
-            ?>
-            </tbody>
-        </table>
+                        while ($row = $result->fetch_assoc()) {
+                            $formattedTime = date("h:i A", strtotime($row['time']));
+                            echo "<tr>
+                                <td>{$row['visitor_id']}</td>
+                                <td>" . ucwords(strtolower($row['fullName'])) . "</td>
+                                <td>{$row['city']}</td>
+                                <td>{$row['gender']}</td>
+                                <td>{$row['reason']}</td>
+                                <td>{$formattedTime}</td>
+                                <td>
+                                    <a href='view_visitor.php?id={$row['visitor_id']}' class='btn btn-info btn-sm'>View</a>
+                                    <a href='edit_visitor.php?id={$row['visitor_id']}' class='btn btn-warning btn-sm'>Edit</a>
+                                    <a href='delete_visitor.php?id={$row['visitor_id']}' class='btn btn-danger btn-sm' onclick='return confirm(\"Are you sure?\")'>Delete</a>
+                                </td>
+                            </tr>";
+                        }
+                    ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-
-    </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
+        $(document).ready(function () {
+            $('#visitorTable').DataTable({
+                "paging": true,
+                "pageLength": 10, // Number of rows per page
+                "lengthChange": false, // Hide "Show X entries"
+                "info": false, // Hide "Showing X to Y of Z entries"
+                "searching": true, // Enable search filter
+                "ordering": true // Enable sorting
+            });
+        });
         document.getElementById('hamburger').addEventListener('click', function() {
         const sidebar = document.getElementById('sidebar');
         sidebar.classList.toggle('show');
@@ -283,25 +301,6 @@
             });
             collapse.addEventListener('hidden.bs.collapse', () => {
                 collapse.style.height = '0px';
-            });
-        });
-
-        $(document).ready(function() {
-            $('#visitorTable').DataTable({
-                "paging": true,
-                "searching": false,
-                "lengthChange": false,
-                "pageLength": 5,
-                "ordering": false,
-                "info": false,
-                "language": {
-                    "paginate": {
-                        "previous": "<i class='fas fa-chevron-left'></i>",
-                        "next": "<i class='fas fa-chevron-right'></i>"
-                    },
-                    "search": "🔍 Search:"
-                },
-                "dom": '<"top"f>rt<"bottom"p><"clear">'
             });
         });
     </script>
