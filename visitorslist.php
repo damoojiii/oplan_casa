@@ -179,6 +179,12 @@
             color: white;
         }
 
+        .btn-success {
+            --bs-btn-bg: #5D9C59 !important;
+            --bs-btn-border-color: #5D9C59 !important;
+            --bs-btn-hover-bg: #5D9C59 !important;
+        }
+
         #table-container {
             display: flex;
             justify-content: center;
@@ -236,7 +242,7 @@
                         <th>Gender</th>
                         <th>Purpose for Visit</th>
                         <th>Time</th>
-                        <th>Action</th> <!-- Added Action Column -->
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -258,8 +264,18 @@
                                 <td>{$formattedTime}</td>
                                 <td>
                                     <a href='view_visitor.php?id={$row['visitor_id']}' class='btn btn-info btn-sm'>View</a>
-                                    <a href='edit_visitor.php?id={$row['visitor_id']}' class='btn btn-warning btn-sm'>Edit</a>
-                                    <a href='delete_visitor.php?id={$row['visitor_id']}' class='btn btn-danger btn-sm' onclick='return confirm(\"Are you sure?\")'>Delete</a>
+                                    <a href='#' 
+                                    class='btn btn-warning btn-sm edit-btn' 
+                                    data-id='{$row['visitor_id']}' 
+                                    data-name='" . htmlspecialchars($row['fullName'], ENT_QUOTES, 'UTF-8') . "' 
+                                    data-city='" . htmlspecialchars($row['city'], ENT_QUOTES, 'UTF-8') . "' 
+                                    data-gender='{$row['gender']}' 
+                                    data-reason='" . htmlspecialchars($row['reason'], ENT_QUOTES, 'UTF-8') . "' 
+                                    data-bs-toggle='modal' 
+                                    data-bs-target='#editVisitorModal'>
+                                    Edit
+                                    </a>
+                                    <a href='deleteVisitor.php?id={$row['visitor_id']}' class='btn btn-danger btn-sm' onclick='return confirm(\"Are you sure?\")'>Delete</a>
                                 </td>
                             </tr>";
                         }
@@ -267,23 +283,122 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Edit Visitor Modal -->
+        <div class="modal fade" id="editVisitorModal" tabindex="-1" aria-labelledby="editVisitorModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editVisitorModalLabel">Edit Visitor</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                    <form id="editVisitorForm">
+                        <input type="hidden" id="editVisitorId" name="visitor_id">
+                        <div class="form-group">
+                            <label for="editFullName">Full Name</label>
+                            <input type="text" class="form-control" id="editFullName" name="fullName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editCity">City</label>
+                            <input type="text" class="form-control" id="editCity" name="city" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editGender">Gender</label>
+                            <select class="form-control" id="editGender" name="gender">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editReason">Reason</label>
+                            <input type="text" class="form-control" id="editReason" name="reason" required>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
+        $(document).ready(function() {
+            setTimeout(function() {
+                $('#visitorTable').DataTable({
+                    "paging": true,
+                    "searching": false,
+                    "lengthChange": false,
+                    "pageLength": 10,
+                    "ordering": false,
+                    "info": false,
+                    "language": {
+                        "paginate": {
+                            "previous": "<i class='fas fa-chevron-left'></i>",
+                            "next": "<i class='fas fa-chevron-right'></i>"
+                        }
+                    },
+                    "dom": '<"top"f>rt<"bottom"p><"clear">'
+                });
+            }, 500);
+        });
+
         $(document).ready(function () {
-            $('#visitorTable').DataTable({
-                "paging": true,
-                "pageLength": 10, // Number of rows per page
-                "lengthChange": false, // Hide "Show X entries"
-                "info": false, // Hide "Showing X to Y of Z entries"
-                "searching": true, // Enable search filter
-                "ordering": true // Enable sorting
+            // Handle the edit button click
+            $(".edit-btn").click(function () {
+                var id = $(this).data("id");
+                var name = $(this).data("name");
+                var city = $(this).data("city");
+                var gender = $(this).data("gender");
+                var reason = $(this).data("reason");
+
+                $("#editVisitorId").val(id);
+                $("#editFullName").val(name);
+                $("#editCity").val(city);
+                $("#editGender").val(gender);
+                $("#editReason").val(reason);
+
+                $("#editVisitorModal").modal("show");
+            });
+
+            
+            $("#editVisitorForm").submit(function (e) {
+                e.preventDefault(); 
+
+                var formData = $(this).serialize();
+                $.ajax({
+                    type: "POST",
+                    url: "updateVisitor.php",
+                    data: formData,
+                    success: function (response) {
+                        var result = JSON.parse(response);
+
+                        if (result.success) {
+                            alert("Visitor details updated successfully!");
+                            location.reload(); 
+                        } else {
+                            alert("Error updating visitor: " + result.message);
+                        }
+
+                        $("#editVisitorModal").modal("hide");
+                    },
+                    error: function () {
+                        alert("An error occurred while updating.");
+                    }
+                });
             });
         });
+
         document.getElementById('hamburger').addEventListener('click', function() {
         const sidebar = document.getElementById('sidebar');
         sidebar.classList.toggle('show');
