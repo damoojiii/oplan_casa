@@ -263,17 +263,29 @@
                                 <td>{$row['reason']}</td>
                                 <td>{$formattedTime}</td>
                                 <td>
-                                    <a href='view_visitor.php?id={$row['visitor_id']}' class='btn btn-info btn-sm'>View</a>
                                     <a href='#' 
-                                    class='btn btn-warning btn-sm edit-btn' 
-                                    data-id='{$row['visitor_id']}' 
-                                    data-name='" . htmlspecialchars($row['fullName'], ENT_QUOTES, 'UTF-8') . "' 
-                                    data-city='" . htmlspecialchars($row['city'], ENT_QUOTES, 'UTF-8') . "' 
-                                    data-gender='{$row['gender']}' 
-                                    data-reason='" . htmlspecialchars($row['reason'], ENT_QUOTES, 'UTF-8') . "' 
-                                    data-bs-toggle='modal' 
-                                    data-bs-target='#editVisitorModal'>
-                                    Edit
+                                        class='btn btn-info btn-sm view-btn' 
+                                        data-id='{$row['visitor_id']}' 
+                                        data-name='" . htmlspecialchars($row['fullName'], ENT_QUOTES, 'UTF-8') . "' 
+                                        data-city='" . htmlspecialchars($row['city'], ENT_QUOTES, 'UTF-8') . "' 
+                                        data-gender='{$row['gender']}' 
+                                        data-reason='" . htmlspecialchars($row['reason'], ENT_QUOTES, 'UTF-8') . "' 
+                                        data-time='{$formattedTime}' 
+                                        data-photo='" . (!empty($row['photo']) ? $row['photo'] : 'default.jpg') . "' 
+                                        data-bs-toggle='modal' 
+                                        data-bs-target='#viewVisitorModal'>
+                                        View
+                                    </a>
+                                    <a href='#' 
+                                        class='btn btn-warning btn-sm edit-btn' 
+                                        data-id='{$row['visitor_id']}' 
+                                        data-name='" . htmlspecialchars($row['fullName'], ENT_QUOTES, 'UTF-8') . "' 
+                                        data-city='" . htmlspecialchars($row['city'], ENT_QUOTES, 'UTF-8') . "' 
+                                        data-gender='{$row['gender']}' 
+                                        data-reason='" . htmlspecialchars($row['reason'], ENT_QUOTES, 'UTF-8') . "' 
+                                        data-bs-toggle='modal' 
+                                        data-bs-target='#editVisitorModal'>
+                                        Edit
                                     </a>
                                     <a href='deleteVisitor.php?id={$row['visitor_id']}' class='btn btn-danger btn-sm' onclick='return confirm(\"Are you sure?\")'>Delete</a>
                                 </td>
@@ -282,6 +294,37 @@
                     ?>
                 </tbody>
             </table>
+        </div>
+
+        <!-- View Visitor Modal -->
+        <div class="modal fade" id="viewVisitorModal" tabindex="-1" aria-labelledby="viewVisitorModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewVisitorModalLabel">Visitor Profile</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                                <img id="visitorPhoto" src="default.jpg" alt="Visitor Photo" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px;">
+                            </div>
+                            <div class="col-md-8">
+                                <p><strong>Full Name:</strong> <span id="viewFullName"></span></p>
+                                <p><strong>City:</strong> <span id="viewCity"></span></p>
+                                <p><strong>Gender:</strong> <span id="viewGender"></span></p>
+                                <p><strong>Purpose for Visit:</strong> <span id="viewReason"></span></p>
+                                <p><strong>Time:</strong> <span id="viewTime"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Edit Visitor Modal -->
@@ -295,32 +338,34 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                    <form id="editVisitorForm">
-                        <input type="hidden" id="editVisitorId" name="visitor_id">
-                        <div class="form-group">
-                            <label for="editFullName">Full Name</label>
-                            <input type="text" class="form-control" id="editFullName" name="fullName" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="editCity">City</label>
-                            <input type="text" class="form-control" id="editCity" name="city" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="editGender">Gender</label>
-                            <select class="form-control" id="editGender" name="gender">
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="editReason">Reason</label>
-                            <input type="text" class="form-control" id="editReason" name="reason" required>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Update</button>
-                        </div>
-                    </form>
+                        <form id="editVisitorForm">
+                            <input type="hidden" id="editVisitorId" name="visitor_id">
+                            <div class="form-group">
+                                <label for="editFullName">Full Name</label>
+                                <input type="text" class="form-control" id="editFullName" name="fullName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editCity">City</label>
+                                <select class="form-control" id="editCity" name="city" required>
+                                    <option value="">Select City</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="editGender">Gender</label>
+                                <select class="form-control" id="editGender" name="gender">
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="editReason">Reason</label>
+                                <input type="text" class="form-control" id="editReason" name="reason" required>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -354,6 +399,55 @@
         });
 
         $(document).ready(function () {
+            // Handle the view button click
+            $(".view-btn").click(function () {
+                /* var id = $(this).data("id"); */
+                var name = $(this).data("name");
+                var city = $(this).data("city");
+                var gender = $(this).data("gender");
+                var reason = $(this).data("reason");
+                var time = $(this).data("time");
+                var photo = $(this).data("photo"); // Get the photo URL
+
+                $("#viewFullName").text(name);
+                $("#viewCity").text(city);
+                $("#viewGender").text(gender);
+                $("#viewReason").text(reason);
+                $("#viewTime").text(time);
+                
+                // Set the photo (use a default if empty)
+                if (photo) {
+                    $("#visitorPhoto").attr("src", "uploads/" + photo);
+                } else {
+                    $("#visitorPhoto").attr("src", "default.jpg");
+                }
+
+                $("#viewVisitorModal").modal("show");
+            });
+        });
+
+        $(document).ready(function () {
+            // Fetch cities and populate the dropdown
+            function loadCities() {
+                $.ajax({
+                    url: "fetch_cities.php", 
+                    type: "GET",
+                    dataType: "json",
+                    success: function (data) {
+                        var citySelect = $("#editCity");
+                        citySelect.empty(); // Clear existing options
+                        citySelect.append('<option value="">Select City</option>'); // Default option
+                        
+                        data.forEach(city => {
+                            citySelect.append(`<option value="${city.city_name}">${city.city_name}</option>`);
+                        });
+                    },
+                    error: function () {
+                        console.error("Error fetching cities.");
+                    }
+                });
+            }
+
             // Handle the edit button click
             $(".edit-btn").click(function () {
                 var id = $(this).data("id");
@@ -364,16 +458,21 @@
 
                 $("#editVisitorId").val(id);
                 $("#editFullName").val(name);
-                $("#editCity").val(city);
                 $("#editGender").val(gender);
                 $("#editReason").val(reason);
+
+                loadCities(); // Load cities before setting the value
+                
+                setTimeout(() => {
+                    $("#editCity").val(city); // Set selected city
+                }, 500); // Delay to ensure dropdown is populated
 
                 $("#editVisitorModal").modal("show");
             });
 
-            
+            // Form submission handler
             $("#editVisitorForm").submit(function (e) {
-                e.preventDefault(); 
+                e.preventDefault();
 
                 var formData = $(this).serialize();
                 $.ajax({
@@ -382,14 +481,12 @@
                     data: formData,
                     success: function (response) {
                         var result = JSON.parse(response);
-
                         if (result.success) {
                             alert("Visitor details updated successfully!");
-                            location.reload(); 
+                            location.reload();
                         } else {
                             alert("Error updating visitor: " + result.message);
                         }
-
                         $("#editVisitorModal").modal("hide");
                     },
                     error: function () {

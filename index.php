@@ -481,21 +481,21 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        fetch('fetch_cities.php') // Call the PHP script
-            .then(response => response.json()) // Convert response to JSON
-            .then(data => {
-                const citySelect = document.getElementById("city");
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('fetch_cities.php') // Call the PHP script
+                .then(response => response.json()) // Convert response to JSON
+                .then(data => {
+                    const citySelect = document.getElementById("city");
 
-                data.forEach(city => {
-                    let option = document.createElement("option");
-                    option.value = city.city_name;
-                    option.textContent = city.city_name;
-                    citySelect.appendChild(option);
-                });
-            })
-            .catch(error => console.error("Error fetching cities:", error));
-    });
+                    data.forEach(city => {
+                        let option = document.createElement("option");
+                        option.value = city.city_name;
+                        option.textContent = city.city_name;
+                        citySelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Error fetching cities:", error));
+        });
 
     const video = document.getElementById("video");
     const captureBtn = document.getElementById("captureBtn");
