@@ -312,18 +312,18 @@
 
     <!-- Add this JavaScript at the end of your existing script section -->
     <script>
-    window.addEventListener('load', function() {
-        const loaderWrapper = document.querySelector('.loader-wrapper');
-        // Add slight delay for smooth transition
-        setTimeout(() => {
-            loaderWrapper.classList.add('hidden');
-        }, 500);
+        window.addEventListener('load', function() {
+            const loaderWrapper = document.querySelector('.loader-wrapper');
+            // Add slight delay for smooth transition
+            setTimeout(() => {
+                loaderWrapper.classList.add('hidden');
+            }, 500);
 
-        // Remove loader after animation
-        setTimeout(() => {
-            loaderWrapper.style.display = 'none';
-        }, 1000);
-    });
+            // Remove loader after animation
+            setTimeout(() => {
+                loaderWrapper.style.display = 'none';
+            }, 1000);
+        });
     </script>
 
     <div class="header d-flex align-items-center justify-content-between p-3">

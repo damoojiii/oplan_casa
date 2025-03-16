@@ -1,5 +1,6 @@
 <?php
     session_start();
+    include 'connection.php';
 ?>
 
 <!DOCTYPE html>
@@ -151,11 +152,23 @@
 
     <div class="header d-flex align-items-center justify-content-between p-3">
         <div class="d-flex align-items-center">
-            <img src="img/rosariologo.png" alt="Municipality Logo" class="logo">
+            <?php
+            // Fetch logo from database
+            $sql = "SELECT logo_path FROM site_settings WHERE id = 1";
+            $result = mysqli_query($conn, $sql);
+            if ($result && mysqli_num_rows($result) > 0) {
+                $row = mysqli_fetch_assoc($result);
+                $logoPath = $row['logo_path'] ?? 'img/rosariologo.png';
+            } else {
+                $logoPath = 'img/rosariologo.png'; // Default logo
+            }
+            ?>
+            <img src="<?php echo $logoPath; ?>" alt="Tourism Office Logo" class="logo">
             <h4 class="mb-0 ms-3 text-white" >
                 <a href="index.php" style="text-decoration:none; color:white;">Tourism Office - Municipality of Rosario</a></h4>
         </div>
     </div>
+    
         
     <div class="main">
         <div class="login-container">
