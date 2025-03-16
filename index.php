@@ -328,8 +328,20 @@
 
     <div class="header d-flex align-items-center justify-content-between p-3">
         <div class="d-flex align-items-center">
-            <img src="img/rosariologo.png" alt="Municipality Logo" class="logo">
-            <h4 class="mb-0 ms-3 text-white">Tourism Office - Municipality of Rosario</h4>
+        <?php
+        // Fetch logo from database
+        $sql = "SELECT logo_path FROM site_settings WHERE id = 1";
+        $result = mysqli_query($conn, $sql);
+        if ($result && mysqli_num_rows($result) > 0) {
+            $row = mysqli_fetch_assoc($result);
+            $logoPath = $row['logo_path'] ?? 'img/rosariologo.png';
+        } else {
+            $logoPath = 'img/rosariologo.png'; // Default logo
+        }
+        ?>
+        <img src="<?php echo $logoPath; ?>" alt="Tourism Office Logo" class="logo">
+                    
+        <h4 class="mb-0 ms-3 text-white">Tourism Office - Municipality of Rosario</h4>
         </div>
 
         <a href="login.php"><button class="btn btn-success login">Login</button></a>

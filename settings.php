@@ -138,6 +138,87 @@
             background-color: #fff !important;
             color: #000 !important;
         }
+
+        
+        .parent {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: auto;
+            gap: 15px;
+            padding: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+         /* Logo content */   
+        .logo {
+            grid-column: span 2;
+            grid-row: span 1;
+            background-color: #273E26;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 200px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo h4 {
+            color: white !important;
+            font-family: 'Karla', sans-serif;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .current-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            background-color: #273E26;
+            border-radius: 6px;
+        }
+        
+        .logo .form-label {
+            color: #273E26;
+            font-family: 'Karla', sans-serif;
+        }
+        
+        .logo .btn-primary {
+            background-color: #273E26;
+            border-color: #273E26;
+        }
+        
+        .logo .btn-primary:hover {
+            background-color:rgb(35, 77, 35);
+            border-color: #1a2c1a;
+        }
+
+        /* Info content */
+        
+        .info {
+            grid-column: span 4;
+            grid-row: span 1;
+            background-color: #273E26;
+            border-radius: 20px;
+            padding: 15px;
+            min-height: 280px;
+        }
+
+        /* Edit content */
+        .edit {
+            grid-column: 1 / -1; /* Span all columns */
+            grid-row: span 1;
+            background-color:#273E26;
+            border-radius: 20px;
+            padding: 15px;
+            min-height: 270px;
+        }
+        
+        
     </style>
 </head>
 <body>
@@ -179,13 +260,54 @@
     </div>
 
     <div id="main-content" class="container mt-1">
-        
+       
+        <div class="parent">
+            
+            <div class="logo">
+                <h4 class="mb-3 text-dark">Tourism Office Logo</h4>
+                <div class="current-logo mb-3 text-center">
+                    <?php
+                    // Fetch current logo from database
+                    $sql = "SELECT logo_path FROM site_settings WHERE id = 1";
+                    $result = mysqli_query($conn, $sql);
+                    if ($result && mysqli_num_rows($result) > 0) {
+                        $row = mysqli_fetch_assoc($result);
+                        $logoPath = $row['logo_path'] ?? 'img/rosariologo.png';
+                    } else {
+                        $logoPath = 'img/rosariologo.png'; // Default logo
+                    }
+                    ?>
+                    <img src="<?php echo $logoPath; ?>" alt="Tourism Office Logo" class="img-fluid mb-2" style="max-height: 150px;">
+                </div>
+                
+                <form action="update_logo.php" method="post" enctype="multipart/form-data" class="mt-3">
+                    <div class="mb-3 text-center">
+                        <label for="logoFile" class="form-label text-white fw-bold ">Upload New Logo</label>
+                        <input type="file" class="form-control" id="logoFile" name="logoFile" accept="image/*" required>
+                    </div>
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-primary">Update Logo</button>
+                    </div>
+                </form>
+            </div>
+
+
+            <div class="info">
+                <!-- Info content here -->
+            </div>
+            <div class="edit">
+                <!-- Edit content here -->
+            </div>
+
+        </div>
+    
     </div>
 
 
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.getElementById('hamburger').addEventListener('click', function() {
         const sidebar = document.getElementById('sidebar');
@@ -206,6 +328,41 @@
                 collapse.style.height = '0px';
             });
         });
+
+        <!-- Error Success Message -->
+            document.addEventListener('DOMContentLoaded', function() {
+                <?php if(isset($_GET['success'])): ?>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Logo updated successfully!',
+                        confirmButtonColor: '#273E26'
+                    });
+                <?php endif; ?>
+                
+                <?php if(isset($_GET['error'])): ?>
+                    <?php
+                        $error = $_GET['error'];
+                        $message = 'An error occurred.';
+
+                        if($error == 'filetype') {
+                            $message = 'Invalid file type. Please upload JPG, JPEG, PNG or GIF.';
+                        } elseif($error == 'upload') {
+                            $message = 'Failed to upload file. Please try again.';
+                        } elseif($error == 'db') {
+                            $message = 'Database error. Please try again.';
+                        } elseif($error == 'nofile') {
+                            $message = 'No file selected or error in upload.';
+                        }
+                    ?>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: '<?php echo $message; ?>',
+                        confirmButtonColor: '#273E26'
+                    });
+                <?php endif; ?>
+            });
     </script>
 </body>
 </html>
