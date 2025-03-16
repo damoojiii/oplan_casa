@@ -184,13 +184,6 @@
             --bs-btn-border-color: #5D9C59 !important;
             --bs-btn-hover-bg: #5D9C59 !important;
         }
-
-        #table-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
     </style>
 </head>
 <body>
@@ -231,8 +224,8 @@
         </div>
     </div>
 
-    <div id="main-content" class="container mt-1 d-flex justify-content-center">
-        <div id="table-container" class="w-100">
+    <div id="main-content" class="container d-flex justify-content-center align-items-center vh-100">
+        <div id="table-container" class="w-100 container-fluid">
             <table id="visitorTable" class="table table-bordered text-center">
                 <thead class="bg-dark text-white">
                     <tr>
@@ -241,26 +234,30 @@
                         <th>City</th>
                         <th>Gender</th>
                         <th>Purpose for Visit</th>
+                        <th>Date</th>
                         <th>Time</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                        $sql = "SELECT visitor_id, fullName, city, gender, reason, time FROM visitors ORDER BY visitor_id ASC";
+                        $sql = "SELECT visitor_id, fullName, city, gender, reason, time, photo FROM visitors ORDER BY visitor_id ASC";
 
                         $stmt = $conn->prepare($sql);
                         $stmt->execute();
                         $result = $stmt->get_result();
 
                         while ($row = $result->fetch_assoc()) {
+                            $formattedDate = date("Y-m-d", strtotime($row['time']));
                             $formattedTime = date("h:i A", strtotime($row['time']));
+
                             echo "<tr>
                                 <td>{$row['visitor_id']}</td>
                                 <td>" . ucwords(strtolower($row['fullName'])) . "</td>
                                 <td>{$row['city']}</td>
                                 <td>{$row['gender']}</td>
                                 <td>{$row['reason']}</td>
+                                <td>{$formattedDate}</td>
                                 <td>{$formattedTime}</td>
                                 <td>
                                     <a href='#' 
@@ -274,7 +271,7 @@
                                         data-photo='" . (!empty($row['photo']) ? $row['photo'] : 'default.jpg') . "' 
                                         data-bs-toggle='modal' 
                                         data-bs-target='#viewVisitorModal'>
-                                        View
+                                        <i class='fa-solid fa-eye'></i>
                                     </a>
                                     <a href='#' 
                                         class='btn btn-warning btn-sm edit-btn' 
@@ -285,9 +282,9 @@
                                         data-reason='" . htmlspecialchars($row['reason'], ENT_QUOTES, 'UTF-8') . "' 
                                         data-bs-toggle='modal' 
                                         data-bs-target='#editVisitorModal'>
-                                        Edit
+                                        <i class='fa-solid fa-pen-to-square'></i>
                                     </a>
-                                    <a href='deleteVisitor.php?id={$row['visitor_id']}' class='btn btn-danger btn-sm' onclick='return confirm(\"Are you sure?\")'>Delete</a>
+                                    <a href='deleteVisitor.php?id={$row['visitor_id']}' class='btn btn-danger btn-sm' onclick='return confirm(\"Are you sure?\")'><i class='fa-solid fa-trash'></i></a>
                                 </td>
                             </tr>";
                         }
@@ -308,9 +305,9 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <div class="col-md-4 text-center">
-                                <img id="visitorPhoto" src="default.jpg" alt="Visitor Photo" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px;">
-                            </div>
+                        <div class="col-md-4 text-center">
+                            <img id="visitorPhoto" src="default.jpg" alt="Visitor Photo" class="img-fluid mx-auto mb-3" style="width: 150px; height: 150px; border-radius: 10px; border: 2px solid #ddd;">
+                        </div>
                             <div class="col-md-8">
                                 <p><strong>Full Name:</strong> <span id="viewFullName"></span></p>
                                 <p><strong>City:</strong> <span id="viewCity"></span></p>
@@ -398,32 +395,39 @@
             }, 500);
         });
 
-        $(document).ready(function () {
-            // Handle the view button click
-            $(".view-btn").click(function () {
-                /* var id = $(this).data("id"); */
-                var name = $(this).data("name");
-                var city = $(this).data("city");
-                var gender = $(this).data("gender");
-                var reason = $(this).data("reason");
-                var time = $(this).data("time");
-                var photo = $(this).data("photo"); // Get the photo URL
+        $(".view-btn").click(function () {
+            var name = $(this).data("name");
+            var city = $(this).data("city");
+            var gender = $(this).data("gender");
+            var reason = $(this).data("reason");
+            var time = $(this).data("time");
+            var photo = $(this).data("photo");
 
-                $("#viewFullName").text(name);
-                $("#viewCity").text(city);
-                $("#viewGender").text(gender);
-                $("#viewReason").text(reason);
-                $("#viewTime").text(time);
-                
-                // Set the photo (use a default if empty)
-                if (photo) {
-                    $("#visitorPhoto").attr("src", "uploads/" + photo);
-                } else {
-                    $("#visitorPhoto").attr("src", "default.jpg");
-                }
+            console.log("Photo filename:", photo);
 
-                $("#viewVisitorModal").modal("show");
-            });
+            $("#viewFullName").text(name);
+            $("#viewCity").text(city);
+            $("#viewGender").text(gender);
+            $("#viewReason").text(reason);
+            $("#viewTime").text(time);
+
+            var imagePath;
+            if (photo && !photo.includes("uploads/")) {
+                imagePath = "/OPLAN_CASA/uploads/" + photo;
+            } else {
+                imagePath = "/OPLAN_CASA/" + photo;
+            }
+
+            // Use default image if empty
+            if (!photo || photo.trim() === "") {
+                imagePath = "/OPLAN_CASA/default.jpg";
+            }
+
+            console.log("Final Image Path:", imagePath); // Debugging log
+
+            $("#visitorPhoto").attr("src", imagePath);
+
+            $("#viewVisitorModal").modal("show");
         });
 
         $(document).ready(function () {
