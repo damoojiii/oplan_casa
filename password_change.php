@@ -157,14 +157,14 @@
         }
         
         .password-card {
-            background-color: #fff;
+            background-color: #273E26;
             border-radius: 6px;
             padding: 20px;
         }
         
         .form-label {
             font-weight: 500;
-            color: #273E26;
+            color:rgb(255, 255, 255);
         }
         
         .btn-primary {
@@ -231,44 +231,32 @@
             <h4>Change Password</h4>
             <div class="password-card">
                 <form id="passwordChangeForm" action="change_password.php" method="post">
-                    <div class="mb-3">
-                        <label for="currentPassword" class="form-label">Current Password</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
-                            <button class="btn btn-outline-secondary toggle-password" type="button" data-target="currentPassword">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
+                <div class="mb-3">
+                    <label for="currentPassword" class="form-label">Current Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="newPassword" class="form-label">New Password</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control" id="newPassword" name="newPassword" required>
-                            <button class="btn btn-outline-secondary toggle-password" type="button" data-target="newPassword">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
+                </div>
+                <div class="mb-3">
+                    <label for="newPassword" class="form-label">New Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="newPassword" name="newPassword" required>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
-                            <button class="btn btn-outline-secondary toggle-password" type="button" data-target="confirmPassword">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
+                </div>
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
                     </div>
-
-                    <div class="d-flex justify-content-between mt-4">
-                        <a href="settings.php" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Back to Settings
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Change Password
-                        </button>
-                    </div>
+                </div>
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="settings.php" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Settings
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Change Password
+                    </button>
+                </div>
                 </form>
             </div>
         </div>
