@@ -246,16 +246,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
             $_SESSION['email'] = $user['email'];
             $_SESSION['username'] = $user['username'];
 
-            // Redirect to a logged-in page or dashboard
             echo "<script>
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'You have logged in successfully.',
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        window.location.href = 'admin-dashboard.php';
-                    });
+                    window.location.href = 'admin-dashboard.php';
                   </script>";
         } else {
             // Invalid password

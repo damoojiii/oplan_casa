@@ -295,20 +295,18 @@
 
         <!-- View Visitor Modal -->
         <div class="modal fade" id="viewVisitorModal" tabindex="-1" aria-labelledby="viewVisitorModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
+            <div class="modal-dialog  modal-dialog-centered">
+                <div class="modal-content" style="margin-left: auto; margin-right: auto;">
                     <div class="modal-header">
                         <h5 class="modal-title" id="viewVisitorModalLabel">Visitor Profile</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
                     </div>
                     <div class="modal-body">
-                        <div class="row">
-                        <div class="col-md-4 text-center">
-                            <img id="visitorPhoto" src="default.jpg" alt="Visitor Photo" class="img-fluid mx-auto mb-3" style="width: 150px; height: 150px; border-radius: 10px; border: 2px solid #ddd;">
-                        </div>
-                            <div class="col-md-8">
+                        <div class="row text-center">
+                            <!-- Centered Image above information -->
+                            <div class="col-12 mb-3">
+                                <img id="visitorPhoto" src="uploads/default.jpg" alt="Visitor Photo" class="img-fluid" style="width: 150px; height: 150px; border-radius: 10px; border: 2px solid #ddd;">
+                            </div>
+                            <div class="col-12">
                                 <p><strong>Full Name:</strong> <span id="viewFullName"></span></p>
                                 <p><strong>City:</strong> <span id="viewCity"></span></p>
                                 <p><strong>Gender:</strong> <span id="viewGender"></span></p>
@@ -317,8 +315,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <div class="modal-footer" style="margin-left: auto; margin-right: auto;">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
