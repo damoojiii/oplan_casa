@@ -1,6 +1,7 @@
 <?php
     include "session.php";
     include("connection.php");
+    include "loader.php";
 ?>
 
 <!DOCTYPE html>
@@ -126,7 +127,20 @@
     <div id="main-content" class="container">
         <!-- Filtering Section -->
         <div class="row mb-3">
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <label for="yearFilter" class="form-label">Filter by Year:</label>
+                <select id="yearFilter" class="form-select">
+                    <option value="">All Years</option>
+                    <?php
+                        $yearQuery = "SELECT DISTINCT YEAR(time) AS year FROM visitors ORDER BY year DESC";
+                        $yearResult = $conn->query($yearQuery);
+                        while ($yearRow = $yearResult->fetch_assoc()) {
+                            echo "<option value='" . htmlspecialchars($yearRow['year'], ENT_QUOTES, 'UTF-8') . "'>" . htmlspecialchars($yearRow['year'], ENT_QUOTES, 'UTF-8') . "</option>";
+                        }
+                    ?>
+                </select>
+            </div>
+            <div class="col-md-3">
                 <label for="monthFilter" class="form-label">Filter by Month:</label>
                 <select id="monthFilter" class="form-select">
                     <option value="">All Months</option>
@@ -144,7 +158,7 @@
                     <option value="12">December</option>
                 </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label for="cityFilter" class="form-label">Filter by City:</label>
                 <select id="cityFilter" class="form-select">
                     <option value="">All Cities</option>
@@ -157,7 +171,7 @@
                     ?>
                 </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label for="purposeFilter" class="form-label">Filter by Purpose:</label>
                 <select id="purposeFilter" class="form-select">
                     <option value="">All Purposes</option>
@@ -322,14 +336,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
-        $(document).ready(function() {
-            setTimeout(function() {
-                $('#visitorTable').DataTable({
+        $(document).ready(function () {
+            setTimeout(function () {
+                let table = $('#visitorTable').DataTable({
                     "paging": true,
-                    "searching": false,
+                    "searching": true, // Keep DataTables' built-in search
                     "lengthChange": false,
                     "pageLength": 10,
-                    "ordering": false,
+                    "ordering": false, // Allow sorting
                     "info": false,
                     "language": {
                         "paginate": {
@@ -339,6 +353,30 @@
                     },
                     "dom": '<"top"f>rt<"bottom"p><"clear">'
                 });
+
+                // Custom filtering function
+                $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                    let row = table.row(dataIndex).node(); // Get the actual row element
+                    let selectedMonth = $("#monthFilter").val();
+                    let selectedCity = $.trim($("#cityFilter").val().toLowerCase());
+                    let selectedPurpose = $.trim($("#purposeFilter").val().toLowerCase());
+
+                    let rowMonth = $(row).attr("data-month") || "";
+                    let rowCity = ($(row).attr("data-city") || "").toLowerCase().trim();
+                    let rowPurpose = ($(row).attr("data-reason") || "").toLowerCase().trim();
+
+                    let monthMatch = selectedMonth === "" || rowMonth === selectedMonth;
+                    let cityMatch = selectedCity === "" || rowCity.includes(selectedCity);
+                    let purposeMatch = selectedPurpose === "" || rowPurpose.includes(selectedPurpose);
+
+                    return monthMatch && cityMatch && purposeMatch;
+                });
+
+                // Apply filter on change
+                $("#monthFilter, #cityFilter, #purposeFilter").on("change", function () {
+                    table.draw(); // Redraw table with filters applied
+                });
+
             }, 500);
         });
 
@@ -359,20 +397,16 @@
             $("#viewTime").text(time);
 
             var imagePath;
-            if (photo && !photo.includes("uploads/")) {
-                imagePath = "OPLAN_CASA/uploads/" + photo;
-            } else {
-                imagePath = "/" + photo;
-            }
 
-            // Use default image if empty
-            if (!photo || photo.trim() === "") {
-                imagePath = "/default.jpg";
+            if (photo && photo.trim() !== "" && photo !== "default.jpg") {
+                imagePath = "/OPLAN_CASA/uploads/" + photo;
+            } else {
+                imagePath = "/OPLAN_CASA/uploads/default.jpg"; // Corrected default image path
             }
 
             console.log("Final Image Path:", imagePath); // Debugging log
 
-            $("#visitorPhoto").attr("src", imagePath);
+            $("#visitorPhoto").attr("src", imagePath + "?t=" + new Date().getTime()); // Prevent browser cache issues
 
             $("#viewVisitorModal").modal("show");
         });
@@ -465,35 +499,6 @@
             collapse.addEventListener('hidden.bs.collapse', () => {
                 collapse.style.height = '0px';
             });
-        });
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const monthFilter = document.getElementById("monthFilter");
-            const cityFilter = document.getElementById("cityFilter");
-            const purposeFilter = document.getElementById("purposeFilter");
-            const tableRows = document.querySelectorAll("#visitorTable tbody tr");
-
-            function filterTable() {
-                const selectedMonth = monthFilter.value;
-                const selectedCity = cityFilter.value.toLowerCase().trim();
-                const selectedPurpose = purposeFilter.value.toLowerCase().trim();
-
-                tableRows.forEach(row => {
-                    const rowMonth = row.getAttribute("data-month") || "";
-                    const rowCity = (row.getAttribute("data-city") || "").toLowerCase().trim();
-                    const rowPurpose = (row.getAttribute("data-reason") || "").toLowerCase().trim();
-
-                    const monthMatch = selectedMonth === "" || rowMonth === selectedMonth;
-                    const cityMatch = selectedCity === "" || rowCity.includes(selectedCity);
-                    const purposeMatch = selectedPurpose === "" || rowPurpose.includes(selectedPurpose);
-
-                    row.style.display = (monthMatch && cityMatch && purposeMatch) ? "" : "none";
-                });
-            }
-
-            monthFilter.addEventListener("change", filterTable);
-            cityFilter.addEventListener("change", filterTable);
-            purposeFilter.addEventListener("change", filterTable);
         });
     </script>
 </body>
