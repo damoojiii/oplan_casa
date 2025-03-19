@@ -411,14 +411,14 @@
 
             var imagePath;
             if (photo && !photo.includes("uploads/")) {
-                imagePath = "/OPLAN_CASA/uploads/" + photo;
+                imagePath = "OPLAN_CASA-1/uploads/" + photo;
             } else {
-                imagePath = "/OPLAN_CASA/" + photo;
+                imagePath = "/" + photo;
             }
 
             // Use default image if empty
             if (!photo || photo.trim() === "") {
-                imagePath = "/OPLAN_CASA/default.jpg";
+                imagePath = "/default.jpg";
             }
 
             console.log("Final Image Path:", imagePath); // Debugging log
