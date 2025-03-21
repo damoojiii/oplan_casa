@@ -76,7 +76,7 @@
         <!-- Logo/Icon -->
         <div class="text-center">
             <div class="logo-circle">
-                <img src="logo.png" alt="Logo" class="img-fluid">
+                <img src="uploads/logos/logo_20250317042406.jpg" alt="Logo" class="img-fluid">
             </div>
         </div>
 

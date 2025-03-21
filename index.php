@@ -382,7 +382,6 @@
                         <label for="city" class="form-label input-label">City/Municipality</label>
                         <select id="city" name="city" class="form-select" required>
                             <option value="" disabled selected hidden>Select City/Municipality</option>
-                            <option value="a">a</option>
                         </select>
                     </div>
 
@@ -390,11 +389,9 @@
                         <label for="visitReason" class="form-label input-label">Purpose for Visit</label>
                         <select id="visitReason" name="reason" class="form-select" required>
                             <option value="" disabled selected hidden>Select Reason</option>
-                            <option value="Ocular Visit">Ocular Visit</option>
-                            <option value="Business">Business</option>
-                            <option value="Tourism">Tourism</option>
                         </select>
                     </div>
+
                     <div class="col-md-2">
                         <label for="gender" class="form-label input-label">Gender</label>
                         <select id="gender" name="gender" class="form-select" required>
@@ -509,151 +506,167 @@
                 .catch(error => console.error("Error fetching cities:", error));
         });
 
-    const video = document.getElementById("video");
-    const captureBtn = document.getElementById("captureBtn");
-    const photoPreviewContainer = document.getElementById("photoPreviewContainer");
-    const photoPreview = document.getElementById("photoPreview");
-    const retakePhotoBtn = document.getElementById("retakePhoto");
-    const confirmPhotoBtn = document.getElementById("confirmPhoto");
-    const photoDataInput = document.getElementById("photoData");
-    const visitorForm = document.getElementById("visitorForm");
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('fetch_reasons.php') // Call the PHP script
+                .then(response => response.json()) // Convert response to JSON
+                .then(data => {
+                    const reasonSelect = document.getElementById("visitReason");
 
-    function validateForm() {
-        const form = document.getElementById('visitorForm');
-        let isValid = true;
-
-        // Trigger HTML5 validation
-        if (!form.checkValidity()) {
-            form.reportValidity(); // Show native validation messages
-            isValid = false;
-        }
-
-        // Custom validation for Full Name
-        if (!validateFullName()) {
-            isValid = false;
-        }
-
-        return isValid;
-    }
-
-    document.getElementById("submitBtn").addEventListener("click", function(event) {
-        event.preventDefault(); // Prevent default form submission
-
-        // Validate the form before showing the modal
-        if (!validateForm()) {
-            return; // Stop if validation fails
-        }
-
-        // Show the photo modal only if validation passes
-        const photoModal = new bootstrap.Modal(document.getElementById("photoModal"));
-        photoModal.show();
-
-        // Access the camera after modal is shown
-        navigator.mediaDevices.getUserMedia({
-                video: true
-            })
-            .then(stream => {
-                video.srcObject = stream;
-            })
-            .catch(err => {
-                console.error("Camera access error:", err);
-                alert("Camera access denied. Please allow camera permission to proceed.");
-                photoModal.hide();
-            });
-    });
-    // Capture Photo
-    captureBtn.addEventListener("click", function() {
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const context = canvas.getContext("2d");
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        const imageData = canvas.toDataURL("image/png");
-        photoDataInput.value = imageData;
-        photoPreview.src = imageData;
-        photoPreviewContainer.style.display = "block";
-
-        captureBtn.style.display = "none";
-    });
-
-    // Retake
-    retakePhotoBtn.addEventListener("click", function() {
-        photoPreviewContainer.style.display = "none";
-        photoDataInput.value = "";
-        captureBtn.style.display = "block";
-        /* captureBtn.style.margin-left = "auto";
-        captureBtn.style.margin-right = "auto"; */
-    });
-
-    // Confirm Photo & Submit Form
-    confirmPhotoBtn.addEventListener("click", function() {
-        if (photoDataInput.value) {
-            new bootstrap.Modal(document.getElementById("photoModal")).hide();
-            visitorForm.submit();
-        } else {
-            alert("Please capture a photo before confirming.");
-        }
-    });
-
-    $(document).ready(function() {
-        $('#visitorTable').DataTable({
-            "paging": true,
-            "searching": false,
-            "lengthChange": false,
-            "pageLength": 5,
-            "ordering": false,
-            "info": false,
-            "language": {
-                "paginate": {
-                    "previous": "<i class='fas fa-chevron-left'></i>",
-                    "next": "<i class='fas fa-chevron-right'></i>"
-                },
-                "search": "🔍 Search:"
-            },
-            "dom": '<"top"f>rt<"bottom"p><"clear">'
+                    data.forEach(reason => {
+                        let option = document.createElement("option");
+                        option.value = reason.reason;
+                        option.textContent = reason.reason;
+                        reasonSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Error fetching reasons:", error));
         });
-    });
 
-    function validateFullName() {
-        const fullNameInput = document.getElementById("fullName");
-        const fullNameError = document.getElementById("fullNameError");
-        const name = fullNameInput.value.trim();
-        const nameRegex = /^[A-Za-z\s]+$/;
+        const video = document.getElementById("video");
+        const captureBtn = document.getElementById("captureBtn");
+        const photoPreviewContainer = document.getElementById("photoPreviewContainer");
+        const photoPreview = document.getElementById("photoPreview");
+        const retakePhotoBtn = document.getElementById("retakePhoto");
+        const confirmPhotoBtn = document.getElementById("confirmPhoto");
+        const photoDataInput = document.getElementById("photoData");
+        const visitorForm = document.getElementById("visitorForm");
 
-        if (name === "" || !nameRegex.test(name)) {
-            fullNameError.style.display = "block";
-            return false;
-        }
-        fullNameError.style.display = "none";
-        return true;
-    }
-    document.addEventListener("DOMContentLoaded", function() {
+        function validateForm() {
+            const form = document.getElementById('visitorForm');
+            let isValid = true;
 
-        // Add an event listener for the form submission
-        const form = document.getElementById("visitorForm");
-        form.addEventListener("submit", function(event) {
+            // Trigger HTML5 validation
+            if (!form.checkValidity()) {
+                form.reportValidity(); // Show native validation messages
+                isValid = false;
+            }
+
+            // Custom validation for Full Name
             if (!validateFullName()) {
-                event.preventDefault(); // Prevent form submission if validation fails
-            }
-        });
-        const fullNameInput = document.getElementById("fullName");
-        // Prevent entry of special characters or numbers while typing
-        fullNameInput.addEventListener("input", function(event) {
-            const inputValue = fullNameInput.value;
-
-            // Remove any non-alphabetical characters (including numbers and special characters)
-            const cleanedValue = inputValue.replace(/[^A-Za-z\s]/g, "");
-
-            if (inputValue !== cleanedValue) {
-                fullNameInput.value =
-                    cleanedValue; // Update the input value to remove invalid characters
+                isValid = false;
             }
 
-            // Dynamically validate the input on every keystroke
-            validateFullName();
+            return isValid;
+        }
+
+        document.getElementById("submitBtn").addEventListener("click", function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Validate the form before showing the modal
+            if (!validateForm()) {
+                return; // Stop if validation fails
+            }
+
+            // Show the photo modal only if validation passes
+            const photoModal = new bootstrap.Modal(document.getElementById("photoModal"));
+            photoModal.show();
+
+            // Access the camera after modal is shown
+            navigator.mediaDevices.getUserMedia({
+                    video: true
+                })
+                .then(stream => {
+                    video.srcObject = stream;
+                })
+                .catch(err => {
+                    console.error("Camera access error:", err);
+                    alert("Camera access denied. Please allow camera permission to proceed.");
+                    photoModal.hide();
+                });
         });
-    });
+        // Capture Photo
+        captureBtn.addEventListener("click", function() {
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext("2d");
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const imageData = canvas.toDataURL("image/png");
+            photoDataInput.value = imageData;
+            photoPreview.src = imageData;
+            photoPreviewContainer.style.display = "block";
+
+            captureBtn.style.display = "none";
+        });
+
+        // Retake
+        retakePhotoBtn.addEventListener("click", function() {
+            photoPreviewContainer.style.display = "none";
+            photoDataInput.value = "";
+            captureBtn.style.display = "block";
+            /* captureBtn.style.margin-left = "auto";
+            captureBtn.style.margin-right = "auto"; */
+        });
+
+        // Confirm Photo & Submit Form
+        confirmPhotoBtn.addEventListener("click", function() {
+            if (photoDataInput.value) {
+                new bootstrap.Modal(document.getElementById("photoModal")).hide();
+                visitorForm.submit();
+            } else {
+                alert("Please capture a photo before confirming.");
+            }
+        });
+
+        $(document).ready(function() {
+            $('#visitorTable').DataTable({
+                "paging": true,
+                "searching": false,
+                "lengthChange": false,
+                "pageLength": 5,
+                "ordering": false,
+                "info": false,
+                "language": {
+                    "paginate": {
+                        "previous": "<i class='fas fa-chevron-left'></i>",
+                        "next": "<i class='fas fa-chevron-right'></i>"
+                    },
+                    "search": "🔍 Search:"
+                },
+                "dom": '<"top"f>rt<"bottom"p><"clear">'
+            });
+        });
+
+        function validateFullName() {
+            const fullNameInput = document.getElementById("fullName");
+            const fullNameError = document.getElementById("fullNameError");
+            const name = fullNameInput.value.trim();
+            const nameRegex = /^[A-Za-z\s]+$/;
+
+            if (name === "" || !nameRegex.test(name)) {
+                fullNameError.style.display = "block";
+                return false;
+            }
+            fullNameError.style.display = "none";
+            return true;
+        }
+        document.addEventListener("DOMContentLoaded", function() {
+
+            // Add an event listener for the form submission
+            const form = document.getElementById("visitorForm");
+            form.addEventListener("submit", function(event) {
+                if (!validateFullName()) {
+                    event.preventDefault(); // Prevent form submission if validation fails
+                }
+            });
+            const fullNameInput = document.getElementById("fullName");
+            // Prevent entry of special characters or numbers while typing
+            fullNameInput.addEventListener("input", function(event) {
+                const inputValue = fullNameInput.value;
+
+                // Remove any non-alphabetical characters (including numbers and special characters)
+                const cleanedValue = inputValue.replace(/[^A-Za-z\s]/g, "");
+
+                if (inputValue !== cleanedValue) {
+                    fullNameInput.value =
+                        cleanedValue; // Update the input value to remove invalid characters
+                }
+
+                // Dynamically validate the input on every keystroke
+                validateFullName();
+            });
+        });
     </script>
 
 </body>

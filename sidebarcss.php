@@ -135,7 +135,8 @@
     #main-content {
         transition: margin-left 0.3s ease;
         margin-left: 250px;
-        max-width: 80%;
+        margin-block: 50px;
+        max-width: 85%;
         font-family: 'Inter';
     }
 
