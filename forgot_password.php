@@ -1,55 +1,76 @@
 <?php
-    session_start();
-    include 'connection.php';
-    date_default_timezone_set("Asia/Manila");
+include "connection.php";
+include "loader.php";
+session_start();
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // Check if required fields exist before accessing them
-        $fullName = isset($_POST['fullName']) ? $_POST['fullName'] : null;
-        $city = isset($_POST['city']) ? $_POST['city'] : null;
-        $gender = isset($_POST['gender']) ? $_POST['gender'] : null;
-        $visitReason = isset($_POST['reason']) ? $_POST['reason'] : null;
-        $time = date("Y-m-d H:i:s");
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-        // Validate inputs to prevent NULL database values
-        if (!$fullName || !$city || !$gender || !$visitReason) {
-            $_SESSION['message'] = "Error: Missing required fields!";
-            $_SESSION['message_type'] = "Error";
-            $_SESSION['icon'] = "error";
-            header("Location: index.php");
-            exit();
-        }
+require 'PHPMailer/Exception.php';
+require 'PHPMailer/PHPMailer.php';
+require 'PHPMailer/SMTP.php';
 
-        // Handle photo upload
-        if (!empty($_POST['photo'])) {
-            $photoData = $_POST['photo'];
-            $photoData = str_replace("data:image/png;base64,", "", $photoData);
-            $photoData = base64_decode($photoData);
-            $fileName = "uploads/" . uniqid() . ".png";
-            file_put_contents($fileName, $photoData);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['email'])) {
+    header('Content-Type: application/json');
+    $email = $_POST['email'];
+    $_SESSION['email'] = $email;
+    $response = ['status' => 'error', 'message' => ''];
+
+    $mail = new PHPMailer(true);
+    try {
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'casahacienda393@gmail.com';
+        $mail->Password = 'eeji rjxr fjwv mobp';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        $mail->Port = 465;
+
+        $mail->setFrom('casahacienda393@gmail.com', 'Casa Hacienda de Tejeros');
+        $mail->addAddress($email);
+
+        $otp = substr(str_shuffle('1234567890'), 0, 4);
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Password Reset OTP';
+        $mail->Body = 'Your OTP code is: <strong>' . $otp . '</strong>';
+
+        $verifyQuery = $conn->query("SELECT * FROM users WHERE email = '$email'");
+        if ($verifyQuery->num_rows) {
+            $conn->query("UPDATE users SET otp = '$otp' WHERE email = '$email'");
+            $mail->send();
+            $response = ['status' => 'success', 'message' => 'OTP sent to your email'];
         } else {
-            $fileName = null; // No photo uploaded
+            $response['message'] = 'Email not found';
         }
-
-        // Insert into database
-        $sql = "INSERT INTO visitors (fullName, city, gender, reason, time, photo) VALUES (?, ?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssss", $fullName, $city, $gender, $visitReason, $time, $fileName);
-
-        if ($stmt->execute()) {
-            $_SESSION['message'] = "Visitor added successfully!";
-            $_SESSION['message_type'] = "Success";
-            $_SESSION['icon'] = "success";
-        } else {
-            $_SESSION['message'] = "Error: " . $stmt->error;
-            $_SESSION['message_type'] = "Error";
-            $_SESSION['icon'] = "error";
-        }
-
-        $stmt->close();
-        header("Location: index.php");
-        exit();
+    } catch (Exception $e) {
+        error_log("Mailer Error: " . $mail->ErrorInfo);
+        $response['message'] = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
     }
+
+    if (ob_get_length()) {
+        ob_clean();
+    }
+    echo json_encode($response);
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['code'])) {
+    $email = $_SESSION['email'];
+    $input_code = $_POST['code'];
+
+    $result = $conn->query("SELECT otp FROM users WHERE email = '$email' AND otp = '$input_code'");
+    if ($result->num_rows > 0) {
+        $conn->query("UPDATE users SET otp = NULL WHERE email = '$email'");
+        echo '<script>alert("OTP verified successfully!");</script>';
+        echo '<script>window.location.href = "changeForgotPass.php";</script>';
+    } else {
+        echo '<script>alert("Invalid OTP. Please try again.");</script>';
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -71,272 +92,171 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-    @font-face {
-        font-family: 'Inter';
-        src: url('fonts/Inter/Inter-VariableFont_opsz\,wght.ttf') format('truetype');
-        font-weight: 100 900;
-        font-stretch: normal;
-        font-style: normal;
-    }
+        @font-face {
+            font-family: 'Inter';
+            src: url('fonts/Inter/Inter-VariableFont_opsz\,wght.ttf') format('truetype');
+            font-weight: 100 900;
+            font-stretch: normal;
+            font-style: normal;
+        }
 
-    @font-face {
-        font-family: 'Source';
-        src: url('fonts/Source_Serif_4/static/SourceSerif4-SemiBold.ttf') format('truetype');
-        font-weight: normal;
-        font-style: normal;
+        @font-face {
+            font-family: 'Source';
+            src: url('fonts/Source_Serif_4/static/SourceSerif4-SemiBold.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
 
-    }
+        }
 
-    body {
-        font-family: 'Inter', Arial;
-        background: url('img/casabg.jpg') no-repeat center center/cover;
-        height: 100vh;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-    }
+        body {
+            font-family: 'Inter', Arial;
+            background: url('img/casabg.jpg') no-repeat center center/cover;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
 
-    .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: #5D9C5933;
-        z-index: 1;
-    }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #5D9C5933;
+            z-index: 1;
+        }
 
-    .header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        color: white;
-        padding-inline: 70px !important;
-        padding-left: 90px;
-        padding-right: 90px;
-        display: flex;
-        align-items: center;
-        z-index: 10;
-    }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            color: white;
+            padding-inline: 70px !important;
+            padding-left: 90px;
+            padding-right: 90px;
+            display: flex;
+            align-items: center;
+            z-index: 10;
+        }
 
-    .login {
-        padding-inline: 15px;
-    }
+        .login {
+            padding-inline: 15px;
+        }
 
-    .logo {
-        height: 50px;
-        width: 50px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
+        .header h4 {
+            margin: 0;
+            font-family: 'Source';
+        }
 
-    .header h4 {
-        margin: 0;
-        font-family: 'Source';
-    }
+        .visitor {
+            font-family: 'Inter', Arial;
+            font-weight: 400;
+            font-size: 30px;
+        }
 
-    .visitor {
-        font-family: 'Inter', Arial;
-        font-weight: 400;
-        font-size: 30px;
-    }
+        .card {
+            width: 350px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #fff;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            z-index: 10;
+        }
 
-    .card {
-        position: relative;
-        background: white;
-        border-radius: 10px;
-        padding: 20px;
-        z-index: 10;
-    }
+        .logo {
+            width: 80px;
+            margin: 0 auto 10px;
+            display: block;
+        }
 
-    .table {
-        margin-top: 30px !important;
-    }
+        .submit-btn {
+            width: 100%;
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
 
-    thead,
-    th {
-        background-color: #5D9C59 !important;
-        text-align: center !important;
-        color: #fff !important;
-    }
+        .submit-btn:hover {
+            background: #d43f3f;
+        }
 
-    .empty-row td {
-        height: 41px;
-    }
+        .otp-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
 
-    #camera-container,
-    #captured-photo {
-        display: none;
-        margin-top: 10px;
-    }
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            text-align: center;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.2s ease-in-out;
+        }
 
-    video,
-    img {
-        width: 100%;
-        max-width: 300px;
-        height: 300px;
-        object-fit: cover;
-        border: 2px solid #ddd;
-        border-radius: 5px;
-    }
-
-    .dataTables_paginate {
-        text-align: right !important;
-    }
-
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
-        padding: 8px 12px;
-        margin: 2px;
-        border: 1px solid #5D9C59;
-        border-radius: 5px;
-        background-color: white;
-        color: #5D9C59;
-        transition: 0.3s;
-    }
-
-    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-        background-color: #5D9C59;
-        color: white;
-    }
-
-    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-        background-color: #5D9C59;
-        color: white;
-    }
-
-    .btn-success {
-        --bs-btn-bg: #5D9C59 !important;
-        --bs-btn-border-color: #5D9C59 !important;
-        --bs-btn-hover-bg: #5D9C59 !important;
-    }
-
-    .input-label {
-        font-size: 15px;
-    }
-
-    #captureBtn {
-        display: block;
-        margin: 0 auto;
-    }
+        .otp-input:focus {
+            border-color: #ff4d4d;
+            box-shadow: 0px 0px 5px #ff4d4d;
+        }
     </style>
 </head>
 
 <body>
 
     <div class="overlay"></div>
-    <!-- Add this right after the <body> tag -->
-    <div class="loader-wrapper">
-        <div class="loader">
-            <img src="img/rosariologo.png" alt="Loading..." class="loader-logo">
-        </div>
-    </div>
-
-    <!-- Add this CSS inside the <style> section -->
-    <style>
-    .loader-wrapper {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.95);
-        z-index: 2000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: opacity 0.5s ease;
-    }
-
-    .loader-logo {
-        width: 150px;
-        height: 150px;
-        animation:
-            spin 2s linear infinite,
-            bounce 1.5s ease-in-out infinite,
-            pulse 1.5s infinite ease-in-out;
-        transform-origin: center center;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-    }
-
-    @keyframes spin {
-        0% {
-            transform: rotate(0deg) scale(1);
-        }
-
-        50% {
-            transform: rotate(180deg) scale(1.2);
-        }
-
-        100% {
-            transform: rotate(360deg) scale(1);
-        }
-    }
-
-    @keyframes bounce {
-
-        0%,
-        100% {
-            transform: translateY(0);
-        }
-
-        50% {
-            transform: translateY(-20px);
-        }
-    }
-
-    @keyframes pulse {
-        0% {
-            opacity: 0.8;
-        }
-
-        50% {
-            opacity: 1;
-        }
-
-        100% {
-            opacity: 0.8;
-        }
-    }
-
-    .loader-wrapper.hidden {
-        opacity: 0;
-        pointer-events: none;
-    }
-    </style>
-
-    <!-- Add this JavaScript at the end of your existing script section -->
-    <script>
-        window.addEventListener('load', function() {
-            const loaderWrapper = document.querySelector('.loader-wrapper');
-            // Add slight delay for smooth transition
-            setTimeout(() => {
-                loaderWrapper.classList.add('hidden');
-            }, 500);
-
-            // Remove loader after animation
-            setTimeout(() => {
-                loaderWrapper.style.display = 'none';
-            }, 1000);
-        });
-    </script>
 
     <div class="container mt-5">
-
-        <div class="card p-4">
+        <div class="card p-4 d-flex justify-content-center">
             <img src="img/rosariologo.png" class="logo" />
             <h4 style="margin-top: 10px; margin-bottom: 20px;">Forgot Password</h4>
-            <form action="#" method="post">
-            <div class="input-box">
-                <input type="email" name="email" id="emailInput" class="form-control" placeholder="Enter your email" required>
-            </div>
-            <button type="submit" class="submit-btn" name="reset">Reset</button>
+            
+            <form id="forgotPasswordForm" method="POST">
+                <div class="input-box">
+                    <input type="email" name="email" id="emailInput" class="form-control" placeholder="Enter your email" required>
+                </div>
+                <button type="submit" class="submit-btn">Reset</button>
             </form>
+        </div>
+
+        <!-- OTP Modal -->
+        <div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title text-danger text-center w-100" id="otpModalLabel">
+                            Enter OTP to Verify Your Account
+                        </h5>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img src="img/otp_icon.png" alt="OTP Icon" style="width: 80px; margin-bottom: 10px;">
+                        <p class="mb-3">A code has been sent to <strong id="emailDisplay"></strong></p>
+                        <form method="post" id="otpForm">
+                            <div class="otp-container">
+                                <input type="text" class="form-control otp-input" maxlength="1" required>
+                                <input type="text" class="form-control otp-input" maxlength="1" required>
+                                <input type="text" class="form-control otp-input" maxlength="1" required>
+                                <input type="text" class="form-control otp-input" maxlength="1" required>
+                            </div>
+                            <input type="hidden" name="code" id="hiddenCode">
+                            <button type="submit" class="btn btn-danger w-50">Validate</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -344,181 +264,53 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            fetch('fetch_cities.php') // Call the PHP script
-                .then(response => response.json()) // Convert response to JSON
-                .then(data => {
-                    const citySelect = document.getElementById("city");
+        document.addEventListener("DOMContentLoaded", function () {
+            const inputs = document.querySelectorAll(".otp-input");
 
-                    data.forEach(city => {
-                        let option = document.createElement("option");
-                        option.value = city.city_name;
-                        option.textContent = city.city_name;
-                        citySelect.appendChild(option);
-                    });
-                })
-                .catch(error => console.error("Error fetching cities:", error));
-        });
-
-        document.addEventListener("DOMContentLoaded", function() {
-            fetch('fetch_reasons.php') // Call the PHP script
-                .then(response => response.json()) // Convert response to JSON
-                .then(data => {
-                    const reasonSelect = document.getElementById("visitReason");
-
-                    data.forEach(reason => {
-                        let option = document.createElement("option");
-                        option.value = reason.reason;
-                        option.textContent = reason.reason;
-                        reasonSelect.appendChild(option);
-                    });
-                })
-                .catch(error => console.error("Error fetching reasons:", error));
-        });
-
-        const video = document.getElementById("video");
-        const captureBtn = document.getElementById("captureBtn");
-        const photoPreviewContainer = document.getElementById("photoPreviewContainer");
-        const photoPreview = document.getElementById("photoPreview");
-        const retakePhotoBtn = document.getElementById("retakePhoto");
-        const confirmPhotoBtn = document.getElementById("confirmPhoto");
-        const photoDataInput = document.getElementById("photoData");
-        const visitorForm = document.getElementById("visitorForm");
-
-        function validateForm() {
-            const form = document.getElementById('visitorForm');
-            let isValid = true;
-
-            // Trigger HTML5 validation
-            if (!form.checkValidity()) {
-                form.reportValidity(); // Show native validation messages
-                isValid = false;
-            }
-
-            // Custom validation for Full Name
-            if (!validateFullName()) {
-                isValid = false;
-            }
-
-            return isValid;
-        }
-
-        document.getElementById("submitBtn").addEventListener("click", function(event) {
-            event.preventDefault(); // Prevent default form submission
-
-            // Validate the form before showing the modal
-            if (!validateForm()) {
-                return; // Stop if validation fails
-            }
-
-            // Show the photo modal only if validation passes
-            const photoModal = new bootstrap.Modal(document.getElementById("photoModal"));
-            photoModal.show();
-
-            // Access the camera after modal is shown
-            navigator.mediaDevices.getUserMedia({
-                    video: true
-                })
-                .then(stream => {
-                    video.srcObject = stream;
-                })
-                .catch(err => {
-                    console.error("Camera access error:", err);
-                    alert("Camera access denied. Please allow camera permission to proceed.");
-                    photoModal.hide();
+            inputs.forEach((input, index) => {
+                input.addEventListener("input", (e) => {
+                    if (e.target.value && index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
                 });
-        });
-        // Capture Photo
-        captureBtn.addEventListener("click", function() {
-            const canvas = document.createElement("canvas");
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const context = canvas.getContext("2d");
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            const imageData = canvas.toDataURL("image/png");
-            photoDataInput.value = imageData;
-            photoPreview.src = imageData;
-            photoPreviewContainer.style.display = "block";
-
-            captureBtn.style.display = "none";
-        });
-
-        // Retake
-        retakePhotoBtn.addEventListener("click", function() {
-            photoPreviewContainer.style.display = "none";
-            photoDataInput.value = "";
-            captureBtn.style.display = "block";
-            /* captureBtn.style.margin-left = "auto";
-            captureBtn.style.margin-right = "auto"; */
-        });
-
-        // Confirm Photo & Submit Form
-        confirmPhotoBtn.addEventListener("click", function() {
-            if (photoDataInput.value) {
-                new bootstrap.Modal(document.getElementById("photoModal")).hide();
-                visitorForm.submit();
-            } else {
-                alert("Please capture a photo before confirming.");
-            }
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "Backspace" && index > 0 && !e.target.value) {
+                        inputs[index - 1].focus();
+                    }
+                });
+            });
         });
 
         $(document).ready(function() {
-            $('#visitorTable').DataTable({
-                "paging": true,
-                "searching": false,
-                "lengthChange": false,
-                "pageLength": 5,
-                "ordering": false,
-                "info": false,
-                "language": {
-                    "paginate": {
-                        "previous": "<i class='fas fa-chevron-left'></i>",
-                        "next": "<i class='fas fa-chevron-right'></i>"
+            $("#forgotPasswordForm").submit(function(e) {
+                e.preventDefault(); // Prevent default form submission
+
+                var email = $("#emailInput").val();
+
+                $.ajax({
+                    type: "POST",
+                    url: "forgot_password.php",
+                    data: { email: email },
+                    dataType: "json",
+                    success: function(response) {
+                        if (response.status === "success") {
+                            $("#emailDisplay").text(email);
+                            $("#otpModal").modal("show");
+                        } else {
+                            alert(response.message);
+                        }
                     },
-                    "search": "🔍 Search:"
-                },
-                "dom": '<"top"f>rt<"bottom"p><"clear">'
+                    error: function() {
+                        alert("An error occurred. Please try again.");
+                    }
+                });
             });
-        });
 
-        function validateFullName() {
-            const fullNameInput = document.getElementById("fullName");
-            const fullNameError = document.getElementById("fullNameError");
-            const name = fullNameInput.value.trim();
-            const nameRegex = /^[A-Za-z\s]+$/;
-
-            if (name === "" || !nameRegex.test(name)) {
-                fullNameError.style.display = "block";
-                return false;
-            }
-            fullNameError.style.display = "none";
-            return true;
-        }
-        document.addEventListener("DOMContentLoaded", function() {
-
-            // Add an event listener for the form submission
-            const form = document.getElementById("visitorForm");
-            form.addEventListener("submit", function(event) {
-                if (!validateFullName()) {
-                    event.preventDefault(); // Prevent form submission if validation fails
+            $(".otp-input").keyup(function() {
+                if (this.value.length === this.maxLength) {
+                    $(this).next(".otp-input").focus();
                 }
-            });
-            const fullNameInput = document.getElementById("fullName");
-            // Prevent entry of special characters or numbers while typing
-            fullNameInput.addEventListener("input", function(event) {
-                const inputValue = fullNameInput.value;
-
-                // Remove any non-alphabetical characters (including numbers and special characters)
-                const cleanedValue = inputValue.replace(/[^A-Za-z\s]/g, "");
-
-                if (inputValue !== cleanedValue) {
-                    fullNameInput.value =
-                        cleanedValue; // Update the input value to remove invalid characters
-                }
-
-                // Dynamically validate the input on every keystroke
-                validateFullName();
             });
         });
     </script>
