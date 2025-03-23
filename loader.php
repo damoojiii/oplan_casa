@@ -1,18 +1,28 @@
 <!-- Add this right after the <body> tag -->
-<div class="loader-wrapper">
+    <div class="loader-wrapper">
         <div class="loader">
             <?php
-                $db = new mysqli('localhost', 'root', '', 'casadb');
-                if ($db->connect_error) {
+            $db = new mysqli('localhost', 'root', '', 'casadb');
+            if ($db->connect_error) {
                 die("Connection failed: " . $db->connect_error);
-                }
-                $sql = "SELECT logo FROM logo_tbl";
-                $result = $db->query($sql);
-                while($row = $result->fetch_assoc()) {
-                    echo "<div class='logo'>";
-                    echo "<img src='{$row['logo']}' alt='Logo' style='width: 150px; height: 150px; '>";
+            }
+
+            $sql = "SELECT logo FROM logo_tbl";
+            $result = $db->query($sql);
+
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $logo = !empty($row['logo']) ? $row['logo'] : 'img/rosariologo.png'; // Use default if empty
+                    echo "<div class='loader-logo'>";
+                    echo "<img src='$logo' alt='Logo' style='width: 150px; height: 150px;'>";
                     echo "</div>";
                 }
+            } else {
+                // If no logo found, display the default logo
+                echo "<div class='loader-logo'>";
+                echo "<img src='img/rosariologo.png' alt='Default Logo' style='width: 150px; height: 150px;'>";
+                echo "</div>";
+            }
             ?>
         </div>
     </div>
@@ -99,7 +109,7 @@
             // Add slight delay for smooth transition
             setTimeout(() => {
                 loaderWrapper.classList.add('hidden');
-            }, 500);
+            }, 5000);
 
             // Remove loader after animation
             setTimeout(() => {
