@@ -132,9 +132,9 @@
 
     #main-content {
         transition: margin-left 0.3s ease;
-        margin-left: 250px;
+        margin-left: 275px;
         margin-block: 50px;
-        max-width: 85%;
+        max-width: 80%;
         font-family: 'Inter';
     }
 
@@ -166,4 +166,13 @@
     .main-menu {
         font-family: 'Karla';
         margin-bottom: 10px;
+    }
+    .btn-primary {
+        background-color: #273E26 !important;
+        border-color: #273E26 !important;
+    }
+    
+    .btn-primary:hover {
+        background-color:rgb(35, 77, 35) !important;
+        border-color: #1a2c1a !important;
     }

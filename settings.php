@@ -66,16 +66,6 @@
             color: #273E26;
             font-family: 'Karla', sans-serif;
         }
-        
-        .btn-primary {
-            background-color: #273E26 !important;
-            border-color: #273E26 !important;
-        }
-        
-        .btn-primary:hover {
-            background-color:rgb(35, 77, 35) !important;
-            border-color: #1a2c1a !important;
-        }
 
         /* Info content */
         
@@ -220,7 +210,7 @@
                 </a>
             </li>
             <li>
-                <a href="scheduled-field-trips.php" class="nav-link">
+                <a href="trips.php" class="nav-link">
                     <i class="fa-solid fa-bus"></i> Scheduled Field Trips
                 </a>
             </li>

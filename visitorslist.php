@@ -114,7 +114,7 @@
                 </a>
             </li>
             <li>
-                <a href="scheduled-field-trips.php" class="nav-link">
+                <a href="trips.php" class="nav-link">
                     <i class="fa-solid fa-bus"></i> Scheduled Field Trips
                 </a>
             </li>
