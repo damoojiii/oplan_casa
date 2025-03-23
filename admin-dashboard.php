@@ -116,17 +116,21 @@
         <div class="text-center">
             <div class="logo-circle">
             <?php
-            // Fetch logo from database
-            $sql = "SELECT logo_path FROM site_settings WHERE id = 1";
-            $result = mysqli_query($conn, $sql);
-            if ($result && mysqli_num_rows($result) > 0) {
-                $row = mysqli_fetch_assoc($result);
-                $logoPath = $row['logo_path'] ?? 'img/rosariologo.png';
-            } else {
-                $logoPath = 'img/rosariologo.png'; // Default logo
-            }
-            ?>
-            <img src="<?php echo $logoPath; ?>" alt="Tourism Office Logo" class="logo">
+                    $db = new mysqli('localhost', 'root', '', 'casadb');
+
+                    if ($db->connect_error) {
+                    die("Connection failed: " . $db->connect_error);
+                    }
+
+                    $sql = "SELECT logo FROM logo_tbl";
+                    $result = $db->query($sql);
+
+                    while($row = $result->fetch_assoc()) {
+                        echo "<div class='logo-item'>";
+                        echo "<img src='{$row['logo']}' alt='Logo'>";
+                        echo "</div>";
+                    }
+                ?>
             </div>
         </div>
 

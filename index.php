@@ -1,6 +1,7 @@
 <?php
     session_start();
     include 'connection.php';
+    include 'loader.php';
     date_default_timezone_set("Asia/Manila");
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -37,7 +38,6 @@
         $stmt->bind_param("ssssss", $fullName, $city, $gender, $visitReason, $time, $fileName);
 
         if ($stmt->execute()) {
-            $_SESSION['message'] = "Visitor added successfully!";
             $_SESSION['message_type'] = "Success";
             $_SESSION['icon'] = "success";
         } else {
@@ -99,6 +99,10 @@
         position: relative;
     }
 
+    body.swal2-shown {
+        padding-right: 0px !important;
+    }
+
     .overlay {
         position: fixed;
         top: 0;
@@ -130,10 +134,15 @@
     .logo {
         height: 50px;
         width: 50px;
+        
+        object-fit: cover;
+    }
+    .logo img {
+        width: 100%;
+        height: 100%;
         border-radius: 50%;
         object-fit: cover;
     }
-
     .header h4 {
         margin: 0;
         font-family: 'Source';
@@ -329,17 +338,19 @@
     <div class="header d-flex align-items-center justify-content-between p-3">
         <div class="d-flex align-items-center">
         <?php
-        // Fetch logo from database
-        $sql = "SELECT logo_path FROM site_settings WHERE id = 1";
-        $result = mysqli_query($conn, $sql);
-        if ($result && mysqli_num_rows($result) > 0) {
-            $row = mysqli_fetch_assoc($result);
-            $logoPath = $row['logo_path'] ?? 'img/rosariologo.png';
-        } else {
-            $logoPath = 'img/rosariologo.png'; // Default logo
-        }
+            $db = new mysqli('localhost', 'root', '', 'casadb');
+            if ($db->connect_error) {
+            die("Connection failed: " . $db->connect_error);
+            }
+            $sql = "SELECT logo FROM logo_tbl";
+            $result = $db->query($sql);
+            while($row = $result->fetch_assoc()) {
+                echo "<div class='logo'>";
+                echo "<img src='{$row['logo']}' alt='Logo' style='width: 50px; height: 50px; object-fit: cover;'>";
+                echo "</div>";
+            }
         ?>
-        <img src="<?php echo $logoPath; ?>" alt="Tourism Office Logo" class="logo">
+        
                     
         <h4 class="mb-0 ms-3 text-white">Tourism Office - Municipality of Rosario</h4>
         </div>
@@ -347,22 +358,6 @@
         <a href="login.php"><button class="btn btn-success login">Login</button></a>
     </div>
 
-
-    <?php
-        if (isset($_SESSION['message'])) {
-            echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        Swal.fire({
-                            title: '". $_SESSION['message_type'] ."',
-                            text: '" . $_SESSION['message'] . "',
-                            icon: '". $_SESSION['icon'] ."',
-                            confirmButtonText: 'OK'
-                        });
-                    });
-                </script>";
-            unset($_SESSION['message']); 
-        }
-    ?>
     <div class="container mt-5">
 
         <div class="card p-4">
@@ -378,22 +373,48 @@
                             Please enter a valid name (letters only)
                         </div>
                     </div>
+
+                    
+
                     <div class="col-md-2">
                         <label for="city" class="form-label input-label">City/Municipality</label>
                         <select id="city" name="city" class="form-select" required>
                             <option value="" disabled selected hidden>Select City/Municipality</option>
+
+                            <?php
+                        
+                            // Query to get the cities
+                            $sql = "SELECT cityID, city_name FROM cities"; // Assuming your table is 'cities' and has 'id' and 'city_name' columns
+                            $result = $conn->query($sql);
+                        
+                            // Loop through the results and display them as options
+                            if ($result->num_rows > 0) {
+                                while($row = $result->fetch_assoc()) {
+                                    echo '<option value="' . $row["cityID"] . '">' . $row["city_name"] . '</option>';
+                                }
+                            } else {
+                                echo '<option value="">No cities found</option>';
+                            }
+                            ?>
                         </select>
+
                     </div>
+
+                    <?php
+                        $purposeQuery = "SELECT DISTINCT purpose FROM purpose_tbl";
+                        $purposeResult = mysqli_query($conn, $purposeQuery);
+                    ?>
 
                     <div class="col-md-3">
                         <label for="visitReason" class="form-label input-label">Purpose for Visit</label>
-                        <select id="visitReason" name="reason" class="form-select" required>
-                            <option value="" disabled selected hidden>Select Reason</option>
-                            <option value="Ocular Visit">Ocular Visit</option>
-                            <option value="Business">Business</option>
-                            <option value="Tourism">Tourism</option>
+                        <select name="purpose" id="purpose" class="form-select" required>
+                            <option value="">Select purpose</option>
+                            <?php while($row = mysqli_fetch_assoc($purposeResult)) { ?>
+                            <option value="<?php echo $row['purpose']; ?>"><?php echo $row['purpose']; ?></option>
+                            <?php } ?>
                         </select>
                     </div>
+
                     <div class="col-md-2">
                         <label for="gender" class="form-label input-label">Gender</label>
                         <select id="gender" name="gender" class="form-select" required>
@@ -488,171 +509,191 @@
         </div>
     </div>
 
+    <?php
+        if (isset($_SESSION['message'])) {
+            echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        setTimeout(function() {
+                            Swal.fire({
+                                title: '". $_SESSION['message_type'] ."',
+                                text: '" . $_SESSION['message'] . "',
+                                icon: '". $_SESSION['icon'] ."',
+                                confirmButtonText: 'OK'
+                            });
+                        }, 500); // 500 milliseconds delay
+                    });
+                </script>";
+            unset($_SESSION['message']); 
+        }
+    ?>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        
+
         document.addEventListener("DOMContentLoaded", function() {
-            fetch('fetch_cities.php') // Call the PHP script
+            fetch('fetch_reasons.php') // Call the PHP script
                 .then(response => response.json()) // Convert response to JSON
                 .then(data => {
-                    const citySelect = document.getElementById("city");
+                    const reasonSelect = document.getElementById("visitReason");
 
-                    data.forEach(city => {
+                    data.forEach(purpose => {
                         let option = document.createElement("option");
-                        option.value = city.city_name;
-                        option.textContent = city.city_name;
-                        citySelect.appendChild(option);
+                        option.value = purpose.purpose;
+                        option.textContent = purpose.purpose;
+                        reasonSelect.appendChild(option);
                     });
                 })
-                .catch(error => console.error("Error fetching cities:", error));
+                .catch(error => console.error("Error fetching reasons:", error));
         });
 
-    const video = document.getElementById("video");
-    const captureBtn = document.getElementById("captureBtn");
-    const photoPreviewContainer = document.getElementById("photoPreviewContainer");
-    const photoPreview = document.getElementById("photoPreview");
-    const retakePhotoBtn = document.getElementById("retakePhoto");
-    const confirmPhotoBtn = document.getElementById("confirmPhoto");
-    const photoDataInput = document.getElementById("photoData");
-    const visitorForm = document.getElementById("visitorForm");
+        const video = document.getElementById("video");
+        const captureBtn = document.getElementById("captureBtn");
+        const photoPreviewContainer = document.getElementById("photoPreviewContainer");
+        const photoPreview = document.getElementById("photoPreview");
+        const retakePhotoBtn = document.getElementById("retakePhoto");
+        const confirmPhotoBtn = document.getElementById("confirmPhoto");
+        const photoDataInput = document.getElementById("photoData");
+        const visitorForm = document.getElementById("visitorForm");
 
-    function validateForm() {
-        const form = document.getElementById('visitorForm');
-        let isValid = true;
+        function validateForm() {
+            const form = document.getElementById('visitorForm');
+            let isValid = true;
 
-        // Trigger HTML5 validation
-        if (!form.checkValidity()) {
-            form.reportValidity(); // Show native validation messages
-            isValid = false;
-        }
+            // Trigger HTML5 validation
+            if (!form.checkValidity()) {
+                form.reportValidity(); // Show native validation messages
+                isValid = false;
+            }
 
-        // Custom validation for Full Name
-        if (!validateFullName()) {
-            isValid = false;
-        }
-
-        return isValid;
-    }
-
-    document.getElementById("submitBtn").addEventListener("click", function(event) {
-        event.preventDefault(); // Prevent default form submission
-
-        // Validate the form before showing the modal
-        if (!validateForm()) {
-            return; // Stop if validation fails
-        }
-
-        // Show the photo modal only if validation passes
-        const photoModal = new bootstrap.Modal(document.getElementById("photoModal"));
-        photoModal.show();
-
-        // Access the camera after modal is shown
-        navigator.mediaDevices.getUserMedia({
-                video: true
-            })
-            .then(stream => {
-                video.srcObject = stream;
-            })
-            .catch(err => {
-                console.error("Camera access error:", err);
-                alert("Camera access denied. Please allow camera permission to proceed.");
-                photoModal.hide();
-            });
-    });
-    // Capture Photo
-    captureBtn.addEventListener("click", function() {
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const context = canvas.getContext("2d");
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        const imageData = canvas.toDataURL("image/png");
-        photoDataInput.value = imageData;
-        photoPreview.src = imageData;
-        photoPreviewContainer.style.display = "block";
-
-        captureBtn.style.display = "none";
-    });
-
-    // Retake
-    retakePhotoBtn.addEventListener("click", function() {
-        photoPreviewContainer.style.display = "none";
-        photoDataInput.value = "";
-        captureBtn.style.display = "block";
-        /* captureBtn.style.margin-left = "auto";
-        captureBtn.style.margin-right = "auto"; */
-    });
-
-    // Confirm Photo & Submit Form
-    confirmPhotoBtn.addEventListener("click", function() {
-        if (photoDataInput.value) {
-            new bootstrap.Modal(document.getElementById("photoModal")).hide();
-            visitorForm.submit();
-        } else {
-            alert("Please capture a photo before confirming.");
-        }
-    });
-
-    $(document).ready(function() {
-        $('#visitorTable').DataTable({
-            "paging": true,
-            "searching": false,
-            "lengthChange": false,
-            "pageLength": 5,
-            "ordering": false,
-            "info": false,
-            "language": {
-                "paginate": {
-                    "previous": "<i class='fas fa-chevron-left'></i>",
-                    "next": "<i class='fas fa-chevron-right'></i>"
-                },
-                "search": "🔍 Search:"
-            },
-            "dom": '<"top"f>rt<"bottom"p><"clear">'
-        });
-    });
-
-    function validateFullName() {
-        const fullNameInput = document.getElementById("fullName");
-        const fullNameError = document.getElementById("fullNameError");
-        const name = fullNameInput.value.trim();
-        const nameRegex = /^[A-Za-z\s]+$/;
-
-        if (name === "" || !nameRegex.test(name)) {
-            fullNameError.style.display = "block";
-            return false;
-        }
-        fullNameError.style.display = "none";
-        return true;
-    }
-    document.addEventListener("DOMContentLoaded", function() {
-
-        // Add an event listener for the form submission
-        const form = document.getElementById("visitorForm");
-        form.addEventListener("submit", function(event) {
+            // Custom validation for Full Name
             if (!validateFullName()) {
-                event.preventDefault(); // Prevent form submission if validation fails
-            }
-        });
-        const fullNameInput = document.getElementById("fullName");
-        // Prevent entry of special characters or numbers while typing
-        fullNameInput.addEventListener("input", function(event) {
-            const inputValue = fullNameInput.value;
-
-            // Remove any non-alphabetical characters (including numbers and special characters)
-            const cleanedValue = inputValue.replace(/[^A-Za-z\s]/g, "");
-
-            if (inputValue !== cleanedValue) {
-                fullNameInput.value =
-                    cleanedValue; // Update the input value to remove invalid characters
+                isValid = false;
             }
 
-            // Dynamically validate the input on every keystroke
-            validateFullName();
+            return isValid;
+        }
+
+        document.getElementById("submitBtn").addEventListener("click", function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Validate the form before showing the modal
+            if (!validateForm()) {
+                return; // Stop if validation fails
+            }
+
+            // Show the photo modal only if validation passes
+            const photoModal = new bootstrap.Modal(document.getElementById("photoModal"));
+            photoModal.show();
+
+            // Access the camera after modal is shown
+            navigator.mediaDevices.getUserMedia({
+                    video: true
+                })
+                .then(stream => {
+                    video.srcObject = stream;
+                })
+                .catch(err => {
+                    console.error("Camera access error:", err);
+                    alert("Camera access denied. Please allow camera permission to proceed.");
+                    photoModal.hide();
+                });
         });
-    });
+        // Capture Photo
+        captureBtn.addEventListener("click", function() {
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext("2d");
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const imageData = canvas.toDataURL("image/png");
+            photoDataInput.value = imageData;
+            photoPreview.src = imageData;
+            photoPreviewContainer.style.display = "block";
+
+            captureBtn.style.display = "none";
+        });
+
+        // Retake
+        retakePhotoBtn.addEventListener("click", function() {
+            photoPreviewContainer.style.display = "none";
+            photoDataInput.value = "";
+            captureBtn.style.display = "block";
+            /* captureBtn.style.margin-left = "auto";
+            captureBtn.style.margin-right = "auto"; */
+        });
+
+        // Confirm Photo & Submit Form
+        confirmPhotoBtn.addEventListener("click", function() {
+            if (photoDataInput.value) {
+                new bootstrap.Modal(document.getElementById("photoModal")).hide();
+                visitorForm.submit();
+            } else {
+                alert("Please capture a photo before confirming.");
+            }
+        });
+
+        $(document).ready(function() {
+            $('#visitorTable').DataTable({
+                "paging": true,
+                "searching": false,
+                "lengthChange": false,
+                "pageLength": 5,
+                "ordering": false,
+                "info": false,
+                "language": {
+                    "paginate": {
+                        "previous": "<i class='fas fa-chevron-left'></i>",
+                        "next": "<i class='fas fa-chevron-right'></i>"
+                    },
+                    "search": "🔍 Search:"
+                },
+                "dom": '<"top"f>rt<"bottom"p><"clear">'
+            });
+        });
+
+        function validateFullName() {
+            const fullNameInput = document.getElementById("fullName");
+            const fullNameError = document.getElementById("fullNameError");
+            const name = fullNameInput.value.trim();
+            const nameRegex = /^[A-Za-z\s]+$/;
+
+            if (name === "" || !nameRegex.test(name)) {
+                fullNameError.style.display = "block";
+                return false;
+            }
+            fullNameError.style.display = "none";
+            return true;
+        }
+        document.addEventListener("DOMContentLoaded", function() {
+
+            // Add an event listener for the form submission
+            const form = document.getElementById("visitorForm");
+            form.addEventListener("submit", function(event) {
+                if (!validateFullName()) {
+                    event.preventDefault(); // Prevent form submission if validation fails
+                }
+            });
+            const fullNameInput = document.getElementById("fullName");
+            // Prevent entry of special characters or numbers while typing
+            fullNameInput.addEventListener("input", function(event) {
+                const inputValue = fullNameInput.value;
+
+                // Remove any non-alphabetical characters (including numbers and special characters)
+                const cleanedValue = inputValue.replace(/[^A-Za-z\s]/g, "");
+
+                if (inputValue !== cleanedValue) {
+                    fullNameInput.value =
+                        cleanedValue; // Update the input value to remove invalid characters
+                }
+
+                // Dynamically validate the input on every keystroke
+                validateFullName();
+            });
+        });
     </script>
 
 </body>

@@ -13,6 +13,7 @@
     <title>Admin Tourism</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="icon" href="img/rosariologo.png">
     
     <style>
@@ -182,18 +183,22 @@
         <!-- Logo/Icon -->
         <div class="text-center">
             <div class="logo-circle">
-            <?php
-            // Fetch logo from database
-            $sql = "SELECT logo_path FROM site_settings WHERE id = 1";
-            $result = mysqli_query($conn, $sql);
-            if ($result && mysqli_num_rows($result) > 0) {
-                $row = mysqli_fetch_assoc($result);
-                $logoPath = $row['logo_path'] ?? 'img/rosariologo.png';
-            } else {
-                $logoPath = 'img/rosariologo.png'; // Default logo
-            }
-            ?>
-            <img src="<?php echo $logoPath; ?>" alt="Tourism Office Logo" class="logo">
+                <?php
+                    $db = new mysqli('localhost', 'root', '', 'casadb');
+
+                    if ($db->connect_error) {
+                    die("Connection failed: " . $db->connect_error);
+                    }
+
+                    $sql = "SELECT logo FROM logo_tbl";
+                    $result = $db->query($sql);
+
+                    while($row = $result->fetch_assoc()) {
+                        echo "<div class='logo-item'>";
+                        echo "<img src='{$row['logo']}' alt='Logo'>";
+                        echo "</div>";
+                    }
+                ?>
             </div>
         </div>
 
@@ -241,11 +246,12 @@
     </div>
 
     <div id="main-content" class="container mt-1">
-       
+    
+
         <div class="parent">
             
-            <div class="logo-main">
-                <h4 class="mb-3 text-dark">Rosario Tourism Office Logo</h4>
+            <div class="logo">
+                <h4 class="mb-3 text-dark">Tourism Office Logo</h4>
                 <div class="current-logo mb-3 text-center">
                     <?php
                     // Fetch current logo from database
@@ -258,7 +264,7 @@
                         $logoPath = 'img/rosariologo.png'; // Default logo
                     }
                     ?>
-                    <img src="<?php echo $logoPath; ?>" alt="Tourism Office Logo">
+                    <img src="<?php echo $logoPath; ?>" alt="Tourism Office Logo" class="img-fluid mb-2" style="max-height: 150px;">
                 </div>
                 
                 <form action="update_logo.php" method="post" enctype="multipart/form-data" class="mt-3">
@@ -321,12 +327,215 @@
 
 
             <div class="edit">
-                <!-- Edit content here -->
-            </div>
+                <h4 class="mb-3 text-white text-center">Edit Site Information</h4>
+                <div class="card">
+                    <div class="card-body">
+                        
+                        <!-- Visit Purpose Management Section -->
+                        <?php
+                            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                                if (isset($_POST['newReason'])) {
+                                    $purpose = $conn->real_escape_string($_POST['newReason']);
+                                    if ($conn->query("INSERT INTO purpose_tbl (purpose) VALUES ('$purpose')")) {
+                                        echo "<script>
+                                                Swal.fire({
+                                                    title: 'Success!',
+                                                    text: 'Purpose added successfully.',
+                                                    icon: 'success',
+                                                    confirmButtonText: 'Okay'
+                                                });
+                                            </script>";
+                                    } else {
+                                        echo "<script>
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: 'Failed to add purpose.',
+                                                    icon: 'error',
+                                                    confirmButtonText: 'Okay'
+                                                });
+                                            </script>";
+                                    }
+                                }
 
-        </div>
-    
-    </div>
+                                if (isset($_POST['delete_purpose'])) {
+                                    $id = (int)$_POST['id'];
+                                    if ($conn->query("DELETE FROM purpose_tbl WHERE purpose_id = $id")) {
+                                        echo "<script>
+                                                Swal.fire({
+                                                    title: 'Deleted!',
+                                                    text: 'Purpose deleted successfully.',
+                                                    icon: 'success',
+                                                    confirmButtonText: 'Okay'
+                                                });
+                                            </script>";
+                                    } else {
+                                        echo "<script>
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: 'Failed to delete purpose.',
+                                                    icon: 'error',
+                                                    confirmButtonText: 'Okay'
+                                                });
+                                            </script>";
+                                    }
+                                }
+                            }
+                        ?>
+
+
+                        <h5 class=" mb-3">Manage Visit Purposes</h5>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- Add new visit purpose -->
+                                <div class="card bg-light mb-3">
+                                    <div class="card-header bg-success text-white">
+                                        <i class="fas fa-plus-circle"></i> Add New Purpose
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="addReasonForm" method="post">
+                                            <input type="hidden" name="action" value="add">
+                                            <div class="input-group mb-3">
+                                                <input type="text" class="form-control" name="newReason" placeholder="New visit purpose" required>
+                                                <button class="btn btn-success" type="submit">
+                                                    <i class="fas fa-plus"></i> Add
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <!-- Current visit purposes list -->
+                                <div class="card bg-light">
+                                    <div class="card-header bg-success text-white">
+                                        <i class="fas fa-list"></i> Current Purposes
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group mb-3">
+                                            <label for="purposeSelect" class="form-label">Select a purpose to manage:</label>
+                                            <select id="purposeSelect" class="form-select" onchange="showPurpose(this.value)">
+                                                <option value="">-- Select a purpose --</option>
+                                                <?php
+                                                $result = $conn->query("SELECT * FROM purpose_tbl ORDER BY purpose_id DESC");
+                                                while ($row = $result->fetch_assoc()) {
+                                                    echo "<option value='{$row['purpose_id']}'>{$row['purpose']}</option>";
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <div id="purposeDetails" class="mt-3 p-3 border rounded bg-white"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>  
+                    </div>  
+                </div>
+                <!-- Manage Cities -->
+
+                <?php
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                        if (isset($_POST['newCity'])) {
+                            $city_name = $conn->real_escape_string($_POST['newCity']);
+                            if ($conn->query("INSERT INTO cities (city_name) VALUES ('$city_name')")) {
+                                echo "<script>
+                                        Swal.fire({
+                                            title: 'Success!',
+                                            text: 'City added successfully.',
+                                            icon: 'success',
+                                            confirmButtonText: 'Okay'
+                                        });
+                                    </script>";
+                            } else {
+                                echo "<script>
+                                        Swal.fire({
+                                            title: 'Error!',
+                                            text: 'Failed to add city.',
+                                            icon: 'error',
+                                            confirmButtonText: 'Okay'
+                                        });
+                                    </script>";
+                            }
+                        }
+
+                        if (isset($_POST['delete_city'])) {
+                            $id = (int)$_POST['id'];
+                            if ($conn->query("DELETE FROM cities WHERE cityID = $id")) {
+                                echo "<script>
+                                        Swal.fire({
+                                            title: 'Deleted!',
+                                            text: 'City deleted successfully.',
+                                            icon: 'success',
+                                            confirmButtonText: 'Okay'
+                                        });
+                                    </script>";
+                            } else {
+                                echo "<script>
+                                        Swal.fire({
+                                            title: 'Error!',
+                                            text: 'Failed to delete city.',
+                                            icon: 'error',
+                                            confirmButtonText: 'Okay'
+                                        });
+                                    </script>";
+                            }
+                        }
+                    }
+                ?>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class=" mb-3">Manage Cities</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card bg-light mb-3">
+                                    <div class="card-header bg-success text-white">
+                                        <i class="fas fa-plus-circle"></i> Add New City
+                                    </div>
+
+                                    <div class="card-body">
+                                        <form id="addCityForm" method="post">
+                                            <input type="hidden" name="action" value="add">
+                                            <div class="input-group mb-3">
+                                                <input type="text" class="form-control" name="newCity" placeholder="Add New City" required>
+                                                <button class="btn btn-success" type="submit">
+                                                    <i class="fas fa-plus"></i> Add
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <!-- Current city list -->
+                                <div class="card bg-light">
+                                    <div class="card-header bg-success text-white">
+                                        <i class="fas fa-list"></i> Current Cities
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group mb-3">
+                                            <label for="purposeSelect" class="form-label">Select a City to manage:</label>
+                                            <select id="purposeSelect" class="form-select" onchange="showCities(this.value)">
+                                                <option value="">-- Select a city --</option>
+                                                <?php
+                                                $result = $conn->query("SELECT * FROM cities ORDER BY cityID DESC");
+                                                while ($row = $result->fetch_assoc()) {
+                                                    echo "<option value='{$row['cityID']}'>{$row['city_name']}</option>";
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <div id="cityDetails" class="mt-3 p-3 border rounded bg-white"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>    
+                    </div>    
+                </div>
 
 
     </div>
@@ -386,6 +595,52 @@
             }
         });
 
+        // Function to show purpose details
+        function showPurpose(id) {
+            if (id === "") {
+                document.getElementById('purposeDetails').innerHTML = "";
+                return;
+            }
+            
+            const purposeText = document.querySelector(`option[value='${id}']`).innerText;
+            document.getElementById('purposeDetails').innerHTML = `
+                <div class='purpose-item'>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">${purposeText}</h5>
+                        <form method='POST' style='display:inline;'>
+                            <input type='hidden' name='id' value='${id}'>
+                            <button type='submit' name='delete_purpose' class='btn btn-danger btn-sm'>
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Function to show city details
+        function showCities(id) {
+            if (id === "") {
+                document.getElementById('cityDetails').innerHTML = "";
+                return;
+            }
+            
+            const purposeText = document.querySelector(`option[value='${id}']`).innerText;
+            document.getElementById('cityDetails').innerHTML = `
+                <div class='purpose-item'>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">${purposeText}</h5>
+                        <form method='POST' style='display:inline;'>
+                            <input type='hidden' name='id' value='${id}'>
+                            <button type='submit' name='delete_city' class='btn btn-danger btn-sm'>
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+
         // Error Success Message
         document.addEventListener('DOMContentLoaded', function() {
             <?php if(isset($_GET['success'])): ?>
@@ -419,6 +674,22 @@
                 });
             <?php endif; ?>
         });
+
+        // Preview Image
+        function previewImage(input) {
+            const preview = document.getElementById('imagePreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
 
         <?php if(isset($_GET['account_success'])): ?>
             Swal.fire({
