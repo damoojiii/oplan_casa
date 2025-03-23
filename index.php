@@ -130,10 +130,15 @@
     .logo {
         height: 50px;
         width: 50px;
+        
+        object-fit: cover;
+    }
+    .logo img {
+        width: 100%;
+        height: 100%;
         border-radius: 50%;
         object-fit: cover;
     }
-
     .header h4 {
         margin: 0;
         font-family: 'Source';
@@ -231,7 +236,19 @@
     <!-- Add this right after the <body> tag -->
     <div class="loader-wrapper">
         <div class="loader">
-            <img src="img/rosariologo.png" alt="Loading..." class="loader-logo">
+            <?php
+                $db = new mysqli('localhost', 'root', '', 'casadb');
+                if ($db->connect_error) {
+                die("Connection failed: " . $db->connect_error);
+                }
+                $sql = "SELECT logo FROM logo_tbl";
+                $result = $db->query($sql);
+                while($row = $result->fetch_assoc()) {
+                    echo "<div class='logo-item'>";
+                    echo "<img src='{$row['logo']}' style='border-radius: 50%' alt='Logo'>";
+                    echo "</div>";
+                }
+            ?>
         </div>
     </div>
 
@@ -329,17 +346,19 @@
     <div class="header d-flex align-items-center justify-content-between p-3">
         <div class="d-flex align-items-center">
         <?php
-        // Fetch logo from database
-        $sql = "SELECT logo_path FROM site_settings WHERE id = 1";
-        $result = mysqli_query($conn, $sql);
-        if ($result && mysqli_num_rows($result) > 0) {
-            $row = mysqli_fetch_assoc($result);
-            $logoPath = $row['logo_path'] ?? 'img/rosariologo.png';
-        } else {
-            $logoPath = 'img/rosariologo.png'; // Default logo
-        }
+            $db = new mysqli('localhost', 'root', '', 'casadb');
+            if ($db->connect_error) {
+            die("Connection failed: " . $db->connect_error);
+            }
+            $sql = "SELECT logo FROM logo_tbl";
+            $result = $db->query($sql);
+            while($row = $result->fetch_assoc()) {
+                echo "<div class='logo'>";
+                echo "<img src='{$row['logo']}' alt='Logo' style='width: 50px; height: 50px; object-fit: cover;'>";
+                echo "</div>";
+            }
         ?>
-        <img src="<?php echo $logoPath; ?>" alt="Tourism Office Logo" class="logo">
+        
                     
         <h4 class="mb-0 ms-3 text-white">Tourism Office - Municipality of Rosario</h4>
         </div>
@@ -378,17 +397,45 @@
                             Please enter a valid name (letters only)
                         </div>
                     </div>
+
+                    
+
                     <div class="col-md-2">
                         <label for="city" class="form-label input-label">City/Municipality</label>
                         <select id="city" name="city" class="form-select" required>
                             <option value="" disabled selected hidden>Select City/Municipality</option>
+
+                            <?php
+                        
+                            // Query to get the cities
+                            $sql = "SELECT cityID, city_name FROM cities"; // Assuming your table is 'cities' and has 'id' and 'city_name' columns
+                            $result = $conn->query($sql);
+                        
+                            // Loop through the results and display them as options
+                            if ($result->num_rows > 0) {
+                                while($row = $result->fetch_assoc()) {
+                                    echo '<option value="' . $row["cityID"] . '">' . $row["city_name"] . '</option>';
+                                }
+                            } else {
+                                echo '<option value="">No cities found</option>';
+                            }
+                            ?>
                         </select>
+
                     </div>
+
+                    <?php
+                        $purposeQuery = "SELECT DISTINCT purpose FROM purpose_tbl";
+                        $purposeResult = mysqli_query($conn, $purposeQuery);
+                    ?>
 
                     <div class="col-md-3">
                         <label for="visitReason" class="form-label input-label">Purpose for Visit</label>
-                        <select id="visitReason" name="reason" class="form-select" required>
-                            <option value="" disabled selected hidden>Select Reason</option>
+                        <select name="purpose" id="purpose" class="form-select" required>
+                            <option value="">Select purpose</option>
+                            <?php while($row = mysqli_fetch_assoc($purposeResult)) { ?>
+                            <option value="<?php echo $row['purpose']; ?>"><?php echo $row['purpose']; ?></option>
+                            <?php } ?>
                         </select>
                     </div>
 
@@ -490,21 +537,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            fetch('fetch_cities.php') // Call the PHP script
-                .then(response => response.json()) // Convert response to JSON
-                .then(data => {
-                    const citySelect = document.getElementById("city");
-
-                    data.forEach(city => {
-                        let option = document.createElement("option");
-                        option.value = city.city_name;
-                        option.textContent = city.city_name;
-                        citySelect.appendChild(option);
-                    });
-                })
-                .catch(error => console.error("Error fetching cities:", error));
-        });
+        
 
         document.addEventListener("DOMContentLoaded", function() {
             fetch('fetch_reasons.php') // Call the PHP script

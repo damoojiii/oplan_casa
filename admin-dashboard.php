@@ -115,7 +115,22 @@
         <!-- Logo/Icon -->
         <div class="text-center">
             <div class="logo-circle">
-                <img src="logo.png" alt="Logo" class="img-fluid">
+            <?php
+                    $db = new mysqli('localhost', 'root', '', 'casadb');
+
+                    if ($db->connect_error) {
+                    die("Connection failed: " . $db->connect_error);
+                    }
+
+                    $sql = "SELECT logo FROM logo_tbl";
+                    $result = $db->query($sql);
+
+                    while($row = $result->fetch_assoc()) {
+                        echo "<div class='logo-item'>";
+                        echo "<img src='{$row['logo']}' alt='Logo'>";
+                        echo "</div>";
+                    }
+                ?>
             </div>
         </div>
 
