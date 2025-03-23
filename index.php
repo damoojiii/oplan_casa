@@ -1,6 +1,7 @@
 <?php
     session_start();
     include 'connection.php';
+    include 'loader.php';
     date_default_timezone_set("Asia/Manila");
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -37,7 +38,6 @@
         $stmt->bind_param("ssssss", $fullName, $city, $gender, $visitReason, $time, $fileName);
 
         if ($stmt->execute()) {
-            $_SESSION['message'] = "Visitor added successfully!";
             $_SESSION['message_type'] = "Success";
             $_SESSION['icon'] = "success";
         } else {
@@ -97,6 +97,10 @@
         align-items: center;
         justify-content: center;
         position: relative;
+    }
+
+    body.swal2-shown {
+        padding-right: 0px !important;
     }
 
     .overlay {
@@ -228,103 +232,6 @@
 <body>
 
     <div class="overlay"></div>
-    <!-- Add this right after the <body> tag -->
-    <div class="loader-wrapper">
-        <div class="loader">
-            <img src="img/rosariologo.png" alt="Loading..." class="loader-logo">
-        </div>
-    </div>
-
-    <!-- Add this CSS inside the <style> section -->
-    <style>
-    .loader-wrapper {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.95);
-        z-index: 2000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: opacity 0.5s ease;
-    }
-
-    .loader-logo {
-        width: 150px;
-        height: 150px;
-        animation:
-            spin 2s linear infinite,
-            bounce 1.5s ease-in-out infinite,
-            pulse 1.5s infinite ease-in-out;
-        transform-origin: center center;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-    }
-
-    @keyframes spin {
-        0% {
-            transform: rotate(0deg) scale(1);
-        }
-
-        50% {
-            transform: rotate(180deg) scale(1.2);
-        }
-
-        100% {
-            transform: rotate(360deg) scale(1);
-        }
-    }
-
-    @keyframes bounce {
-
-        0%,
-        100% {
-            transform: translateY(0);
-        }
-
-        50% {
-            transform: translateY(-20px);
-        }
-    }
-
-    @keyframes pulse {
-        0% {
-            opacity: 0.8;
-        }
-
-        50% {
-            opacity: 1;
-        }
-
-        100% {
-            opacity: 0.8;
-        }
-    }
-
-    .loader-wrapper.hidden {
-        opacity: 0;
-        pointer-events: none;
-    }
-    </style>
-
-    <!-- Add this JavaScript at the end of your existing script section -->
-    <script>
-        window.addEventListener('load', function() {
-            const loaderWrapper = document.querySelector('.loader-wrapper');
-            // Add slight delay for smooth transition
-            setTimeout(() => {
-                loaderWrapper.classList.add('hidden');
-            }, 500);
-
-            // Remove loader after animation
-            setTimeout(() => {
-                loaderWrapper.style.display = 'none';
-            }, 1000);
-        });
-    </script>
 
     <div class="header d-flex align-items-center justify-content-between p-3">
         <div class="d-flex align-items-center">
@@ -347,22 +254,6 @@
         <a href="login.php"><button class="btn btn-success login">Login</button></a>
     </div>
 
-
-    <?php
-        if (isset($_SESSION['message'])) {
-            echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        Swal.fire({
-                            title: '". $_SESSION['message_type'] ."',
-                            text: '" . $_SESSION['message'] . "',
-                            icon: '". $_SESSION['icon'] ."',
-                            confirmButtonText: 'OK'
-                        });
-                    });
-                </script>";
-            unset($_SESSION['message']); 
-        }
-    ?>
     <div class="container mt-5">
 
         <div class="card p-4">
@@ -486,6 +377,24 @@
         </div>
     </div>
 
+    <?php
+        if (isset($_SESSION['message'])) {
+            echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        setTimeout(function() {
+                            Swal.fire({
+                                title: '". $_SESSION['message_type'] ."',
+                                text: '" . $_SESSION['message'] . "',
+                                icon: '". $_SESSION['icon'] ."',
+                                confirmButtonText: 'OK'
+                            });
+                        }, 500); // 500 milliseconds delay
+                    });
+                </script>";
+            unset($_SESSION['message']); 
+        }
+    ?>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -512,10 +421,10 @@
                 .then(data => {
                     const reasonSelect = document.getElementById("visitReason");
 
-                    data.forEach(reason => {
+                    data.forEach(purpose => {
                         let option = document.createElement("option");
-                        option.value = reason.reason;
-                        option.textContent = reason.reason;
+                        option.value = purpose.purpose;
+                        option.textContent = purpose.purpose;
                         reasonSelect.appendChild(option);
                     });
                 })

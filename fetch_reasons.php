@@ -3,7 +3,7 @@
     include 'connection.php';
     date_default_timezone_set("Asia/Manila");
     
-    $query = "SELECT id, reason FROM reasons ORDER BY reason ASC";
+    $query = "SELECT purpose_id, purpose FROM purpose_tbl ORDER BY purpose ASC";
     $result = $conn->query($query);
 
     $reason = [];

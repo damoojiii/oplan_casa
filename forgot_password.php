@@ -152,6 +152,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['code'])) {
             font-family: 'Source';
         }
 
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh; /* Full height of the screen */
+            width: 100vw; /* Full width of the screen */
+            position: relative; /* Ensures proper positioning */
+            z-index: 10;
+        }
+
         .visitor {
             font-family: 'Inter', Arial;
             font-weight: 400;
@@ -165,6 +175,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['code'])) {
             background: #fff;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             z-index: 10;
         }
 
@@ -220,7 +233,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['code'])) {
     <div class="overlay"></div>
 
     <div class="container mt-5">
-        <div class="card p-4 d-flex justify-content-center">
+        <div class="card p-4">
             <img src="img/rosariologo.png" class="logo" />
             <h4 style="margin-top: 10px; margin-bottom: 20px;">Forgot Password</h4>
             
