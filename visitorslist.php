@@ -77,7 +77,18 @@
         <!-- Logo/Icon -->
         <div class="text-center">
             <div class="logo-circle">
-                <img src="logo.png" alt="Logo" class="img-fluid">
+            <?php
+            // Fetch logo from database
+            $sql = "SELECT logo_path FROM site_settings WHERE id = 1";
+            $result = mysqli_query($conn, $sql);
+            if ($result && mysqli_num_rows($result) > 0) {
+                $row = mysqli_fetch_assoc($result);
+                $logoPath = $row['logo_path'] ?? 'img/rosariologo.png';
+            } else {
+                $logoPath = 'img/rosariologo.png'; // Default logo
+            }
+            ?>
+            <img src="<?php echo $logoPath; ?>" alt="Tourism Office Logo" class="logo">
             </div>
         </div>
 
@@ -399,14 +410,14 @@
             var imagePath;
 
             if (photo && photo.trim() !== "" && photo !== "default.jpg") {
-                imagePath = "/OPLAN_CASA/uploads/" + photo;
+                imagePath = "" + photo;
             } else {
-                imagePath = "/OPLAN_CASA/uploads/default.jpg"; // Corrected default image path
+                imagePath = "/default.jpg"; // Corrected default image path
             }
 
             console.log("Final Image Path:", imagePath); // Debugging log
 
-            $("#visitorPhoto").attr("src", imagePath + "?t=" + new Date().getTime()); // Prevent browser cache issues
+            $("#visitorPhoto").attr("src", imagePath); // Prevent browser cache issues
 
             $("#viewVisitorModal").modal("show");
         });

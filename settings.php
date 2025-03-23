@@ -1,6 +1,8 @@
 <?php
     include "session.php";
     include("connection.php");
+
+    
 ?>
 
 <!DOCTYPE html>
@@ -29,7 +31,7 @@
         }
 
          /* Logo content */   
-        .logo {
+        .logo-main {
             grid-column: span 2;
             grid-row: span 1;
             background-color: #5D9C59;
@@ -154,8 +156,6 @@
             border-radius: 4px;
         }
 
-
-
         /* Edit content */
         .edit {
             grid-column: 1 / -1; /* Span all columns */
@@ -182,7 +182,18 @@
         <!-- Logo/Icon -->
         <div class="text-center">
             <div class="logo-circle">
-                <img src="logo.png" alt="Logo" class="img-fluid">
+            <?php
+            // Fetch logo from database
+            $sql = "SELECT logo_path FROM site_settings WHERE id = 1";
+            $result = mysqli_query($conn, $sql);
+            if ($result && mysqli_num_rows($result) > 0) {
+                $row = mysqli_fetch_assoc($result);
+                $logoPath = $row['logo_path'] ?? 'img/rosariologo.png';
+            } else {
+                $logoPath = 'img/rosariologo.png'; // Default logo
+            }
+            ?>
+            <img src="<?php echo $logoPath; ?>" alt="Tourism Office Logo" class="logo">
             </div>
         </div>
 
@@ -233,8 +244,8 @@
        
         <div class="parent">
             
-            <div class="logo">
-                <h4 class="mb-3 text-dark">Tourism Office Logo</h4>
+            <div class="logo-main">
+                <h4 class="mb-3 text-dark">Rosario Tourism Office Logo</h4>
                 <div class="current-logo mb-3 text-center">
                     <?php
                     // Fetch current logo from database
@@ -247,7 +258,7 @@
                         $logoPath = 'img/rosariologo.png'; // Default logo
                     }
                     ?>
-                    <img src="<?php echo $logoPath; ?>" alt="Tourism Office Logo" class="img-fluid mb-2" style="max-height: 150px;">
+                    <img src="<?php echo $logoPath; ?>" alt="Tourism Office Logo">
                 </div>
                 
                 <form action="update_logo.php" method="post" enctype="multipart/form-data" class="mt-3">

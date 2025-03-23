@@ -47,9 +47,8 @@
 
     /* Logo Circle */
     .logo-circle {
-        width: 80px;
-        height: 80px;
-        background: #ccc; /* Placeholder background */
+        width: 100%;
+        height: 100%;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -59,7 +58,6 @@
 
     .logo-circle img {
         width: 100%;
-        border-radius: 50%;
     }
 
     /* Sidebar Links */

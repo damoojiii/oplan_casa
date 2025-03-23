@@ -382,7 +382,6 @@
                         <label for="city" class="form-label input-label">City/Municipality</label>
                         <select id="city" name="city" class="form-select" required>
                             <option value="" disabled selected hidden>Select City/Municipality</option>
-                            <option value="a">a</option>
                         </select>
                     </div>
 
