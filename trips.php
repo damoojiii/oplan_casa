@@ -17,6 +17,36 @@
 
     <style>
     <?php include 'sidebarcss.php'; ?>
+    .nav-tabs {
+       margin-top: 20px;
+    }
+
+    .nav-tabs .nav-item {
+        margin-right: 3px;
+    }
+    .nav-tabs .nav-link {
+        border: 2px solid #ddd;
+        border-bottom: none;
+        border-radius: 8px 8px 0 0;
+        background: #f8f9fa;
+        color: #333;
+        padding: 10px 15px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+    .nav-tabs .nav-link.active {
+        background: #273E26;
+        color: #fff;
+        border-color: #273E26;
+    }
+
+    /* Hover Effect */
+    .nav-tabs .nav-link:hover {
+        background: #273E26;
+        border-color: #273E26;
+        color: #fff;
+    }
+
     .header-title{
         font-weight: bolder;
     }
@@ -27,7 +57,7 @@
         justify-content: center;
     }
     .calendar{
-        width: 380px;
+        width: 100%;
         height: auto;
         display: flex;
         flex-direction: column;
@@ -81,10 +111,10 @@
         padding: 10px;
         margin: auto;
         cursor: pointer;
-        font-weight: 600;
+        font-weight: 400;
         border-radius: 50%;
-        width: 40px;
-        height: 40px;
+        width: 35px;
+        height: 35px;
         transition: 0.2s;
     }
 
@@ -125,17 +155,9 @@
                     $sql = "SELECT logo FROM logo_tbl";
                     $result = $db->query($sql);
 
-                    if ($result->num_rows > 0) {
-                        while ($row = $result->fetch_assoc()) {
-                            $logo = !empty($row['logo']) ? $row['logo'] : 'img/rosariologo.png'; // Use default if empty
-                            echo "<div class='logo-item'>";
-                            echo "<img src='$logo' alt='Logo' style='width: 80px; height: 80px;'>";
-                            echo "</div>";
-                        }
-                    } else {
-                        // If walay logong makita, display the default logo nganii para di empty yung logo
+                    while($row = $result->fetch_assoc()) {
                         echo "<div class='logo-item'>";
-                        echo "<img src='img/rosariologo.png' alt='Default Logo' style='width: 80px; height: 80px;'>";
+                        echo "<img src='{$row['logo']}' alt='Logo'>";
                         echo "</div>";
                     }
                 ?>
@@ -150,7 +172,7 @@
         <div class="text-white main-menu">Main Menu</div>
         <ul class="nav flex-column mb-auto">
             <li class="nav-item">
-                <a href="admin-dashboard.php" class="nav-link active">
+                <a href="admin-dashboard.php" class="nav-link">
                     <i class="fa-solid fa-list"></i> Dashboard
                 </a>
             </li>
@@ -160,7 +182,7 @@
                 </a>
             </li>
             <li>
-                <a href="trips.php" class="nav-link">
+                <a href="trips.php" class="nav-link active">
                     <i class="fa-solid fa-bus"></i> Scheduled Field Trips
                 </a>
             </li>
@@ -186,102 +208,101 @@
     </div>
 
     <div id="main-content" class="container mt-1">
-        <div class="container-fluid">
-            <h2 class="mt-3 header-title">Hello, Admin!</h2>
-            <p>Lorem ipsum dolor</p>
-            
-            <div class="row">
-                <!-- Left Column -->
-                <div class="col-md-8">
-                    <!-- Statistic Cards -->
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="card text-center">
-                                <div class="card-body">
-                                    <h3>0</h3>
-                                </div>
+        <!-- Tabs Navigation -->
+        <ul class="nav nav-tabs" id="scheduleTabs">
+            <li class="nav-item tabs">
+                <a class="nav-link active" id="tab1" data-bs-toggle="tab" href="trips.php">Scheduled Trips</a>
+            </li>
+            <li class="nav-item tabs">
+                <a class="nav-link" id="tab2" data-bs-toggle="tab" href="student-info.php">Student Info</a>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content mt-3">
+            <!-- Tab 1: Scheduled Trips -->
+            <div class="tab-pane fade show active" id="scheduledTrips">
+                <div class="row">
+                    <!-- Left Side: Schedule Form -->
+                    <div class="col-md-8">
+                        <h3 class="header-title">Create a Schedule</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Enter School/Company Name</label>
+                                <input type="text" class="form-control">
+                                <label>Choose Date</label>
+                                <input type="date" class="form-control">
+                                <label>Choose Time</label>
+                                <input type="time" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Enter Number of Bus(es)</label>
+                                <input type="number" class="form-control">
+                                <label>Enter Number of Visitors/Students</label>
+                                <input type="number" class="form-control">
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card text-center">
-                                <div class="card-body">
-                                    <h3>0</h3>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card text-center">
-                                <div class="card-body">
-                                    <h3>0</h3>
-                                </div>
-                            </div>
-                        </div>
+                        <button class="btn btn-primary mt-3">Submit</button>
                     </div>
 
-                    <div class="row">
-                        <!-- Left Inner Column (Upcoming Schedules) -->
-                        <div class="col-md-4">
-                            <div class="card mt-3">
-                                <div class="card-header header-title">Upcoming Schedules</div>
-                                <div class="card-body">
-                                    <ul>
-                                        <li>School Name High School - Feb 23, 2025 <span class="text-success">Ongoing</span></li>
-                                        <li>School Name High School - Feb 26, 2025 <span class="text-primary">Upcoming</span></li>
-                                        <li>School Name High School - Feb 28, 2025 <span class="text-danger">Cancelled</span></li>
-                                    </ul>
+                    <!-- Right Side: Calendar -->
+                    <div class="col-md-4">
+                        <div class="border p-3">
+                            <div class="calendar">
+                                <div class="header">
+                                    <button id="prevBtn"><i class="fa-solid fa-chevron-left"></i></button>
+                                    <div class="monthYear header-title" id="monthYear"></div>
+                                    <button id="nextBtn"><i class="fa-solid fa-chevron-right"></i></button>
                                 </div>
-                            </div>
-                        </div>
-                        <!-- Right Inner Column (Charts) -->
-                        <div class="col-md-8">
-                            <div class="card mt-3">
-                                <div class="card-header header-title">Visitor Chart</div>
-                                <div class="card-body">
-                                    <canvas id="visitorChart"></canvas>
+                                <div class="days">
+                                    <div class="day">Mon</div>
+                                    <div class="day">Tue</div>
+                                    <div class="day">Wed</div>
+                                    <div class="day">Thu</div>
+                                    <div class="day">Fri</div>
+                                    <div class="day">Sat</div>
+                                    <div class="day">Sun</div>
                                 </div>
-                            </div>
-                            <div class="card mt-3">
-                                <div class="card-header header-title">Appointed Field Trips</div>
-                                <div class="card-body">
-                                    <canvas id="fieldTripsChart"></canvas>
-                                </div>
+                                <div class="dates" id="dates"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Right Column -->
-                <div class="col-md-4">
-                    <!-- Reason for Visit Pie Chart -->
-                    <div class="card">
-                        <div class="card-header header-title">Reason for Visit</div>
-                        <div class="card-body">
-                            <canvas id="reasonChart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <!-- Calendar -->
-                    <div class="calendar-container">
-                        <div class="calendar">
-                            <div class="header">
-                                <button id="prevBtn"><i class="fa-solid fa-chevron-left"></i></button>
-                                <div class="monthYear header-title" id="monthYear"></div>
-                                <button id="nextBtn"><i class="fa-solid fa-chevron-right"></i></button>
-                            </div>
-                            <div class="days">
-                                <div class="day">Mon</div>
-                                <div class="day">Tue</div>
-                                <div class="day">Wed</div>
-                                <div class="day">Thu</div>
-                                <div class="day">Fri</div>
-                                <div class="day">Sat</div>
-                                <div class="day">Sun</div>
-                            </div>
-                            <div class="dates" id="dates"></div>
-                        </div>
-                    </div>
-                    
-                </div>
+
+                <hr>
+
+                <!-- Schedule Table -->
+                <h3 class="header-title">View Schedule</h3>
+                <table class="table table-bordered">
+                    <thead class="table-success">
+                        <tr>
+                            <th>ID</th>
+                            <th>School/Company Name</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>No. of Bus(es)</th>
+                            <th>No. of Visitors</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Unknown University</td>
+                            <td>Feb 25, 2025</td>
+                            <td>9:00 AM</td>
+                            <td>3</td>
+                            <td>70</td>
+                            <td><span class="badge bg-warning text-dark">Upcoming</span></td>
+                            <td>
+                                <button class="btn btn-success btn-sm"><i class="fa-solid fa-check"></i></button>
+                                <button class="btn btn-warning btn-sm"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger btn-sm"><i class="fa-solid fa-x"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -361,16 +382,6 @@
 
         togglePrevButton();
         updateCalendar();
-    </script>
-    <script>
-        const ctx1 = document.getElementById('visitorChart').getContext('2d');
-        new Chart(ctx1, { type: 'line', data: { labels: [0,1,2,3,4], datasets: [{ data: [2000, 3000, 1000, 4000, 2500], borderColor: 'blue' }] }});
-        
-        const ctx2 = document.getElementById('reasonChart').getContext('2d');
-        new Chart(ctx2, { type: 'doughnut', data: { labels: ['A', 'B', 'C'], datasets: [{ data: [418, 994, 547], backgroundColor: ['#d9534f', '#5bc0de', '#5cb85c'] }] }});
-        
-        const ctx3 = document.getElementById('fieldTripsChart').getContext('2d');
-        new Chart(ctx3, { type: 'bar', data: { labels: [0,1,2,3,4,5,6,7,8,9], datasets: [{ data: [1500, 3200, 2000, 1800, 3000, 5000], backgroundColor: 'orange' }] }});
     </script>
 </body>
 

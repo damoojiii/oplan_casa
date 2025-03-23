@@ -122,7 +122,7 @@
                 </a>
             </li>
             <li>
-                <a href="scheduled-field-trips.php" class="nav-link">
+                <a href="trips.php" class="nav-link">
                     <i class="fa-solid fa-bus"></i> Scheduled Field Trips
                 </a>
             </li>
@@ -424,12 +424,12 @@
             if (photo && photo.trim() !== "" && photo !== "default.jpg") {
                 imagePath = "" + photo;
             } else {
-                imagePath = "/OPLAN_CASA/uploads/default.jpg"; // Corrected default image path
+                imagePath = "/default.jpg"; // Corrected default image path
             }
 
             console.log("Final Image Path:", imagePath); // Debugging log
 
-            $("#visitorPhoto").attr("src", imagePath + "?t=" + new Date().getTime()); // Prevent browser cache issues
+            $("#visitorPhoto").attr("src", imagePath); // Prevent browser cache issues
 
             $("#viewVisitorModal").modal("show");
         });

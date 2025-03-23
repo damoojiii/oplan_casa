@@ -1,6 +1,8 @@
 <?php
     include "session.php";
     include("connection.php");
+
+    
 ?>
 
 <!DOCTYPE html>
@@ -30,7 +32,7 @@
         }
 
          /* Logo content */   
-        .logo {
+        .logo-main {
             grid-column: span 2;
             grid-row: span 1;
             background-color: #5D9C59;
@@ -63,16 +65,6 @@
         .logo .form-label {
             color: #273E26;
             font-family: 'Karla', sans-serif;
-        }
-        
-        .btn-primary {
-            background-color: #273E26 !important;
-            border-color: #273E26 !important;
-        }
-        
-        .btn-primary:hover {
-            background-color:rgb(35, 77, 35) !important;
-            border-color: #1a2c1a !important;
         }
 
         /* Info content */
@@ -155,8 +147,6 @@
             border-radius: 4px;
         }
 
-
-
         /* Edit content */
         .edit {
             grid-column: 1 / -1; /* Span all columns */
@@ -220,7 +210,7 @@
                 </a>
             </li>
             <li>
-                <a href="scheduled-field-trips.php" class="nav-link">
+                <a href="trips.php" class="nav-link">
                     <i class="fa-solid fa-bus"></i> Scheduled Field Trips
                 </a>
             </li>
@@ -251,62 +241,30 @@
         <div class="parent">
             
             <div class="logo">
-            <h4 class="mb-3 text-white">Tourism Office Logo</h4>
-                <div class="current-logo mb-3 p-3 rounded">
-                    <form action="" method="POST" enctype="multipart/form-data" class="d-flex flex-column align-items-center">
-                        <div class="mb-3 w-100">
-                            <label for="logoFile" class="form-label text-white">Select new logo image:</label>
-                            <input type="file" class="form-control" id="logoFile" name="logo" accept="image/*" required onchange="previewImage(this)">
-                        </div>
-                        
-
-                
+                <h4 class="mb-3 text-dark">Tourism Office Logo</h4>
+                <div class="current-logo mb-3 text-center">
                     <?php
-                        if(isset($_POST['submit'])) {
-                            $upload_dir = "uploads/";
-
-                            if (!file_exists($upload_dir)) {
-                                mkdir($upload_dir, 0777, true);
-                            }
-
-                            $target_file = $upload_dir . basename($_FILES["logo"]["name"]);
-                            $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-
-                            if(getimagesize($_FILES["logo"]["tmp_name"]) !== false) {
-                                $db->query("DELETE FROM logo_tbl");
-                                $old_logo_query = $db->query("SELECT logo FROM logo_tbl");
-                                if ($old_logo_query->num_rows > 0) {
-                                    $old_logo = $old_logo_query->fetch_assoc()['logo'];
-                                    if (file_exists($old_logo)) {
-                                        unlink($old_logo);  
-                                    }
-                                }
-
-                                if (move_uploaded_file($_FILES["logo"]["tmp_name"], $target_file)) {
-                                    $logo_path = $target_file;
-                                    $sql = "INSERT INTO logo_tbl (logo) VALUES (?)";
-                                    $stmt = $db->prepare($sql);
-                                    $stmt->bind_param("s", $logo_path);
-
-                                    if($stmt->execute()) {
-                                        
-                                    }
-                                    $stmt->close();
-                                }
-                            }
-                        }
-
-                        $sql = "SELECT logo FROM logo_tbl ORDER BY logo_id DESC LIMIT 1";
-                        $result = $db->query($sql);
-                        if($result->num_rows > 0) {
-                            $row = $result->fetch_assoc();
-                            echo "<h2 style='color: white;' >Current Logo:</h2>";
-                            echo "<img src='{$row['logo']}' alt='Logo' style='max-width: 150px; margin-bottom: 15px; border-radius: 50%;'>";
-                        }
-                        ?>
-                        <button type="submit" name="submit" class="btn btn-success"><i class="fas fa-upload me-2"></i>Update Logo</button>
-                    </form>
-                </div>    
+                    // Fetch current logo from database
+                    $sql = "SELECT logo_path FROM site_settings WHERE id = 1";
+                    $result = mysqli_query($conn, $sql);
+                    if ($result && mysqli_num_rows($result) > 0) {
+                        $row = mysqli_fetch_assoc($result);
+                        $logoPath = $row['logo_path'] ?? 'img/rosariologo.png';
+                    } else {
+                        $logoPath = 'img/rosariologo.png'; // Default logo
+                    }
+                    ?>
+                    <img src="<?php echo $logoPath; ?>" alt="Tourism Office Logo" class="img-fluid mb-2" style="max-height: 150px;">
+                </div>
+                
+                <form action="update_logo.php" method="post" enctype="multipart/form-data" class="mt-3">
+                    <div class="mb-3 text-center">
+                        <input type="file" class="form-control" id="logoFile" name="logoFile" accept="image/*" required>
+                    </div>
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-primary">Update Logo</button>
+                    </div>
+                </form>
             </div>
 
 
