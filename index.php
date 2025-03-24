@@ -134,7 +134,6 @@
     .logo {
         height: 50px;
         width: 50px;
-        
         object-fit: cover;
     }
     .logo img {
@@ -190,7 +189,7 @@
         height: 300px;
         object-fit: cover;
         border: 2px solid #ddd;
-        border-radius: 5px;
+        border-radius: 50%;
     }
 
     .dataTables_paginate {
@@ -302,7 +301,7 @@
                             // Loop through the results and display them as options
                             if ($result->num_rows > 0) {
                                 while($row = $result->fetch_assoc()) {
-                                    echo '<option value="' . $row["cityID"] . '">' . $row["city_name"] . '</option>';
+                                    echo '<option value="' . $row["cityID"] . '">' . ucwords($row["city_name"]) . '</option>';
                                 }
                             } else {
                                 echo '<option value="">No cities found</option>';
@@ -319,10 +318,10 @@
 
                     <div class="col-md-3">
                         <label for="visitReason" class="form-label input-label">Purpose for Visit</label>
-                        <select name="purpose" id="purpose" class="form-select" required>
+                        <select name="purpose" id="visitReason" class="form-select" required>
                             <option value="">Select purpose</option>
                             <?php while($row = mysqli_fetch_assoc($purposeResult)) { ?>
-                            <option value="<?php echo $row['purpose']; ?>"><?php echo $row['purpose']; ?></option>
+                            <option value="<?php echo $row['purpose']; ?>"><?php echo ucwords($row['purpose']); ?></option>
                             <?php } ?>
                         </select>
                     </div>
@@ -443,23 +442,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        
-
-        document.addEventListener("DOMContentLoaded", function() {
-            fetch('fetch_reasons.php') // Call the PHP script
-                .then(response => response.json()) // Convert response to JSON
-                .then(data => {
-                    const reasonSelect = document.getElementById("visitReason");
-
-                    data.forEach(purpose => {
-                        let option = document.createElement("option");
-                        option.value = purpose.purpose;
-                        option.textContent = purpose.purpose;
-                        reasonSelect.appendChild(option);
-                    });
-                })
-                .catch(error => console.error("Error fetching reasons:", error));
-        });
 
         const video = document.getElementById("video");
         const captureBtn = document.getElementById("captureBtn");
