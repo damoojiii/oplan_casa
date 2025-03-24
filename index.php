@@ -302,7 +302,7 @@
                                 // Loop through the results and display them as options
                                 if ($result->num_rows > 0) {
                                     while($row = $result->fetch_assoc()) {
-                                        echo '<option value="' . $row["city_name"] . '">' . $row["city_name"] . '</option>';
+                                        echo '<option value="' . $row["city_name"] . '">' . ucwords($row["city_name"]) . '</option>';
                                     }
                                 } else {
                                     echo '<option value="">No cities found</option>';
@@ -325,7 +325,7 @@
                                 // Loop through the results and display them as options
                                 if ($result->num_rows > 0) {
                                     while($row = $result->fetch_assoc()) {
-                                        echo '<option value="' . $row["purpose"] . '">' . $row["purpose"] . '</option>';
+                                        echo '<option value="' . $row["purpose"] . '">' . ucwords($row["purpose"]) . '</option>';
                                     }
                                 } else {
                                     echo '<option value="">No purpose found</option>';
