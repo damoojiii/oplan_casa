@@ -294,34 +294,29 @@
 
                             <?php
                         
-                            // Query to get the cities
-                            $sql = "SELECT cityID, city_name FROM cities"; // Assuming your table is 'cities' and has 'id' and 'city_name' columns
-                            $result = $conn->query($sql);
-                        
-                            // Loop through the results and display them as options
-                            if ($result->num_rows > 0) {
-                                while($row = $result->fetch_assoc()) {
-                                    echo '<option value="' . $row["cityID"] . '">' . ucwords($row["city_name"]) . '</option>';
+                                // Query to get the cities
+                                $sql = "SELECT cityID, city_name FROM cities"; // Assuming your table is 'cities' and has 'id' and 'city_name' columns
+                                $result = $conn->query($sql);
+                            
+                                // Loop through the results and display them as options
+                                if ($result->num_rows > 0) {
+                                    while($row = $result->fetch_assoc()) {
+                                        echo '<option value="' . $row["city_name"] . '">' . $row["city_name"] . '</option>';
+                                    }
+                                } else {
+                                    echo '<option value="">No cities found</option>';
                                 }
-                            } else {
-                                echo '<option value="">No cities found</option>';
-                            }
                             ?>
                         </select>
 
                     </div>
 
-                    <?php
-                        $purposeQuery = "SELECT DISTINCT purpose FROM purpose_tbl";
-                        $purposeResult = mysqli_query($conn, $purposeQuery);
-                    ?>
-
                     <div class="col-md-3">
                         <label for="visitReason" class="form-label input-label">Purpose for Visit</label>
-                        <select name="purpose" id="visitReason" class="form-select" required>
+                        <select name="purpose" id="purpose" class="form-select" required>
                             <option value="">Select purpose</option>
                             <?php while($row = mysqli_fetch_assoc($purposeResult)) { ?>
-                            <option value="<?php echo $row['purpose']; ?>"><?php echo ucwords($row['purpose']); ?></option>
+                            <option value="<?php echo $row['purpose']; ?>"><?php echo $row['purpose']; ?></option>
                             <?php } ?>
                         </select>
                     </div>

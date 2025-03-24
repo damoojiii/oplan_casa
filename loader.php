@@ -14,13 +14,13 @@
                 while ($row = $result->fetch_assoc()) {
                     $logo = !empty($row['logo_path']) ? $row['logo_path'] : 'img/rosariologo.png'; // Use default if empty
                     echo "<div class='loader-logo'>";
-                    echo "<img src='$logo' alt='Logo' class='logo-circle' style='width: 150px; height: 150px;'>";
+                    echo "<img src='$logo' alt='Logo' class='logo-circle' style='width: 150px; height: 150px; radius: 50%;'>";
                     echo "</div>";
                 }
             } else {
                 // If no logo found, display the default logo
                 echo "<div class='loader-logo'>";
-                echo "<img src='img/rosariologo.png' class='logo-circle' alt='Default Logo' style='width: 150px; height: 150px;'>";
+                echo "<img src='img/rosariologo.png' class='logo-circle' alt='Default Logo' style='width: 150px; height: 150px;radius: 50%;'>";
                 echo "</div>";
             }
             ?>
