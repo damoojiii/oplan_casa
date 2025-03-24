@@ -280,34 +280,36 @@
         </div>
 
         <!-- View Visitor Modal -->
-        <div class="modal fade" id="viewVisitorModal" tabindex="-1" aria-labelledby="viewVisitorModalLabel" aria-hidden="true">
-            <div class="modal-dialog  modal-dialog-centered">
-                <div class="modal-content" style="margin-left: auto; margin-right: auto;">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="viewVisitorModalLabel">Visitor Profile</h5>
+<div class="modal fade" id="viewVisitorModal" tabindex="-1" aria-labelledby="viewVisitorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="margin-left: auto; margin-right: auto;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewVisitorModalLabel">Visitor Profile</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row text-center">
+                    <!-- Centered Image above information -->
+                    <div class="col-12 mb-3">
+                        <img id="visitorPhoto" src="uploads/default.jpg" alt="Visitor Photo" class="img-fluid" style="width: 150px; height: 150px; border-radius: 10px; border: 2px solid #ddd;">
                     </div>
-                    <div class="modal-body">
-                        <div class="row text-center">
-                            <!-- Centered Image above information -->
-                            <div class="col-12 mb-3">
-                                <img id="visitorPhoto" src="uploads/default.jpg" alt="Visitor Photo" class="img-fluid" style="width: 150px; height: 150px; border-radius: 10px; border: 2px solid #ddd;">
-                            </div>
-                            <div class="col-12">
-                                <p><strong>Full Name:</strong> <span id="viewFullName"></span></p>
-                                <p><strong>City:</strong> <span id="viewCity"></span></p>
-                                <p><strong>Gender:</strong> <span id="viewGender"></span></p>
-                                <p><strong>Purpose for Visit:</strong> <span id="viewReason"></span></p>
-                                <p><strong>Time:</strong> <span id="viewTime"></span></p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer" style="margin-left: auto; margin-right: auto;">
-                        <button type="button" class="btn btn-secondary">Certificate</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <div class="col-12">
+                        <p><strong>Full Name:</strong> <span id="viewFullName"></span></p>
+                        <p><strong>City:</strong> <span id="viewCity"></span></p>
+                        <p><strong>Gender:</strong> <span id="viewGender"></span></p>
+                        <p><strong>Purpose for Visit:</strong> <span id="viewReason"></span></p>
+                        <p><strong>Time:</strong> <span id="viewTime"></span></p>
                     </div>
                 </div>
             </div>
+            <div class="modal-footer" style="margin-left: auto; margin-right: auto;">
+                <!-- Button to generate certificate, with data-visitor-id -->
+                <button type="button" class="btn btn-secondary" id="generateCertificateBtn" data-visitor-id="">Certificate</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
+    </div>
+</div>
+
 
         <!-- Edit Visitor Modal -->
         <div class="modal fade" id="editVisitorModal" tabindex="-1" aria-labelledby="editVisitorModalLabel" aria-hidden="true">
@@ -360,6 +362,16 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
+        // Event listener for the Certificate button
+        document.getElementById('generateCertificateBtn').addEventListener('click', function() {
+            var visitorId = this.getAttribute('data-visitor-id');
+            
+            // Redirect to certificate.php with the visitor ID as a URL parameter
+            if (visitorId) {
+                window.location.href = 'certificate.php?id=' + visitorId;
+            }
+        });
+
         $(document).ready(function () {
             setTimeout(function () {
                 let table = $('#visitorTable').DataTable({

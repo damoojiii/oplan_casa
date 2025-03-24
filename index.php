@@ -315,7 +315,7 @@
                     <div class="col-md-3">
                         <label for="visitReason" class="form-label input-label">Purpose for Visit</label>
                         <select name="reason" id="purpose" class="form-select" required>
-                            <option value="">Select purpose</option>
+                            <option value="" disabled selected hidden>Select purpose</option>
                             <?php
                         
                                 // Query to get the cities
