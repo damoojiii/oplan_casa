@@ -164,11 +164,20 @@
                 if ($db->connect_error) {
                 die("Connection failed: " . $db->connect_error);
                 }
-                $sql = "SELECT logo FROM logo_tbl";
+                $sql = "SELECT logo_path FROM site_settings WHERE id = 1";
                 $result = $db->query($sql);
-                while($row = $result->fetch_assoc()) {
-                    echo "<div class='logo'>";
-                    echo "<img src='{$row['logo']}' alt='Logo' style='width: 50px; height: 50px; object-fit: cover;'>";
+                
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        $logo = !empty($row['logo_path']) ? $row['logo_path'] : 'img/rosariologo.png'; // Use default if empty
+                        echo "<div class='logo-item'>";
+                        echo "<img src='$logo' alt='Logo' class='logo-circle' style='width: 80px; height: 80px;'>";
+                        echo "</div>";
+                    }
+                } else {
+                    // If walay logong makita, display the default logo nganii para di empty yung logo
+                    echo "<div class='logo-item'>";
+                    echo "<img src='img/rosariologo.png' alt='Default Logo' class='logo-circle' style='width: 80px; height: 80px;'>";
                     echo "</div>";
                 }
             ?>

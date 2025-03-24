@@ -240,30 +240,30 @@
 
     <div class="header d-flex align-items-center justify-content-between p-3">
         <div class="d-flex align-items-center">
-        <?php
-            $db = new mysqli('localhost', 'root', '', 'casadb');
-            if ($db->connect_error) {
-            die("Connection failed: " . $db->connect_error);
-            }
-            $sql = "SELECT logo FROM logo_tbl";
-            $result = $db->query($sql);
-            
-            if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    $logo = !empty($row['logo']) ? $row['logo'] : 'img/rosariologo.png'; // Use default if empty
-                    echo "<div class='logo-item'>";
-                    echo "<img src='$logo' alt='Logo' style='width: 80px; height: 80px;'>";
-                    echo "</div>";
-                }
-            } else {
-                // If walay logong makita, display the default logo nganii para di empty yung logo
-                echo "<div class='logo-item'>";
-                echo "<img src='img/rosariologo.png' alt='Default Logo' style='width: 80px; height: 80px;'>";
-                echo "</div>";
-            }
-        ?>
-        
+            <div class="logo-circle">
+                <?php
+                    $db = new mysqli('localhost', 'root', '', 'casadb');
+                    if ($db->connect_error) {
+                    die("Connection failed: " . $db->connect_error);
+                    }
+                    $sql = "SELECT logo_path FROM site_settings WHERE id = 1";
+                    $result = $db->query($sql);
                     
+                    if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                            $logo = !empty($row['logo_path']) ? $row['logo_path'] : 'img/rosariologo.png'; // Use default if empty
+                            echo "<div class='logo-item'>";
+                            echo "<img src='$logo' alt='Logo' class='logo-circle' style='width: 80px; height: 80px;'>";
+                            echo "</div>";
+                        }
+                    } else {
+                        // If walay logong makita, display the default logo nganii para di empty yung logo
+                        echo "<div class='logo-item'>";
+                        echo "<img src='img/rosariologo.png' alt='Default Logo' class='logo-circle' style='width: 80px; height: 80px;'>";
+                        echo "</div>";
+                    }
+                ?>
+            </div>  
         <h4 class="mb-0 ms-3 text-white">Tourism Office - Municipality of Rosario</h4>
         </div>
 

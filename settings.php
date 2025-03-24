@@ -186,7 +186,7 @@
                         while ($row = $result->fetch_assoc()) {
                             $logo = !empty($row['logo_path']) ? $row['logo_path'] : 'img/rosariologo.png'; // Use default if empty
                             echo "<div class='logo-item'>";
-                            echo "<img src='$logo' alt='Logo' style='width: 90px; height: 90px;'>";
+                            echo "<img src='$logo' alt='Logo' class='logo-circle' style='width: 90px; height: 90px;'>";
                             echo "</div>";
                         }
                     } else {
