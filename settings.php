@@ -21,7 +21,7 @@
         
         .parent {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             grid-template-rows: auto;
             gap: 15px;
             padding: 20px;
@@ -45,7 +45,6 @@
         
         .logo h4 {
             color: white !important;
-            font-family: 'Karla', sans-serif;
             font-weight: 600;
             text-align: center;
             margin-bottom: 15px;
@@ -56,20 +55,18 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            margin-inline: auto;
             padding: 10px;
-            background-color: #273E26;
-            border-radius: 6px;
+            width: 45%;
+            background-color: #77ac67;
+            border-radius: 50%;
         }
         
-        .logo .form-label {
-            color: #273E26;
-            font-family: 'Karla', sans-serif;
-        }
 
         /* Info content */
         
         .info {
-            grid-column: span 4;
+            grid-column: span 3;
             grid-row: span 1;
             background-color: #5D9C59;
             border-radius: 8px;
@@ -82,7 +79,6 @@
 
         .info h4 {
             color: white;
-            font-family: 'Karla', sans-serif;
             font-weight: 600;
             text-align: center;
             margin-bottom: 15px;
@@ -91,14 +87,13 @@
         .info .card {
             border: none;
             border-radius: 6px;
-            background-color: #273E26;
+            background-color: #77ac67;
             flex-grow: 1;
             color: white;
         }
 
         .info .form-label {
             color: white;
-            font-family: 'Karla', sans-serif;
             font-weight: 500;
         }
 
@@ -154,6 +149,10 @@
             border-radius: 20px;
             padding: 15px;
             min-height: 270px;
+        }
+
+        .card-header{
+            background-color: #77ac67;
         }
         
         
@@ -247,8 +246,8 @@
 
         <div class="parent">
             
-            <div class="logo">
-                <h4 class="mb-3 text-dark">Tourism Office Logo</h4>
+            <div class="logo-main">
+                <h4 class="mb-3 text-white">Tourism Office Logo</h4>
                 <div class="current-logo mb-3 text-center">
                     <?php
                     // Fetch current logo from database
@@ -386,7 +385,7 @@
                             <div class="col-md-6">
                                 <!-- Add new visit purpose -->
                                 <div class="card bg-light mb-3">
-                                    <div class="card-header bg-success text-white">
+                                    <div class="card-header text-white">
                                         <i class="fas fa-plus-circle"></i> Add New Purpose
                                     </div>
                                     <div class="card-body">
@@ -394,7 +393,7 @@
                                             <input type="hidden" name="action" value="add">
                                             <div class="input-group mb-3">
                                                 <input type="text" class="form-control" name="newReason" placeholder="New visit purpose" required>
-                                                <button class="btn btn-success" type="submit">
+                                                <button class="btn btn-primary" type="submit">
                                                     <i class="fas fa-plus"></i> Add
                                                 </button>
                                             </div>
@@ -406,7 +405,7 @@
                             <div class="col-md-6">
                                 <!-- Current visit purposes list -->
                                 <div class="card bg-light">
-                                    <div class="card-header bg-success text-white">
+                                    <div class="card-header text-white">
                                         <i class="fas fa-list"></i> Current Purposes
                                     </div>
                                     <div class="card-body">
@@ -489,7 +488,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="card bg-light mb-3">
-                                    <div class="card-header bg-success text-white">
+                                    <div class="card-header text-white">
                                         <i class="fas fa-plus-circle"></i> Add New City
                                     </div>
 
@@ -498,7 +497,7 @@
                                             <input type="hidden" name="action" value="add">
                                             <div class="input-group mb-3">
                                                 <input type="text" class="form-control" name="newCity" placeholder="Add New City" required>
-                                                <button class="btn btn-success" type="submit">
+                                                <button class="btn btn-primary" type="submit">
                                                     <i class="fas fa-plus"></i> Add
                                                 </button>
                                             </div>
@@ -509,7 +508,7 @@
                             <div class="col-md-6">
                                 <!-- Current city list -->
                                 <div class="card bg-light">
-                                    <div class="card-header bg-success text-white">
+                                    <div class="card-header text-white">
                                         <i class="fas fa-list"></i> Current Cities
                                     </div>
                                     <div class="card-body">
