@@ -302,6 +302,7 @@
                         </div>
                     </div>
                     <div class="modal-footer" style="margin-left: auto; margin-right: auto;">
+                        <button type="button" class="btn btn-secondary">Certificate</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
