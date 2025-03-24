@@ -247,9 +247,18 @@
             }
             $sql = "SELECT logo FROM logo_tbl";
             $result = $db->query($sql);
-            while($row = $result->fetch_assoc()) {
-                echo "<div class='logo'>";
-                echo "<img src='{$row['logo']}' alt='Logo' style='width: 50px; height: 50px; object-fit: cover;'>";
+            
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $logo = !empty($row['logo']) ? $row['logo'] : 'img/rosariologo.png'; // Use default if empty
+                    echo "<div class='logo-item'>";
+                    echo "<img src='$logo' alt='Logo' style='width: 80px; height: 80px;'>";
+                    echo "</div>";
+                }
+            } else {
+                // If walay logong makita, display the default logo nganii para di empty yung logo
+                echo "<div class='logo-item'>";
+                echo "<img src='img/rosariologo.png' alt='Default Logo' style='width: 80px; height: 80px;'>";
                 echo "</div>";
             }
         ?>

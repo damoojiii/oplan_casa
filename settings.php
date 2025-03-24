@@ -1,8 +1,7 @@
 <?php
     include "session.php";
     include("connection.php");
-
-    
+    include "loader.php";
 ?>
 
 <!DOCTYPE html>
@@ -180,12 +179,20 @@
                     die("Connection failed: " . $db->connect_error);
                     }
 
-                    $sql = "SELECT logo FROM logo_tbl";
+                    $sql = "SELECT logo_path FROM site_settings WHERE id = 1";
                     $result = $db->query($sql);
 
-                    while($row = $result->fetch_assoc()) {
+                    if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                            $logo = !empty($row['logo_path']) ? $row['logo_path'] : 'img/rosariologo.png'; // Use default if empty
+                            echo "<div class='logo-item'>";
+                            echo "<img src='$logo' alt='Logo' style='width: 90px; height: 90px;'>";
+                            echo "</div>";
+                        }
+                    } else {
+                        // If walay logong makita, display the default logo nganii para di empty yung logo
                         echo "<div class='logo-item'>";
-                        echo "<img src='{$row['logo']}' alt='Logo'>";
+                        echo "<img src='img/rosariologo.png' alt='Default Logo' style='width: 80px; height: 80px;'>";
                         echo "</div>";
                     }
                 ?>
