@@ -128,6 +128,17 @@
     .date.inactive:hover{
         color: #fff;
     }
+
+    thead,
+    th {
+        background-color: #5D9C59 !important;
+        text-align: center !important;
+        color: #fff !important;
+    }
+
+    td{
+        font-size: 15px !important;
+    }
     
     </style>
 </head>
@@ -229,26 +240,73 @@
             <!-- Tab 1: Scheduled Trips -->
             <div class="tab-pane fade show active" id="scheduledTrips">
                 <div class="row">
+                    <?php 
+                        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['create'])) {
+                            // Sanitize input data
+                            $schoolname = htmlspecialchars(trim($_POST['name']));
+                            $date = $_POST['date'];
+                            $num_bus = filter_var($_POST['num_bus'], FILTER_SANITIZE_NUMBER_INT); // Sanitize number of buses
+                            $status = "Upcoming"; 
+                            
+                            // Validate that all fields have data
+                            if (empty($schoolname) || empty($date) || empty($time) || empty($num_bus)) {
+                                $_SESSION['message'] = "All fields are required!";
+                                $_SESSION['message_type'] = "Error";
+                                $_SESSION['icon'] = "error";
+                                header("Location: trips.php");
+                                exit();
+                            }
+                        
+                            // Prepare SQL query for insertion
+                            $sql = "INSERT INTO `scheduled_tbl` (`name`, `date`, `time`, `num_bus`, `status`) VALUES (?, ?, ?, ?, ?)";
+                            if ($stmt = $conn->prepare($sql)) {
+                                $stmt->bind_param("sssis", $schoolname, $date, $time, $num_bus, $status);
+                        
+                                // Execute the query and check if successful
+                                if ($stmt->execute()) {
+                                    $_SESSION['message'] = "Schedule created successfully!";
+                                    $_SESSION['message_type'] = "Success";
+                                    $_SESSION['icon'] = "success";
+                                } else {
+                                    $_SESSION['message'] = "Error: " . $stmt->error;
+                                    $_SESSION['message_type'] = "Error";
+                                    $_SESSION['icon'] = "error";
+                                }
+                    
+                                $stmt->close();
+                                header("Location: trips.php"); 
+                                exit();
+                            } else {
+                                $_SESSION['message'] = "Error preparing the query.";
+                                $_SESSION['message_type'] = "Error";
+                                $_SESSION['icon'] = "error";
+                                header("Location: trips.php");
+                                exit();
+                            }
+                        }
+                    ?>
                     <!-- Left Side: Schedule Form -->
                     <div class="col-md-8">
-                        <h3 class="header-title">Create a Schedule</h3>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label>Enter School/Company Name</label>
-                                <input type="text" class="form-control">
-                                <label>Choose Date</label>
-                                <input type="date" class="form-control">
-                                <label>Choose Time</label>
-                                <input type="time" class="form-control">
+                        <form method="POST">
+                            <h3 class="header-title">Create a Schedule</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Enter School/Company Name</label>
+                                    <input type="text" name="name" class="form-control">
+                                    <label>Choose Date</label>
+                                    <input type="date" name="date" class="form-control">
+                                    <label>Choose Time</label>
+                                    <input type="time" name="time" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Enter Number of Bus(es)</label>
+                                    <input type="number" name="num_bus" class="form-control">
+                                    <label>Enter Number of Visitors/Students</label>
+                                    <input type="number" class="form-control">
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <label>Enter Number of Bus(es)</label>
-                                <input type="number" class="form-control">
-                                <label>Enter Number of Visitors/Students</label>
-                                <input type="number" class="form-control">
-                            </div>
-                        </div>
-                        <button class="btn btn-primary mt-3">Submit</button>
+                            <button class="btn btn-primary mt-3" type="submit" name="create">Submit</button>
+                        </form>
                     </div>
 
                     <!-- Right Side: Calendar -->
@@ -279,8 +337,8 @@
 
                 <!-- Schedule Table -->
                 <h3 class="header-title">View Schedule</h3>
-                <table class="table table-bordered">
-                    <thead class="table-success">
+                <table class="table table-bordered text-center">
+                    <thead class="table-header">
                         <tr>
                             <th>ID</th>
                             <th>School/Company Name</th>
@@ -293,20 +351,33 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <?php 
+                            $sql = "SELECT * FROM scheduled_tbl ORDER BY scheduled_id ASC";
+
+                            $stmt = $conn->prepare($sql);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+
+                            while($row = $result->fetch_assoc()){
+                                $formattedDate = date("F j, Y", strtotime($row['date']));
+                                $formattedTime = date("h:i A", strtotime($row['time']));
+                        ?>
+
                         <tr>
-                            <td>1</td>
-                            <td>Unknown University</td>
-                            <td>Feb 25, 2025</td>
-                            <td>9:00 AM</td>
-                            <td>3</td>
+                            <td><?php echo $row['scheduled_id'] ?></td>
+                            <td><?php echo $row['name'] ?></td>
+                            <td><?php echo $formattedDate ?></td>
+                            <td><?php echo $formattedTime ?></td>
+                            <td><?php echo $row['num_bus'] ?></td>
                             <td>70</td>
-                            <td><span class="badge bg-warning text-dark">Upcoming</span></td>
+                            <td><span class="badge bg-warning text-dark"><?php echo $row['status'] ?></span></td>
                             <td>
                                 <button class="btn btn-success btn-sm"><i class="fa-solid fa-check"></i></button>
                                 <button class="btn btn-warning btn-sm"><i class="fa-solid fa-pen"></i></button>
                                 <button class="btn btn-danger btn-sm"><i class="fa-solid fa-x"></i></button>
                             </td>
                         </tr>
+                        <?php } ?>
                     </tbody>
                 </table>
             </div>
