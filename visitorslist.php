@@ -281,7 +281,7 @@
 
         <!-- View Visitor Modal -->
         <div class="modal fade" id="viewVisitorModal" tabindex="-1" aria-labelledby="viewVisitorModalLabel" aria-hidden="true">
-            <div class="modal-dialog  modal-dialog-centered">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content" style="margin-left: auto; margin-right: auto;">
                     <div class="modal-header">
                         <h5 class="modal-title" id="viewVisitorModalLabel">Visitor Profile</h5>
@@ -302,12 +302,14 @@
                         </div>
                     </div>
                     <div class="modal-footer" style="margin-left: auto; margin-right: auto;">
-                        <button type="button" class="btn btn-secondary">Certificate</button>
+                        <!-- Button to generate certificate, with data-visitor-id -->
+                        <button type="button" class="btn btn-secondary" id="generateCertificateBtn" data-visitor-id="">Certificate</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
         </div>
+
 
         <!-- Edit Visitor Modal -->
         <div class="modal fade" id="editVisitorModal" tabindex="-1" aria-labelledby="editVisitorModalLabel" aria-hidden="true">
@@ -432,7 +434,18 @@
 
             $("#visitorPhoto").attr("src", imagePath); // Prevent browser cache issues
 
+            $("#generateCertificateBtn").attr("data-visitor-id", id);
+
             $("#viewVisitorModal").modal("show");
+        });
+
+        $("#generateCertificateBtn").click(function () {
+            var visitorId = $(this).attr("data-visitor-id");
+            if (visitorId) {
+                window.location.href = "certificate.php?id=" + visitorId;
+            } else {
+                alert("No visitor ID found.");
+            }
         });
 
         $(document).ready(function () {

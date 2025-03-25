@@ -240,7 +240,7 @@
 
     <div class="header d-flex align-items-center justify-content-between p-3">
         <div class="d-flex align-items-center">
-            <div class="logo-circle">
+            <div class="logo-circle" >
                 <?php
                     $db = new mysqli('localhost', 'root', '', 'casadb');
                     if ($db->connect_error) {
@@ -253,13 +253,13 @@
                         while ($row = $result->fetch_assoc()) {
                             $logo = !empty($row['logo_path']) ? $row['logo_path'] : 'img/rosariologo.png'; // Use default if empty
                             echo "<div class='logo-item'>";
-                            echo "<img src='$logo' alt='Logo' class='logo-circle' style='width: 80px; height: 80px;'>";
+                            echo "<img src='$logo' alt='Logo' class='logo-circle' style='width: 80px; height: 80px; border-radius: 50%; border: none;'>";
                             echo "</div>";
                         }
                     } else {
                         // If walay logong makita, display the default logo nganii para di empty yung logo
                         echo "<div class='logo-item'>";
-                        echo "<img src='img/rosariologo.png' alt='Default Logo' class='logo-circle' style='width: 80px; height: 80px;'>";
+                        echo "<img src='img/rosariologo.png' alt='Default Logo' class='logo-circle' style='width: 80px; height: 80px; border-radius: 50%; border: none;'>";
                         echo "</div>";
                     }
                 ?>
@@ -315,7 +315,7 @@
                     <div class="col-md-3">
                         <label for="visitReason" class="form-label input-label">Purpose for Visit</label>
                         <select name="reason" id="purpose" class="form-select" required>
-                            <option value="">Select purpose</option>
+                            <option value="" disabled selected hidden>Select purpose</option>
                             <?php
                         
                                 // Query to get the cities
