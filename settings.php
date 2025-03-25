@@ -17,8 +17,6 @@
     
     <style>
         <?php include 'sidebarcss.php'; ?>
-
-        
         .parent {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -62,7 +60,6 @@
             border-radius: 50%;
         }
         
-
         /* Info content */
         
         .info {
