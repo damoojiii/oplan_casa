@@ -407,6 +407,7 @@
         });
 
         $(".view-btn").click(function () {
+            var id = $(this).data("id");
             var name = $(this).data("name");
             var city = $(this).data("city");
             var gender = $(this).data("gender");
@@ -415,6 +416,7 @@
             var photo = $(this).data("photo");
 
             console.log("Photo filename:", photo);
+            console.log("Visitor ID:", id);
 
             $("#viewFullName").text(name);
             $("#viewCity").text(city);
@@ -427,12 +429,12 @@
             if (photo && photo.trim() !== "" && photo !== "default.jpg") {
                 imagePath = "" + photo;
             } else {
-                imagePath = "/default.jpg"; // Corrected default image path
+                imagePath = "/default.jpg";
             }
 
-            console.log("Final Image Path:", imagePath); // Debugging log
+            console.log("Final Image Path:", imagePath); // Debugging ngani
 
-            $("#visitorPhoto").attr("src", imagePath); // Prevent browser cache issues
+            $("#visitorPhoto").attr("src", imagePath);
 
             $("#generateCertificateBtn").attr("data-visitor-id", id);
 
@@ -441,7 +443,9 @@
 
         $("#generateCertificateBtn").click(function () {
             var visitorId = $(this).attr("data-visitor-id");
-            if (visitorId) {
+            console.log("Generating certificate for Visitor ID:", visitorId); // Debugging ngani
+
+            if (visitorId && visitorId !== "undefined") {
                 window.location.href = "certificate.php?id=" + visitorId;
             } else {
                 alert("No visitor ID found.");
@@ -457,8 +461,8 @@
                     dataType: "json",
                     success: function (data) {
                         var citySelect = $("#editCity");
-                        citySelect.empty(); // Clear existing options
-                        citySelect.append('<option value="">Select City</option>'); // Default option
+                        citySelect.empty();
+                        citySelect.append('<option value="">Select City</option>');
                         
                         data.forEach(city => {
                             citySelect.append(`<option value="${city.city_name}">${city.city_name}</option>`);
@@ -483,11 +487,11 @@
                 $("#editGender").val(gender);
                 $("#editReason").val(reason);
 
-                loadCities(); // Load cities before setting the value
+                loadCities();
                 
                 setTimeout(() => {
-                    $("#editCity").val(city); // Set selected city
-                }, 500); // Delay to ensure dropdown is populated
+                    $("#editCity").val(city);
+                }, 500);
 
                 $("#editVisitorModal").modal("show");
             });
