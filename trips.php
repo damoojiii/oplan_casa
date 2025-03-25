@@ -2,6 +2,20 @@
     include "session.php";
     include("connection.php");
     include "loader.php";
+
+    date_default_timezone_set("Asia/Manila");
+    $today = date('Y-m-d');
+
+    $sql = "SELECT date FROM scheduled_tbl";
+    $result = $conn->query($sql);
+    $blocked_dates = [];
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            // Store the dates in the format YYYY-MM-DD
+            $blocked_dates[] = $row['date'];
+        }
+    }
 ?>
 
 <!DOCTYPE html>
@@ -243,8 +257,9 @@
                     <?php 
                         if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['create'])) {
                             // Sanitize input data
-                            $schoolname = htmlspecialchars(trim($_POST['name']));
+                            $schoolname = htmlspecialchars($_POST['name']);
                             $date = $_POST['date'];
+                            $time = $_POST['time'];
                             $num_bus = filter_var($_POST['num_bus'], FILTER_SANITIZE_NUMBER_INT); // Sanitize number of buses
                             $status = "Upcoming"; 
                             
@@ -253,7 +268,11 @@
                                 $_SESSION['message'] = "All fields are required!";
                                 $_SESSION['message_type'] = "Error";
                                 $_SESSION['icon'] = "error";
-                                header("Location: trips.php");
+                                echo '<script type="text/javascript">
+                                    alert("All fields are required!'.var_dump($schoolname).'"); // Show an alert message
+                                    window.location = "trips.php"; // Redirect to trips.php
+                                </script>';
+
                                 exit();
                             }
                         
@@ -274,13 +293,18 @@
                                 }
                     
                                 $stmt->close();
-                                header("Location: trips.php"); 
+                                echo '<script type="text/javascript">
+                                    window.location = "trips.php"; // Redirect to trips.php
+                                </script>';
                                 exit();
                             } else {
                                 $_SESSION['message'] = "Error preparing the query.";
                                 $_SESSION['message_type'] = "Error";
                                 $_SESSION['icon'] = "error";
-                                header("Location: trips.php");
+                                echo '<script type="text/javascript">
+                                    alert("Error: ' . $conn->error . '"); // Error message
+                                    window.location = "trips.php"; // Redirect to trips.php
+                                </script>';
                                 exit();
                             }
                         }
@@ -292,15 +316,15 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <label>Enter School/Company Name</label>
-                                    <input type="text" name="name" class="form-control">
+                                    <input type="text" name="name" class="form-control" required>
                                     <label>Choose Date</label>
-                                    <input type="date" name="date" class="form-control">
+                                    <input type="date" name="date" class="form-control" id="date" required>
                                     <label>Choose Time</label>
-                                    <input type="time" name="time" class="form-control">
+                                    <input type="time" name="time" class="form-control" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label>Enter Number of Bus(es)</label>
-                                    <input type="number" name="num_bus" class="form-control">
+                                    <input type="number" name="num_bus" class="form-control" required>
                                     <label>Enter Number of Visitors/Students</label>
                                     <input type="number" class="form-control">
                                 </div>
@@ -388,6 +412,22 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script>
+        // Disable specific dates based on the database data
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('date').setAttribute('min', '<?php echo $today; ?>');
+            const blockedDates = <?php echo json_encode($blocked_dates); ?>;
+            
+            const dateInput = document.getElementById('date');
+            
+            // Function to check if the selected date is blocked
+            dateInput.addEventListener('input', function(event) {
+                const selectedDate = event.target.value;
+                if (blockedDates.includes(selectedDate)) {
+                    alert("This date is already booked. Please choose another date.");
+                    event.target.value = ''; // Reset the date input
+                }
+            });
+        });
         const monthYearElement = document.getElementById('monthYear');
         const datesElement = document.getElementById('dates');
         const prevBtn = document.getElementById('prevBtn');

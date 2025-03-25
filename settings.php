@@ -244,7 +244,7 @@
         <div class="parent">
             
             <div class="logo-main">
-                <h4 class="mb-3 text-white">Tourism Office Logo</h4>
+                <h4 class="mb-3 text-white">Rosario Tourism Office Logo</h4>
                 <div class="current-logo mb-3 text-center">
                     <?php
                     // Fetch current logo from database
