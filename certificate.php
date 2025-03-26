@@ -26,7 +26,9 @@ $conn->close();
             font-family: 'March Rough';
             src: url('fonts/March_Rough/March_Rough.ttf') format('truetype');
         }
-
+        .img-fluid{
+            height: 100vh !important;
+        }
         .certificate-container {
             position: relative;
             display: inline-block;
@@ -84,7 +86,7 @@ $conn->close();
     <div class="container text-center">
         <div class="certificate-container" id="certificate">
             <img src="img/cert.png" alt="Certificate" class="img-fluid">
-            <div class="visitor-name"><?php echo htmlspecialchars($name); ?></div>
+            <div class="visitor-name"><?php echo htmlspecialchars(ucwords($name)); ?></div>
         </div>
         <button class="btn btn-primary mt-3" onclick="printCertificate()">Print Certificate</button>
     </div>

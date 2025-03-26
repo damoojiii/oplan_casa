@@ -244,7 +244,10 @@
                 <a class="nav-link active" id="tab1" data-bs-toggle="tab" href="trips.php">Scheduled Trips</a>
             </li>
             <li class="nav-item tabs">
-                <a class="nav-link" id="tab2" data-bs-toggle="tab" href="student-info.php">Student Info</a>
+                <a class="nav-link" id="tab2" data-bs-toggle="tab" href="add-visitor.php">Add Visitor</a>
+            </li>
+            <li class="nav-item tabs">
+                <a class="nav-link" id="tab3" data-bs-toggle="tab" href="trip-info.php">Trip Info</a>
             </li>
         </ul>
 
@@ -418,14 +421,39 @@
             
             const dateInput = document.getElementById('date');
             
-            // Function to check if the selected date is blocked
-            dateInput.addEventListener('input', function(event) {
-                const selectedDate = event.target.value;
-                if (blockedDates.includes(selectedDate)) {
+            function disableBlockedDates() {
+                const blockedSet = new Set(blockedDates); // Create a Set for faster lookup
+                const date = dateInput.value; // Get the currently selected date
+                
+                // Check if the selected date is blocked
+                if (blockedSet.has(date)) {
                     alert("This date is already booked. Please choose another date.");
-                    event.target.value = ''; // Reset the date input
+                    dateInput.value = ''; // Reset the date input if blocked
                 }
-            });
+            }
+
+            // Disable specific blocked dates visually and in the input
+            dateInput.addEventListener('input', disableBlockedDates);
+            
+            // This is an additional enhancement to show blocked dates visually
+            const blockedDatesString = blockedDates.join(',');
+
+            // Apply the blocked dates visually by disabling them in the input
+            dateInput.setAttribute('data-blocked-dates', blockedDatesString);
+
+            // For browsers that support modern input types (like Firefox), block out the dates
+            if (dateInput.type === "date") {
+                dateInput.setAttribute("style", "pointer-events: auto;");
+
+                // Use the input's min and max to block outside of today's date
+                const blocked = blockedDates.map(date => {
+                    return `option[value="${date}"] { background-color: red; color: white; }`;
+                }).join("\n");
+
+                const style = document.createElement('style');
+                style.innerHTML = blocked;
+                document.head.appendChild(style);
+            }
         });
         
         function convertTo12HourFormat(hour) {
