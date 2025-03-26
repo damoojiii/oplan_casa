@@ -12,7 +12,6 @@
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            // Store the dates in the format YYYY-MM-DD
             $blocked_dates[] = $row['date'];
         }
     }
@@ -269,7 +268,7 @@
                                 $_SESSION['message_type'] = "Error";
                                 $_SESSION['icon'] = "error";
                                 echo '<script type="text/javascript">
-                                    alert("All fields are required!'.var_dump($schoolname).'"); // Show an alert message
+                                    alert("All fields are required!"); // Show an alert message
                                     window.location = "trips.php"; // Redirect to trips.php
                                 </script>';
 
@@ -319,14 +318,14 @@
                                     <input type="text" name="name" class="form-control" required>
                                     <label>Choose Date</label>
                                     <input type="date" name="date" class="form-control" id="date" required>
-                                    <label>Choose Time</label>
-                                    <input type="time" name="time" class="form-control" required>
+                                    <label for="time">Choose Time</label>
+                                    <select id="time" name="time" class="form-control" required>
+                                        <option value="" hidden selected>Select a time</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-6">
                                     <label>Enter Number of Bus(es)</label>
-                                    <input type="number" name="num_bus" class="form-control" required>
-                                    <label>Enter Number of Visitors/Students</label>
-                                    <input type="number" class="form-control">
+                                    <input type="number" name="num_bus" class="form-control" min="1" max="10" required>
                                 </div>
                             </div>
                             <button class="btn btn-primary mt-3" type="submit" name="create">Submit</button>
@@ -393,7 +392,7 @@
                             <td><?php echo $formattedDate ?></td>
                             <td><?php echo $formattedTime ?></td>
                             <td><?php echo $row['num_bus'] ?></td>
-                            <td>70</td>
+                            <td>0</td>
                             <td><span class="badge bg-warning text-dark"><?php echo $row['status'] ?></span></td>
                             <td>
                                 <button class="btn btn-success btn-sm"><i class="fa-solid fa-check"></i></button>
@@ -428,6 +427,28 @@
                 }
             });
         });
+        
+        function convertTo12HourFormat(hour) {
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const hour12 = hour % 12 || 12; // Converts 0 to 12 (midnight case)
+            return `${hour12}:00 ${ampm}`;
+        }
+
+        // Populate the dropdown with valid times from 6:00 AM to 4:00 PM
+        const select = document.getElementById('time');
+        const times = [
+            6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+        ];
+
+        // Create options for the dropdown with 12-hour format
+        times.forEach(hour => {
+            const option = document.createElement('option');
+            const timeIn12HourFormat = convertTo12HourFormat(hour);
+            option.value = `${hour}:00`; 
+            option.textContent = timeIn12HourFormat; 
+            select.appendChild(option);
+        });
+
         const monthYearElement = document.getElementById('monthYear');
         const datesElement = document.getElementById('dates');
         const prevBtn = document.getElementById('prevBtn');
