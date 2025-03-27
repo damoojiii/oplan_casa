@@ -214,6 +214,26 @@
                         </form>
                         </div>
                     </div>
+
+                    <hr class="mt-3">
+
+                    <div class="supervisor-container">
+                    <h3 class="header-title">Add a Supervisor</h3>
+                        <form method="POST">
+                            <label>Enter First Name</label>
+                            <input type="text" name="firstname" class="form-control" required>
+                            <label>Enter Last Name</label>
+                            <input type="text" name="lastname" class="form-control" required>
+                            <label for="position">Position</label>
+                            <select id="position" name="position" class="form-control" required>
+                                <option value="" hidden selected>Select a position</option>
+                            </select>
+                            <label>Enter Contact No.</label>
+                            <input type="number" name="contact" class="form-control" required>
+
+                            <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
