@@ -2,6 +2,14 @@
     include "session.php";
     include("connection.php");
     include "loader.php";
+
+    $scheduled_id = $_GET['scheduled_id'];
+
+    $sql_fetch = "SELECT * FROM student_tbl WHERE scheduled_id = ?";
+    $stmt = $conn->prepare($sql_fetch);
+    $stmt->bind_param("i", $scheduled_id);
+    $stmt->execute();
+    $result_fetch = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -193,39 +201,31 @@
         </ul>
 
         <div class="container mt-4">
-            <h2 class="text-center">Scheduled Trips</h2>
-            <ol class="schedule-list">
-                <?php
-                    $sql = "SELECT s.*, 
-                            COALESCE(COUNT(st.student_id), 0) AS num_visitors 
-                    FROM scheduled_tbl s
-                    LEFT JOIN student_tbl st ON s.scheduled_id = st.scheduled_id
-                    GROUP BY s.scheduled_id
-                    ORDER BY s.scheduled_id ASC";
-                    $stmt = $conn->prepare($sql);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-
-                    while ($row = $result->fetch_assoc()) {
-                        $formattedDate = date("F j, Y", strtotime($row['date']));
-                        $formattedTime = date("h:i A", strtotime($row['time']));
-                        $statusClass = strtolower($row['status']); // Convert status to lowercase for class name
-                ?>
-                <li>
-                    <a href="view-students.php?scheduled_id=<?php echo $row['scheduled_id']; ?>" class="text-decoration-none text-dark">
-                        <div class="schedule-item">
-                            <div class="schedule-header"><?php echo $row['name']; ?></div>
-                            <div class="schedule-details">
-                                <strong>Date:</strong> <?php echo $formattedDate; ?> |
-                                <strong>Time:</strong> <?php echo $formattedTime; ?> |
-                                <strong>Visitors:</strong> <?php echo $row['num_visitors']; ?> |
-                                <span class="status-badge <?php echo $statusClass; ?>"><?php echo ucfirst($row['status']); ?></span>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-                <?php } ?>
-            </ol>
+            <h2 class="text-center">Students List</h2>
+            <table class="table table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Grade Level</th>
+                        <th>Guardian</th>
+                        <th>Contact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($row = $result_fetch->fetch_assoc()) { ?>
+                    <tr>
+                        <td><?php echo $row['student_id']; ?></td>
+                        <td><?php echo $row['firstname']; ?></td>
+                        <td><?php echo $row['lastname']; ?></td>
+                        <td><?php echo $row['grade_level']; ?></td>
+                        <td><?php echo $row['guardian']; ?></td>
+                        <td><?php echo $row['contact']; ?></td>
+                    </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
         </div>
 
         
