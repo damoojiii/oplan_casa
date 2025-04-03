@@ -292,18 +292,37 @@
                             <div class="col-12 mb-3">
                                 <img id="visitorPhoto" src="uploads/default.jpg" alt="Visitor Photo" class="img-fluid" style="width: 150px; height: 150px; border-radius: 10px; border: 2px solid #ddd;">
                             </div>
-                            <div class="col-12">
-                                <p><strong>Full Name:</strong> <span id="viewFullName"></span></p>
-                                <p><strong>City:</strong> <span id="viewCity"></span></p>
-                                <p><strong>Gender:</strong> <span id="viewGender"></span></p>
-                                <p><strong>Purpose for Visit:</strong> <span id="viewReason"></span></p>
-                                <p><strong>Time:</strong> <span id="viewTime"></span></p>
+                            <div class="col-12 text-start px-5">
+                                <div class="d-flex">
+                                    <p style="width: 140px;"><strong>Full Name</strong></p>
+                                    <p style="width: 10px;">:</p>
+                                    <p id="viewFullName"></p>
+                                </div>
+                                <div class="d-flex">
+                                    <p style="width: 140px;"><strong>City</strong></p>
+                                    <p style="width: 10px;">:</p>
+                                    <p id="viewCity"></p>
+                                </div>
+                                <div class="d-flex">
+                                    <p style="width: 140px;"><strong>Gender</strong></p>
+                                    <p style="width: 10px;">:</p>
+                                    <p id="viewGender"></p>
+                                </div>
+                                <div class="d-flex">
+                                    <p style="width: 140px;"><strong>Purpose for Visit</strong></p>
+                                    <p style="width: 10px;">:</p>
+                                    <p id="viewReason"></p>
+                                </div>
+                                <div class="d-flex">
+                                    <p style="width: 140px;"><strong>Time</strong></p>
+                                    <p style="width: 10px;">:</p>
+                                    <p id="viewTime"></p>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer" style="margin-left: auto; margin-right: auto;">
-                        <!-- Button to generate certificate, with data-visitor-id -->
-                        <button type="button" class="btn btn-secondary" id="generateCertificateBtn" data-visitor-id="">Certificate</button>
+                        <button type="button" class="btn btn-secondary" style="background: #5D9C59;" id="generateCertificateBtn" data-visitor-id="">Certificate</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
