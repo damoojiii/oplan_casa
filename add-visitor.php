@@ -163,6 +163,61 @@
         <div class="tab-content mt-3">
             <div class="tab-pane fade show active">
                 <div class="row">
+                    <?php 
+                        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['student'])) {
+                            $firstname = htmlspecialchars($_POST['firstname']);
+                            $lastname = htmlspecialchars($_POST['lastname']);
+                            $guardian = htmlspecialchars($_POST['guardian']);
+                            $contact = htmlspecialchars($_POST['contact']);
+                            $gender = $_POST['gender'];
+                            $school = $_POST['school'];
+                            $grade_level = $_POST['grade_name'];
+                            
+                            // Validate that all fields have data
+                            if (empty($firstname) || empty($lastname) || empty($guardian) || empty($contact)) {
+                                $_SESSION['message'] = "All fields are required!";
+                                $_SESSION['message_type'] = "Error";
+                                $_SESSION['icon'] = "error";
+                                echo '<script type="text/javascript">
+                                    alert("All fields are required!"); // Show an alert message
+                                    window.location = "trips.php"; // Redirect to trips.php
+                                </script>';
+
+                                exit();
+                            }
+                        
+                            // Prepare SQL query for insertion
+                            $sql_insert = "INSERT INTO `student_tbl` (`scheduled_id`, `firstname`, `lastname`, `guardian`, `contact`, `gender`,`grade_level`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                            if ($stmt = $conn->prepare($sql_insert)) {
+                                $stmt->bind_param("issssss", $school, $firstname, $lastname, $guardian, $contact, $gender, $grade_level);   
+                                // Execute the query and check if successful
+                                if ($stmt->execute()) {
+                                    $_SESSION['message'] = "Student added successfully!";
+                                    $_SESSION['message_type'] = "Success";
+                                    $_SESSION['icon'] = "success";
+                                } else {
+                                    $_SESSION['message'] = "Error: " . $stmt->error;
+                                    $_SESSION['message_type'] = "Error";
+                                    $_SESSION['icon'] = "error";
+                                }
+                    
+                                $stmt->close();
+                                echo '<script type="text/javascript">
+                                    window.location = "add-visitor.php";
+                                </script>';
+                                exit();
+                            } else {
+                                $_SESSION['message'] = "Error preparing the query.";
+                                $_SESSION['message_type'] = "Error";
+                                $_SESSION['icon'] = "error";
+                                echo '<script type="text/javascript">
+                                    alert("Error: ' . $conn->error . '"); // Error message
+                                    window.location = "add-visitor.php"; 
+                                </script>';
+                                exit();
+                            }
+                        }
+                    ?>
                     <div class="col-md-8">
                         <form method="POST">
                             <h3 class="header-title">Add a Student</h3>
@@ -187,10 +242,38 @@
                                     <label for="school">School/Company Name</label>
                                     <select id="school" name="school" class="form-control" required>
                                         <option value="" hidden selected>Select a school</option>
+                                        <?php
+                                            // Query to get the cities
+                                            $sql = "SELECT scheduled_id, name FROM scheduled_tbl WHERE status = 'Upcoming' OR status ='Ongoing'"; 
+                                            $result = $conn->query($sql);
+                                        
+                                            // Loop through the results and display them as options
+                                            if ($result->num_rows > 0) {
+                                                while($row = $result->fetch_assoc()) {
+                                                    echo '<option value="' . $row["scheduled_id"] . '">' . ucwords($row["name"]) . '</option>';
+                                                }
+                                            } else {
+                                                echo '<option value="">No cities found</option>';
+                                            }
+                                        ?>
                                     </select>
                                     <label for="grade">Grade Level</label>
-                                    <select id="grade" name="grade_level" class="form-control" required>
+                                    <select id="grade" name="grade_name" class="form-control" required>
                                         <option value="" hidden selected>Select grade level</option>
+                                        <?php
+                                            // Query to get the cities
+                                            $sql1 = "SELECT grade_name FROM gradelvl_tbl"; 
+                                            $result1 = $conn->query($sql1);
+                                        
+                                            // Loop through the results and display them as options
+                                            if ($result1->num_rows > 0) {
+                                                while($row = $result1->fetch_assoc()) {
+                                                    echo '<option value="' . $row["grade_name"] . '">' . ucwords($row["grade_name"]) . '</option>';
+                                                }
+                                            } else {
+                                                echo '<option value="">No cities found</option>';
+                                            }
+                                        ?>
                                     </select>
                                 </div>
                             </div>

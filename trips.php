@@ -378,7 +378,12 @@
                     </thead>
                     <tbody>
                         <?php 
-                            $sql = "SELECT * FROM scheduled_tbl ORDER BY scheduled_id ASC";
+                            $sql = "SELECT s.*, 
+                                            COALESCE(COUNT(st.student_id), 0) AS num_visitors 
+                                    FROM scheduled_tbl s
+                                    LEFT JOIN student_tbl st ON s.scheduled_id = st.scheduled_id
+                                    GROUP BY s.scheduled_id
+                                    ORDER BY s.scheduled_id ASC";
 
                             $stmt = $conn->prepare($sql);
                             $stmt->execute();
@@ -395,7 +400,7 @@
                             <td><?php echo $formattedDate ?></td>
                             <td><?php echo $formattedTime ?></td>
                             <td><?php echo $row['num_bus'] ?></td>
-                            <td>0</td>
+                            <td><?php echo $row['num_visitors'] ?? 0 ?></td>
                             <td><span class="badge bg-warning text-dark"><?php echo $row['status'] ?></span></td>
                             <td>
                                 <button class="btn btn-success btn-sm"><i class="fa-solid fa-check"></i></button>
