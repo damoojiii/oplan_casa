@@ -1,7 +1,7 @@
 <?php
     include "session.php";
     include("connection.php");
-    include "loader.php";
+    include "loader.php"; 
 ?>
 
 <!DOCTYPE html>
@@ -162,6 +162,14 @@
 
         <div class="tab-content mt-3">
             <div class="tab-pane fade show active">
+                <div class="mb-3">
+                <label for="visitor-type" class="form-label">Select Visitor Type</label>
+                <select id="visitor-type" class="form-select" onchange="toggleForm(this.value)">
+                    <option value="" disabled selected hidden>Select visitor type</option>
+                    <option value="student">Student</option>
+                    <option value="supervisor">Supervisor</option>
+                </select>
+                </div>
                 <div class="row">
                     <?php 
                         if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['student'])) {
@@ -218,104 +226,131 @@
                             }
                         }
                     ?>
-                    <div class="col-md-8">
-                        <form method="POST">
-                            <h3 class="header-title">Add a Student</h3>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label>Enter Student First Name</label>
-                                    <input type="text" name="firstname" class="form-control" required>
-                                    <label>Enter Student Last Name</label>
-                                    <input type="text" name="lastname" class="form-control" required>
-                                    <label>Enter Student's Guardian</label>
-                                    <input type="text" name="guardian" class="form-control" required>
-                                    <label>Enter Contact No.</label>
-                                    <input type="number" name="contact" class="form-control" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="gender" class="form-label input-label">Gender</label>
-                                    <select id="gender" name="gender" class="form-select" required>
-                                        <option value="" disabled selected hidden>Select Gender</option>
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                    </select>
-                                    <label for="school">School/Company Name</label>
-                                    <select id="school" name="school" class="form-control" required>
-                                        <option value="" hidden selected>Select a school</option>
-                                        <?php
-                                            // Query to get the cities
-                                            $sql = "SELECT scheduled_id, name FROM scheduled_tbl WHERE status = 'Upcoming' OR status ='Ongoing'"; 
-                                            $result = $conn->query($sql);
-                                        
-                                            // Loop through the results and display them as options
-                                            if ($result->num_rows > 0) {
-                                                while($row = $result->fetch_assoc()) {
-                                                    echo '<option value="' . $row["scheduled_id"] . '">' . ucwords($row["name"]) . '</option>';
+                    <div id="student-form" style="display: none;">
+                        <div class="col-md-8">
+                            <form method="POST">
+                                <h3 class="header-title">Add a Student</h3>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>Enter Student First Name</label>
+                                        <input type="text" name="firstname" class="form-control" required>
+                                        <label>Enter Student Last Name</label>
+                                        <input type="text" name="lastname" class="form-control" required>
+                                        <label>Enter Student's Guardian</label>
+                                        <input type="text" name="guardian" class="form-control" required>
+                                        <label>Enter Contact No.</label>
+                                        <input type="number" name="contact" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="gender" class="form-label input-label">Gender</label>
+                                        <select id="gender" name="gender" class="form-select" required>
+                                            <option value="" disabled selected hidden>Select Gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                        </select>
+                                        <label for="school">School/Company Name</label>
+                                        <select id="school" name="school" class="form-control" required>
+                                            <option value="" hidden selected>Select a school</option>
+                                            <?php
+                                                // Query to get the cities
+                                                $sql = "SELECT scheduled_id, name FROM scheduled_tbl WHERE status = 'Upcoming' OR status ='Ongoing'"; 
+                                                $result = $conn->query($sql);
+                                            
+                                                // Loop through the results and display them as options
+                                                if ($result->num_rows > 0) {
+                                                    while($row = $result->fetch_assoc()) {
+                                                        echo '<option value="' . $row["scheduled_id"] . '">' . ucwords($row["name"]) . '</option>';
+                                                    }
+                                                } else {
+                                                    echo '<option value="">No cities found</option>';
                                                 }
-                                            } else {
-                                                echo '<option value="">No cities found</option>';
-                                            }
-                                        ?>
-                                    </select>
-                                    <label for="grade">Grade Level</label>
-                                    <select id="grade" name="grade_name" class="form-control" required>
-                                        <option value="" hidden selected>Select grade level</option>
-                                        <?php
-                                            // Query to get the cities
-                                            $sql1 = "SELECT grade_name FROM gradelvl_tbl"; 
-                                            $result1 = $conn->query($sql1);
-                                        
-                                            // Loop through the results and display them as options
-                                            if ($result1->num_rows > 0) {
-                                                while($row = $result1->fetch_assoc()) {
-                                                    echo '<option value="' . $row["grade_name"] . '">' . ucwords($row["grade_name"]) . '</option>';
+                                            ?>
+                                        </select>
+                                        <label for="grade">Grade Level</label>
+                                        <select id="grade" name="grade_name" class="form-control" required>
+                                            <option value="" hidden selected>Select grade level</option>
+                                            <?php
+                                                // Query to get the cities
+                                                $sql1 = "SELECT grade_name FROM gradelvl_tbl"; 
+                                                $result1 = $conn->query($sql1);
+                                            
+                                                // Loop through the results and display them as options
+                                                if ($result1->num_rows > 0) {
+                                                    while($row = $result1->fetch_assoc()) {
+                                                        echo '<option value="' . $row["grade_name"] . '">' . ucwords($row["grade_name"]) . '</option>';
+                                                    }
+                                                } else {
+                                                    echo '<option value="">No cities found</option>';
                                                 }
-                                            } else {
-                                                echo '<option value="">No cities found</option>';
-                                            }
-                                        ?>
-                                    </select>
+                                            ?>
+                                        </select>
+                                    </div>
                                 </div>
+                                <button class="btn btn-primary mt-3" type="submit" name="student">Submit</button>
+                            </form>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="excel-container">
+                            <h3 class="header-title">Excel Upload</h3>
+                            <form method="POST" enctype="multipart/form-data">
+                                <label for="school">School/Company Name</label>
+                                <select id="school" name="school" class="form-control" required>
+                                    <option value="" hidden selected>Select a school</option>
+                                </select>
+
+                                <!-- Excel File Upload -->
+                                <label for="excel_file" class="mt-3">Upload Excel File</label>
+                                <input type="file" name="excel_file" id="excel_file" class="form-control" accept=".xls,.xlsx" required>
+
+                                <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                            </form>
                             </div>
-                            <button class="btn btn-primary mt-3" type="submit" name="student">Submit</button>
-                        </form>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="excel-container">
-                        <h3 class="header-title">Excel Upload</h3>
-                        <form method="POST" enctype="multipart/form-data">
-                            <label for="school">School/Company Name</label>
-                            <select id="school" name="school" class="form-control" required>
-                                <option value="" hidden selected>Select a school</option>
-                            </select>
-
-                            <!-- Excel File Upload -->
-                            <label for="excel_file" class="mt-3">Upload Excel File</label>
-                            <input type="file" name="excel_file" id="excel_file" class="form-control" accept=".xls,.xlsx" required>
-
-                            <button type="submit" class="btn btn-primary mt-3">Submit</button>
-                        </form>
                         </div>
                     </div>
 
                     <hr class="mt-3">
-
-                    <div class="supervisor-container">
-                    <h3 class="header-title">Add a Supervisor</h3>
-                        <form method="POST">
-                            <label>Enter First Name</label>
-                            <input type="text" name="firstname" class="form-control" required>
-                            <label>Enter Last Name</label>
-                            <input type="text" name="lastname" class="form-control" required>
-                            <label for="position">Position</label>
-                            <select id="position" name="position" class="form-control" required>
-                                <option value="" hidden selected>Select a position</option>
-                            </select>
-                            <label>Enter Contact No.</label>
-                            <input type="number" name="contact" class="form-control" required>
-
-                            <button type="submit" class="btn btn-primary mt-3">Submit</button>
-                        </form>
+                    <div id="supervisor-form" style="display: none;">
+                        <div class="supervisor-container">
+                            <h3 class="header-title">Add a Supervisor</h3>
+                            <form method="POST" action="add-supervisor.php">
+                                <label>Enter First Name</label>
+                                <input type="text" name="firstname" class="form-control" required>
+                                <label>Enter Last Name</label>
+                                <input type="text" name="lastname" class="form-control" required>
+                                <label for="position">Position</label>
+                                <select id="position" name="position" class="form-control" required>
+                                    <option value="" hidden selected>Select a position</option>
+                                    <option value="Teacher">Teacher</option>
+                                </select>
+                                <label for="school">School/Company Name</label>
+                                <select id="school" name="school" class="form-control" required>
+                                    <option value="" hidden selected>Select a school</option>
+                                    <?php
+                                        // Query to get the cities
+                                        $sql = "SELECT scheduled_id, name FROM scheduled_tbl WHERE status = 'Upcoming' OR status ='Ongoing'"; 
+                                        $result = $conn->query($sql);
+                                    
+                                        // Loop through the results and display them as options
+                                        if ($result->num_rows > 0) {
+                                            while($row = $result->fetch_assoc()) {
+                                                echo '<option value="' . $row["scheduled_id"] . '">' . ucwords($row["name"]) . '</option>';
+                                            }
+                                        } else {
+                                            echo '<option value="">No cities found</option>';
+                                        }
+                                    ?>
+                                </select>
+                                <label for="gender" class="form-label input-label">Gender</label>
+                                <select id="gender" name="gender" class="form-select" required>
+                                    <option value="" disabled selected hidden>Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                                <label>Enter Contact No.</label>
+                                <input type="tel" name="contact" class="form-control" required>
+                                <button type="submit" name="supervisor" class="btn btn-primary mt-3">Submit</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -326,7 +361,26 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script>
-        
+        function toggleForm(value) {
+            // Get both form containers
+            const studentFormContainer = document.getElementById('student-form');
+            const supervisorFormContainer = document.getElementById('supervisor-form');
+
+            // Reset both forms (if they exist and are shown)
+            const studentForm = studentFormContainer.querySelector('form');
+            const supervisorForm = supervisorFormContainer.querySelector('form');
+
+            if (studentForm) studentForm.reset();
+            if (supervisorForm) supervisorForm.reset();
+
+            // Also reset any file input (Excel upload)
+            const excelFileInput = document.getElementById('excel_file');
+            if (excelFileInput) excelFileInput.value = "";
+
+            // Hide both, then show selected
+            studentFormContainer.style.display = (value === 'student') ? 'flex' : 'none';
+            supervisorFormContainer.style.display = (value === 'supervisor') ? 'block' : 'none';
+        }
     </script>
 </body>
 

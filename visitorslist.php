@@ -292,37 +292,18 @@
                             <div class="col-12 mb-3">
                                 <img id="visitorPhoto" src="uploads/default.jpg" alt="Visitor Photo" class="img-fluid" style="width: 150px; height: 150px; border-radius: 10px; border: 2px solid #ddd;">
                             </div>
-                            <div class="col-12 text-start px-5">
-                                <div class="d-flex">
-                                    <p style="width: 140px;"><strong>Full Name</strong></p>
-                                    <p style="width: 10px;">:</p>
-                                    <p id="viewFullName"></p>
-                                </div>
-                                <div class="d-flex">
-                                    <p style="width: 140px;"><strong>City</strong></p>
-                                    <p style="width: 10px;">:</p>
-                                    <p id="viewCity"></p>
-                                </div>
-                                <div class="d-flex">
-                                    <p style="width: 140px;"><strong>Gender</strong></p>
-                                    <p style="width: 10px;">:</p>
-                                    <p id="viewGender"></p>
-                                </div>
-                                <div class="d-flex">
-                                    <p style="width: 140px;"><strong>Purpose for Visit</strong></p>
-                                    <p style="width: 10px;">:</p>
-                                    <p id="viewReason"></p>
-                                </div>
-                                <div class="d-flex">
-                                    <p style="width: 140px;"><strong>Time</strong></p>
-                                    <p style="width: 10px;">:</p>
-                                    <p id="viewTime"></p>
-                                </div>
+                            <div class="col-12">
+                                <p><strong>Full Name:</strong> <span id="viewFullName"></span></p>
+                                <p><strong>City:</strong> <span id="viewCity"></span></p>
+                                <p><strong>Gender:</strong> <span id="viewGender"></span></p>
+                                <p><strong>Purpose for Visit:</strong> <span id="viewReason"></span></p>
+                                <p><strong>Time:</strong> <span id="viewTime"></span></p>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer" style="margin-left: auto; margin-right: auto;">
-                        <button type="button" class="btn btn-secondary" style="background: #5D9C59;" id="generateCertificateBtn" data-visitor-id="">Certificate</button>
+                        <!-- Button to generate certificate, with data-visitor-id -->
+                        <button type="button" class="btn btn-secondary" id="generateCertificateBtn" data-visitor-id="">Certificate</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -426,7 +407,6 @@
         });
 
         $(".view-btn").click(function () {
-            var id = $(this).data("id");
             var name = $(this).data("name");
             var city = $(this).data("city");
             var gender = $(this).data("gender");
@@ -435,7 +415,6 @@
             var photo = $(this).data("photo");
 
             console.log("Photo filename:", photo);
-            console.log("Visitor ID:", id);
 
             $("#viewFullName").text(name);
             $("#viewCity").text(city);
@@ -448,54 +427,25 @@
             if (photo && photo.trim() !== "" && photo !== "default.jpg") {
                 imagePath = "" + photo;
             } else {
-                imagePath = "/default.jpg";
+                imagePath = "/default.jpg"; // Corrected default image path
             }
 
-            console.log("Final Image Path:", imagePath); // Debugging ngani
+            console.log("Final Image Path:", imagePath); // Debugging log
 
-            $("#visitorPhoto").attr("src", imagePath);
+            $("#visitorPhoto").attr("src", imagePath); // Prevent browser cache issues
 
             $("#generateCertificateBtn").attr("data-visitor-id", id);
-            $("#generateCertificateBtn").attr("data-visitor-name", name);
 
             $("#viewVisitorModal").modal("show");
         });
 
         $("#generateCertificateBtn").click(function () {
-            var visitorName = $(this).attr("data-visitor-name");
-
-            if (!visitorName) {
-                alert("Visitor name is missing!");
-                return;
+            var visitorId = $(this).attr("data-visitor-id");
+            if (visitorId) {
+                window.location.href = "certificate.php?id=" + visitorId;
+            } else {
+                alert("No visitor ID found.");
             }
-
-            // Open a new print window
-            var printWindow = window.open('', '', 'width=1200,height=850');
-
-            // HTML content for the certificate
-            printWindow.document.write('<html><head><title>Visitor Certificate</title>');
-            printWindow.document.write('<style>');
-            printWindow.document.write('@page { size: A4 landscape; margin: 0; }'); 
-            printWindow.document.write('body { margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }');
-            printWindow.document.write('.certificate { position: relative; width: 100%; height: 100vh; overflow: hidden; }');
-            printWindow.document.write('img { width: 100%; height: 100vh; object-fit: cover; }');
-            printWindow.document.write('.name { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 70px; font-weight: bold; white-space: nowrap; }'); // Name position
-            printWindow.document.write('</style></head><body>');
-
-            // Certificate layout
-            printWindow.document.write('<div class="certificate">');
-            printWindow.document.write('<img src="img/cert.png" alt="Certificate Background">');
-            printWindow.document.write('<div class="name">' + visitorName + '</div>');
-            printWindow.document.write('</div>');
-
-            printWindow.document.write('</body></html>');
-            printWindow.document.close();
-
-            // Wait for the certificate to load before printing
-            printWindow.onload = function () {
-                printWindow.print();
-                printWindow.close();
-            };
         });
 
         $(document).ready(function () {
@@ -507,8 +457,8 @@
                     dataType: "json",
                     success: function (data) {
                         var citySelect = $("#editCity");
-                        citySelect.empty();
-                        citySelect.append('<option value="">Select City</option>');
+                        citySelect.empty(); // Clear existing options
+                        citySelect.append('<option value="">Select City</option>'); // Default option
                         
                         data.forEach(city => {
                             citySelect.append(`<option value="${city.city_name}">${city.city_name}</option>`);
@@ -533,11 +483,11 @@
                 $("#editGender").val(gender);
                 $("#editReason").val(reason);
 
-                loadCities();
+                loadCities(); // Load cities before setting the value
                 
                 setTimeout(() => {
-                    $("#editCity").val(city);
-                }, 500);
+                    $("#editCity").val(city); // Set selected city
+                }, 500); // Delay to ensure dropdown is populated
 
                 $("#editVisitorModal").modal("show");
             });

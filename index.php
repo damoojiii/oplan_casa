@@ -294,7 +294,6 @@
                             <option value="" disabled selected hidden>Select City/Municipality</option>
 
                             <?php
-                        
                                 // Query to get the cities
                                 $sql = "SELECT cityID, city_name FROM cities"; // Assuming your table is 'cities' and has 'id' and 'city_name' columns
                                 $result = $conn->query($sql);

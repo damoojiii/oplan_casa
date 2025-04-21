@@ -379,7 +379,7 @@
                     <tbody>
                         <?php 
                             $sql = "SELECT s.*, 
-                                            COALESCE(COUNT(st.student_id), 0) AS num_visitors 
+                                            COALESCE(COUNT(st.student_id), 0) AS num_visitors
                                     FROM scheduled_tbl s
                                     LEFT JOIN student_tbl st ON s.scheduled_id = st.scheduled_id
                                     GROUP BY s.scheduled_id
@@ -393,7 +393,6 @@
                                 $formattedDate = date("F j, Y", strtotime($row['date']));
                                 $formattedTime = date("h:i A", strtotime($row['time']));
                         ?>
-
                         <tr>
                             <td><?php echo $row['scheduled_id'] ?></td>
                             <td><?php echo $row['name'] ?></td>
