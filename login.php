@@ -33,6 +33,7 @@
             font-stretch: normal;
             font-style: normal;
         }
+        
         @font-face {
             font-family: 'Source';
             src: url('fonts/Source_Serif_4/static/SourceSerif4-SemiBold.ttf') format('truetype');
@@ -84,8 +85,7 @@
 
         .logo {
             height: 50px;
-            width: 50px;  
-            
+            width: 50px;
             object-fit: cover;
         }
 
@@ -123,14 +123,16 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: auto;
         }
+        
         .main{
             display: flex;
             flex-direction: column;
         }
+
         .forgot{
-            margin-bottom: 5px;
+            margin-top: 5px;
             font-size: 0.9rem;
-            color: #fff;
+            color: #fff !important;
         }
 
         h2{
@@ -171,13 +173,13 @@
                     while ($row = $result->fetch_assoc()) {
                         $logo = !empty($row['logo_path']) ? $row['logo_path'] : 'img/rosariologo.png'; // Use default if empty
                         echo "<div class='logo-item'>";
-                        echo "<img src='$logo' alt='Logo' class='logo-circle' style='width: 80px; height: 80px;'>";
+                        echo "<img src='$logo' alt='Logo' class='logo-circle' style='width: 75px; height: 75px; margin-top: -10px;'>";
                         echo "</div>";
                     }
                 } else {
                     // If walay logong makita, display the default logo nganii para di empty yung logo
                     echo "<div class='logo-item'>";
-                    echo "<img src='img/rosariologo.png' alt='Default Logo' class='logo-circle' style='width: 80px; height: 80px;'>";
+                    echo "<img src='img/rosariologo.png' alt='Default Logo' class='logo-circle' style='width: 75px; height: 75px; margin-top: -10px;'>";
                     echo "</div>";
                 }
             ?>
@@ -189,7 +191,7 @@
         
     <div class="main">
         <div class="login-container">
-            <h2 class="text-center mb-4">Admin</h2>
+            <h2 class="text-center mb-4">ADMIN</h2>
             <form method="POST" action="#">
                 <div class="mb-3">
                     <label for="email" class="form-label">Email or Username</label>
@@ -198,13 +200,13 @@
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <label for="password" class="form-label">Password</label>
-                        <p class="text-center list-unstyle forgot"><a href="forgot_password.php">Forgot Password</a></p>
                     </div>
                     <!-- Password field with toggle visibility -->
                     <div class="password-wrapper">
                         <input type="password" class="form-control" id="password" name="password" required>
                         <i class="bi bi-eye" id="togglePassword"></i>
                     </div>
+                    <p class="text-end list-unstyle forgot"><a href="forgot_password.php" style="text-decoration: none; color: #FFFF;">Forgot Password</a></p>
                 </div>
                 <button type="submit" name="login" class="btn btn-primary w-100">Login</button>
             </form>

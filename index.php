@@ -71,166 +71,191 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-    @font-face {
-        font-family: 'Inter';
-        src: url('fonts/Inter/Inter-VariableFont_opsz\,wght.ttf') format('truetype');
-        font-weight: 100 900;
-        font-stretch: normal;
-        font-style: normal;
-    }
+        @font-face {
+            font-family: 'Inter';
+            src: url('fonts/Inter/Inter-VariableFont_opsz\,wght.ttf') format('truetype');
+            font-weight: 100 900;
+            font-stretch: normal;
+            font-style: normal;
+        }
 
-    @font-face {
-        font-family: 'Source';
-        src: url('fonts/Source_Serif_4/static/SourceSerif4-SemiBold.ttf') format('truetype');
-        font-weight: normal;
-        font-style: normal;
+        @font-face {
+            font-family: 'Source';
+            src: url('fonts/Source_Serif_4/static/SourceSerif4-SemiBold.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
 
-    }
+        }
 
-    body {
-        font-family: 'Inter', Arial;
-        background: url('img/casabg.jpg') no-repeat center center/cover;
-        height: 100vh;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-    }
+        body {
+            font-family: 'Inter', Arial;
+            background: url('img/casabg.jpg') no-repeat center center/cover;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
 
-    body.swal2-shown {
-        padding-right: 0px !important;
-    }
+        body.swal2-shown {
+            padding-right: 0px !important;
+        }
 
-    .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: #5D9C5933;
-        z-index: 1;
-    }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #5D9C5933;
+            z-index: 1;
+        }
 
-    .header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        color: white;
-        padding-inline: 70px !important;
-        padding-left: 90px;
-        padding-right: 90px;
-        display: flex;
-        align-items: center;
-        z-index: 10;
-    }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            color: white;
+            padding-inline: 70px !important;
+            padding-left: 90px;
+            padding-right: 90px;
+            display: flex;
+            align-items: center;
+            z-index: 10;
+        }
 
-    .login {
-        padding-inline: 15px;
-    }
+        .login {
+            padding-inline: 15px;
+        }
 
-    .logo {
-        height: 50px;
-        width: 50px;
-        
-        object-fit: cover;
-    }
-    .logo img {
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-    .header h4 {
-        margin: 0;
-        font-family: 'Source';
-    }
+        .logo {
+            height: 50px;
+            width: 50px;
+            
+            object-fit: cover;
+        }
 
-    .visitor {
-        font-family: 'Inter', Arial;
-        font-weight: 400;
-        font-size: 30px;
-    }
+        .logo img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
 
-    .card {
-        position: relative;
-        background: white;
-        border-radius: 10px;
-        padding: 20px;
-        z-index: 10;
-    }
+        .header h4 {
+            margin: 0;
+            font-family: 'Source';
+        }
 
-    .table {
-        margin-top: 30px !important;
-    }
+        .visitor {
+            font-family: 'Inter', Arial;
+            font-weight: 400;
+            font-size: 30px;
+        }
 
-    thead,
-    th {
-        background-color: #5D9C59 !important;
-        text-align: center !important;
-        color: #fff !important;
-    }
+        .card {
+            position: relative;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            z-index: 10;
+        }
 
-    .empty-row td {
-        height: 41px;
-    }
+        .table {
+            margin-top: 30px !important;
+        }
 
-    #camera-container,
-    #captured-photo {
-        display: none;
-        margin-top: 10px;
-    }
+        #visitorTable thead th {
+            background-color: #5D9C59;
+            color: white;
+            font-weight: bold;
+            border: 1px solid black;
+        }
 
-    video,
-    img {
-        width: 100%;
-        max-width: 300px;
-        height: 300px;
-        object-fit: cover;
-        border: 2px solid #ddd;
-        border-radius: 5px;
-    }
+        #visitorTable thead tr th:first-child {
+            border-top-left-radius: 10px;
+        }
 
-    .dataTables_paginate {
-        text-align: right !important;
-    }
+        #visitorTable thead tr th:last-child {
+            border-top-right-radius: 10px;
+        }
 
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
-        padding: 8px 12px;
-        margin: 2px;
-        border: 1px solid #5D9C59;
-        border-radius: 5px;
-        background-color: white;
-        color: #5D9C59;
-        transition: 0.3s;
-    }
+        #visitorTable tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 10px;
+        }
 
-    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-        background-color: #5D9C59;
-        color: white;
-    }
+        #visitorTable tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 10px;
+        }
 
-    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-        background-color: #5D9C59;
-        color: white;
-    }
+        thead,
+        th {
+            background-color: #5D9C59 !important;
+            text-align: center !important;
+            color: #fff !important;
+        }
 
-    .btn-success {
-        --bs-btn-bg: #5D9C59 !important;
-        --bs-btn-border-color: #5D9C59 !important;
-        --bs-btn-hover-bg: #5D9C59 !important;
-    }
+        .empty-row td {
+            height: 41px;
+        }
 
-    .input-label {
-        font-size: 15px;
-    }
+        #camera-container,
+        #captured-photo {
+            display: none;
+            margin-top: 10px;
+        }
 
-    #captureBtn {
-        display: block;
-        margin: 0 auto;
-    }
+        video,
+        img {
+            width: 100%;
+            max-width: 300px;
+            height: 300px;
+            object-fit: cover;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .dataTables_paginate {
+            text-align: right !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 8px 12px;
+            margin: 2px;
+            border: 1px solid #5D9C59;
+            border-radius: 5px;
+            background-color: white;
+            color: #5D9C59;
+            transition: 0.3s;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background-color: #5D9C59;
+            color: white;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background-color: #5D9C59;
+            color: white;
+        }
+
+        .btn-success {
+            --bs-btn-bg: #5D9C59 !important;
+            --bs-btn-border-color: #5D9C59 !important;
+            --bs-btn-hover-bg: #5D9C59 !important;
+        }
+
+        .input-label {
+            font-size: 15px;
+        }
+
+        #captureBtn {
+            display: block;
+            margin: 0 auto;
+        }
     </style>
 </head>
 
@@ -253,13 +278,13 @@
                         while ($row = $result->fetch_assoc()) {
                             $logo = !empty($row['logo_path']) ? $row['logo_path'] : 'img/rosariologo.png'; // Use default if empty
                             echo "<div class='logo-item'>";
-                            echo "<img src='$logo' alt='Logo' class='logo-circle' style='width: 80px; height: 80px; border-radius: 50%; border: none;'>";
+                            echo "<img src='$logo' alt='Logo' class='logo-circle' style='width: 75px; height: 75px; border-radius: 50%; border: none; margin-top: -10px;'>";
                             echo "</div>";
                         }
                     } else {
                         // If walay logong makita, display the default logo nganii para di empty yung logo
                         echo "<div class='logo-item'>";
-                        echo "<img src='img/rosariologo.png' alt='Default Logo' class='logo-circle' style='width: 80px; height: 80px; border-radius: 50%; border: none;'>";
+                        echo "<img src='img/rosariologo.png' alt='Default Logo' class='logo-circle' style='width: 75px; height: 75px; border-radius: 50%; border: none; margin-top: -10px;'>";
                         echo "</div>";
                     }
                 ?>
@@ -318,7 +343,7 @@
                             <?php
                         
                                 // Query to get the cities
-                                $sql = "SELECT purpose_id, purpose FROM purpose_tbl ORDER BY purpose ASC"; // Assuming your table is 'cities' and has 'id' and 'city_name' columns
+                                $sql = "SELECT purpose_id, purpose FROM purpose_tbl ORDER BY purpose ASC";
                                 $result = $conn->query($sql);
                             
                                 // Loop through the results and display them as options
@@ -364,30 +389,30 @@
                 </thead>
                 <tbody id="visitorTable">
                     <?php
-                    $currentDate = date("Y-m-d");
+                        $currentDate = date("Y-m-d");
 
-                    $sql = "SELECT visitor_id, fullName, city, gender, reason, time, RANK() OVER (ORDER BY time ASC) AS daily_counter
-                            FROM visitors 
-                            WHERE DATE(time) = ? 
-                            ORDER BY visitor_id DESC";
+                        $sql = "SELECT visitor_id, fullName, city, gender, reason, time, RANK() OVER (ORDER BY time ASC) AS daily_counter
+                                FROM visitors 
+                                WHERE DATE(time) = ? 
+                                ORDER BY visitor_id DESC";
 
-                    $stmt = $conn->prepare($sql);
-                    $stmt->bind_param("s", $currentDate);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
+                        $stmt = $conn->prepare($sql);
+                        $stmt->bind_param("s", $currentDate);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
 
-                    while ($row = $result->fetch_assoc()) {
-                        $formattedTime = date("h:i A", strtotime($row['time']));
-                        echo "<tr>
-                            <td>{$row['daily_counter']}</td>
-                            <td>" . ucwords(strtolower($row['fullName'])) . "</td>
-                            <td>{$row['city']}</td>
-                            <td>{$row['gender']}</td>
-                            <td>{$row['reason']}</td>
-                            <td>{$formattedTime}</td>
-                        </tr>";
-                    }
-                ?>
+                        while ($row = $result->fetch_assoc()) {
+                            $formattedTime = date("h:i A", strtotime($row['time']));
+                            echo "<tr>
+                                <td>{$row['daily_counter']}</td>
+                                <td>" . ucwords(strtolower($row['fullName'])) . "</td>
+                                <td>{$row['city']}</td>
+                                <td>{$row['gender']}</td>
+                                <td>{$row['reason']}</td>
+                                <td>{$formattedTime}</td>
+                            </tr>";
+                        }
+                    ?>
                 </tbody>
             </table>
         </div>
