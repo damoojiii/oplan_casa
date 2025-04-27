@@ -75,259 +75,88 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['code'])) {
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Visitor's Log</title>
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="icon" href="img/rosariologo.png">
-
-    <!-- Script -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <style>
-        @font-face {
-            font-family: 'Inter';
-            src: url('fonts/Inter/Inter-VariableFont_opsz\,wght.ttf') format('truetype');
-            font-weight: 100 900;
-            font-stretch: normal;
-            font-style: normal;
-        }
-
-        @font-face {
-            font-family: 'Source';
-            src: url('fonts/Source_Serif_4/static/SourceSerif4-SemiBold.ttf') format('truetype');
-            font-weight: normal;
-            font-style: normal;
-
-        }
-
-        body {
-            font-family: 'Inter', Arial;
-            background: url('img/casabg.jpg') no-repeat center center/cover;
-            height: 100vh;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #5D9C5933;
-            z-index: 1;
-        }
-
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            color: white;
-            padding-inline: 70px !important;
-            padding-left: 90px;
-            padding-right: 90px;
-            display: flex;
-            align-items: center;
-            z-index: 10;
-        }
-
-        .login {
-            padding-inline: 15px;
-        }
-
-        .header h4 {
-            margin: 0;
-            font-family: 'Source';
-        }
-
-        .container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh; /* Full height of the screen */
-            width: 100vw; /* Full width of the screen */
-            position: relative; /* Ensures proper positioning */
-            z-index: 10;
-        }
-
-        .visitor {
-            font-family: 'Inter', Arial;
-            font-weight: 400;
-            font-size: 30px;
-        }
-
-        .card {
-            width: 350px;
-            padding: 20px;
-            border-radius: 10px;
-            background: #fff;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-        }
-
-        .logo {
-            width: 80px;
-            margin: 0 auto 10px;
-            display: block;
-        }
-
-        .submit-btn {
-            width: 100%;
-            background: #ff4d4d;
-            color: white;
-            border: none;
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .submit-btn:hover {
-            background: #d43f3f;
-        }
-
-        .otp-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .otp-input {
-            width: 50px;
-            height: 50px;
-            font-size: 24px;
-            text-align: center;
-            border: 2px solid #ccc;
-            border-radius: 8px;
-            outline: none;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .otp-input:focus {
-            border-color: #ff4d4d;
-            box-shadow: 0px 0px 5px #ff4d4d;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
 <body>
 
-    <div class="overlay"></div>
-
-    <div class="container mt-5">
-        <div class="card p-4">
-            <img src="img/rosariologo.png" class="logo" />
-            <h4 style="margin-top: 10px; margin-bottom: 20px;">Forgot Password</h4>
-            
-            <form id="forgotPasswordForm" method="POST">
-                <div class="input-box">
-                    <input type="email" name="email" id="emailInput" class="form-control" placeholder="Enter your email" required>
-                </div>
-                <button type="submit" class="submit-btn">Reset</button>
-            </form>
+<div class="container mt-5">
+    <h2>Forgot Password</h2>
+    <form id="emailForm">
+        <div class="mb-3">
+            <label for="email" class="form-label">Enter your email address</label>
+            <input type="email" class="form-control" id="email" name="email" required>
         </div>
+        <button type="submit" class="btn btn-primary">Send OTP</button>
+    </form>
+</div>
 
-        <!-- OTP Modal -->
-        <div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header border-0">
-                        <h5 class="modal-title text-danger text-center w-100" id="otpModalLabel">
-                            Enter OTP to Verify Your Account
-                        </h5>
-                    </div>
-                    <div class="modal-body text-center">
-                        <img src="img/otp_icon.png" alt="OTP Icon" style="width: 80px; margin-bottom: 10px;">
-                        <p class="mb-3">A code has been sent to <strong id="emailDisplay"></strong></p>
-                        <form method="post" id="otpForm">
-                            <div class="otp-container">
-                                <input type="text" class="form-control otp-input" maxlength="1" required>
-                                <input type="text" class="form-control otp-input" maxlength="1" required>
-                                <input type="text" class="form-control otp-input" maxlength="1" required>
-                                <input type="text" class="form-control otp-input" maxlength="1" required>
-                            </div>
-                            <input type="hidden" name="code" id="hiddenCode">
-                            <button type="submit" class="btn btn-danger w-50">Validate</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+<!-- OTP Modal -->
+<div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="otpForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="otpModalLabel">Enter OTP</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="otp" class="form-label">OTP Code</label>
+            <input type="text" class="form-control" id="otp" name="code" required maxlength="4">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Verify OTP</button>
+        </div>
+      </form>
     </div>
+  </div>
+</div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const inputs = document.querySelectorAll(".otp-input");
+<script>
+document.getElementById('emailForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
 
-            inputs.forEach((input, index) => {
-                input.addEventListener("input", (e) => {
-                    if (e.target.value && index < inputs.length - 1) {
-                        inputs[index + 1].focus();
-                    }
-                });
+    try {
+        const response = await axios.post('forgot_password.php', new URLSearchParams({ email }));
 
-                input.addEventListener("keydown", (e) => {
-                    if (e.key === "Backspace" && index > 0 && !e.target.value) {
-                        inputs[index - 1].focus();
-                    }
-                });
-            });
-        });
+        if (response.data.status === 'success') {
+            alert(response.data.message);
+            var otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
+            otpModal.show();
+        } else {
+            alert(response.data.message);
+        }
+    } catch (error) {
+        console.error(error);
+        alert('An error occurred. Please try again.');
+    }
+});
 
-        $(document).ready(function() {
-            $("#forgotPasswordForm").submit(function(e) {
-                e.preventDefault(); // Prevent default form submission
+document.getElementById('otpForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const code = document.getElementById('otp').value;
 
-                var email = $("#emailInput").val();
+    try {
+        const response = await axios.post('forgotPass.php', new URLSearchParams({ code }));
 
-                $.ajax({
-                    type: "POST",
-                    url: "forgot_password.php",
-                    data: { email: email },
-                    dataType: "json",
-                    success: function(response) {
-                        if (response.status === "success") {
-                            $("#emailDisplay").text(email);
-                            $("#otpModal").modal("show");
-                        } else {
-                            alert(response.message);
-                        }
-                    },
-                    error: function() {
-                        alert("An error occurred. Please try again.");
-                    }
-                });
-            });
+        // Since your PHP file uses echo + script for OTP, no need to handle response here.
+        // If you want to improve, you can change PHP to JSON response style for better AJAX handling.
 
-            $(".otp-input").keyup(function() {
-                if (this.value.length === this.maxLength) {
-                    $(this).next(".otp-input").focus();
-                }
-            });
-        });
-    </script>
+    } catch (error) {
+        console.error(error);
+        alert('An error occurred during OTP verification.');
+    }
+});
+</script>
 
 </body>
-
 </html>

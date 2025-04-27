@@ -172,7 +172,6 @@
             background-color: #5D9C59;
             color: white;
             font-weight: bold;
-            border: 1px solid black;
         }
 
         #visitorTable thead tr th:first-child {
@@ -191,6 +190,10 @@
             border-bottom-right-radius: 10px;
         }
 
+        #visitorTable tbody td {
+
+        }
+
         thead,
         th {
             background-color: #5D9C59 !important;
@@ -200,6 +203,12 @@
 
         .empty-row td {
             height: 41px;
+        }
+
+        td.dataTables_empty {
+            color: #000000;
+            text-align: center;
+            border: none;
         }
 
         #camera-container,
@@ -376,8 +385,8 @@
                 </div>
             </form>
 
-            <table id="visitorTable" class="table table-bordered text-center">
-                <thead class="text-white">
+            <table id="visitorTable" class="table table-bordered table-hover text-center mb-0 rounded-4 overflow-hidden">
+                <thead class="text-white" style="background-color: #4CAF50;">
                     <tr>
                         <th>Visitor No.</th>
                         <th>Visitor Name</th>
@@ -387,7 +396,7 @@
                         <th>Time</th>
                     </tr>
                 </thead>
-                <tbody id="visitorTable">
+                <tbody>
                     <?php
                         $currentDate = date("Y-m-d");
 
@@ -415,6 +424,7 @@
                     ?>
                 </tbody>
             </table>
+
         </div>
 
         <div class="modal fade" id="photoModal" tabindex="-1" aria-labelledby="photoModalLabel" aria-hidden="true">
@@ -571,6 +581,7 @@
                 "ordering": false,
                 "info": false,
                 "language": {
+                    "emptyTable": "No visitors yet.",
                     "paginate": {
                         "previous": "<i class='fas fa-chevron-left'></i>",
                         "next": "<i class='fas fa-chevron-right'></i>"
