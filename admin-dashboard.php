@@ -2,6 +2,63 @@
     include "session.php";
     include("connection.php");
     include "loader.php";
+
+    $sql1 = "SELECT DATE_FORMAT(time, '%M %Y') as month, COUNT(visitor_id) as count 
+            FROM visitors 
+            GROUP BY month 
+            ORDER BY month ASC";
+
+    $result = $conn->query($sql1);
+
+    $months = [];
+    $counts = [];
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $months[] = $row['month']; // Format: 2025-04
+            $counts[] = $row['count'];
+        }
+    }
+
+    $sql2 = "SELECT name, num_bus FROM scheduled_tbl ORDER BY date ASC";
+    $result = $conn->query($sql2);
+
+    $tripNames = [];
+    $busCounts = [];
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $tripNames[] = $row['name'];      // trip names
+            $busCounts[] = $row['num_bus'];    // number of buses for each trip
+        }
+    }
+
+    $sql3 = "SELECT reason, COUNT(visitor_id) as total FROM visitors GROUP BY reason ORDER BY total DESC";
+    $result = $conn->query($sql3);
+
+    $reasons = [];
+    $totals = [];
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $reasons[] = $row['reason'];   // 'Tour', 'Business', 'Education', etc.
+            $totals[] = $row['total'];      // how many visitors for each reason
+        }
+    }
+
+    $sql4 = "SELECT DATE(date) as scheduled_date, status FROM scheduled_tbl";
+    $result = $conn->query($sql4);
+
+    $scheduledDates = [];
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $scheduledDates[] = [
+                'date' => $row['scheduled_date'], // e.g., '2025-05-15'
+                'status' => strtolower($row['status']) // e.g., 'upcoming' or 'completed'
+            ];
+        }
+    }
 ?>
 
 <!DOCTYPE html>
@@ -92,11 +149,18 @@
         background: #273E26;
         color: #fff;
     }
-    .date.inactive{
-        color: #d2d2d2;
+    .date.upcoming {
+        background-color: #f0ad4e; /* orange for upcoming */
+        color: white;
+        border-radius: 50%;
     }
-    .date.inactive:hover{
-        color: #fff;
+    .date.completed {
+        background-color: #5cb85c; /* light green for completed */
+        color: white;
+        border-radius: 50%;
+    }
+    .date.inactive {
+        opacity: 0.4;
     }
     
     </style>
@@ -263,6 +327,11 @@
                     <!-- Calendar -->
                     <div class="calendar-container">
                         <div class="calendar">
+                            <div class="legend mt-2" style="margin-top: 10px;">
+                                <span style="display: inline-block; width: 15px; height: 15px; background-color: #273E26; border-radius: 50%; margin-right: 5px;"></span> Today
+                                <span style="display: inline-block; width: 15px; height: 15px; background-color: #f0ad4e; border-radius: 50%; margin-left: 15px; margin-right: 5px;"></span> Upcoming Trip
+                                <span style="display: inline-block; width: 15px; height: 15px; background-color: #5cb85c; border-radius: 50%; margin-left: 15px; margin-right: 5px;"></span> Completed Trip
+                            </div>
                             <div class="header">
                                 <button id="prevBtn"><i class="fa-solid fa-chevron-left"></i></button>
                                 <div class="monthYear header-title" id="monthYear"></div>
@@ -294,6 +363,7 @@
         const datesElement = document.getElementById('dates');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
+        const scheduledDates = <?php echo json_encode($scheduledDates); ?>;
 
         let currentDate = new Date();
 
@@ -301,35 +371,56 @@
             const currentYear = currentDate.getFullYear();
             const currentMonth = currentDate.getMonth();
 
-            const firstDay = new Date(currentYear, currentMonth, 0);
+            const firstDay = new Date(currentYear, currentMonth, 1); // ❗ Fix: should be day 1, not 0
             const lastDay = new Date(currentYear, currentMonth + 1, 0);
             const totalDays = lastDay.getDate();
-            const firstDayIndex = firstDay.getDay();
+            const firstDayIndex = firstDay.getDay(); // Monday = 1, Sunday = 0
             const lastDayIndex = lastDay.getDay();
 
-            const monthYearString = currentDate.toLocaleString('default', {month: 'long', year: 'numeric'});
+            const monthYearString = currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
             monthYearElement.textContent = monthYearString;
 
             let datesHTML = '';
 
-            for(let i = firstDayIndex; i > 0; i--){
-                const prevDate = new Date(currentYear, currentMonth, 0 - i + 1);
-                datesHTML += `<div class="date inactive">${prevDate.getDate()}</div>`;
+            // Fill previous month inactive dates
+            let prevMonthDays = (firstDayIndex + 6) % 7; // adjust for Monday as start
+            const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
+            for (let i = prevMonthDays; i > 0; i--) {
+                datesHTML += `<div class="date inactive">${prevMonthLastDay - i + 1}</div>`;
             }
 
-            for(let i = 1; i <= totalDays; i++){
+            // Fill current month days
+            for (let i = 1; i <= totalDays; i++) {
                 const date = new Date(currentYear, currentMonth, i);
-                const activeClass = date.toDateString() === new Date().toDateString() ? 'active' : '';
-                datesHTML += `<div class="date ${activeClass}">${i}</div>`;
+                const dateString = date.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+
+                let extraClass = '';
+                const todayString = new Date().toISOString().split('T')[0];
+
+                if (dateString === todayString) {
+                    extraClass = 'active'; // today highlight (blue)
+                } else {
+                    const scheduled = scheduledDates.find(s => s.date === dateString);
+                    if (scheduled) {
+                        if (scheduled.status === 'upcoming') {
+                            extraClass = 'upcoming'; // orange
+                        } else if (scheduled.status === 'completed') {
+                            extraClass = 'completed'; // light green
+                        }
+                    }
+                }
+
+                datesHTML += `<div class="date ${extraClass}">${i}</div>`;
             }
 
-            for(let i = 1; i <= 7 - lastDayIndex; i++){
-                const nextDate = new Date(currentYear, currentMonth + 1, i);
-                datesHTML += `<div class="date inactive">${nextDate.getDate()}</div>`;
+            // Fill next month inactive dates
+            for (let i = 1; i <= (7 - ((firstDayIndex + totalDays - 1) % 7) - 1); i++) {
+                datesHTML += `<div class="date inactive">${i}</div>`;
             }
 
+            // ✅ Now update the page!
             datesElement.innerHTML = datesHTML;
-        }   
+        };  
 
         prevBtn.addEventListener('click', () => {
             const today = new Date();
@@ -342,11 +433,13 @@
             }
             togglePrevButton();
         });
+
         nextBtn.addEventListener('click', () => {
             currentDate.setMonth(currentDate.getMonth()+1);
             updateCalendar();
             togglePrevButton();
         });
+        
         const togglePrevButton = () => {
             const today = new Date();
             if (
@@ -364,13 +457,93 @@
     </script>
     <script>
         const ctx1 = document.getElementById('visitorChart').getContext('2d');
-        new Chart(ctx1, { type: 'line', data: { labels: [0,1,2,3,4], datasets: [{ data: [2000, 3000, 1000, 4000, 2500], borderColor: 'blue' }] }});
+        new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: <?php echo json_encode($months); ?>, // X-axis = months
+                datasets: [{
+                    label: 'Visitors per Month',
+                    data: <?php echo json_encode($counts); ?>, // Y-axis = visitor count
+                    borderColor: 'blue',
+                    fill: false,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Visitors'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Month'
+                        }
+                    }
+                }
+            }
+        });
+
+        const ctx2 = document.getElementById('fieldTripsChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: <?php echo json_encode($tripNames); ?>, // X-axis = trip names
+                datasets: [{
+                    label: 'Number of Buses',
+                    data: <?php echo json_encode($busCounts); ?>, // Y-axis = number of buses
+                    backgroundColor: 'orange'
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Buses'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Field Trip'
+                        }
+                    }
+                }
+            }
+        });
         
-        const ctx2 = document.getElementById('reasonChart').getContext('2d');
-        new Chart(ctx2, { type: 'doughnut', data: { labels: ['A', 'B', 'C'], datasets: [{ data: [418, 994, 547], backgroundColor: ['#d9534f', '#5bc0de', '#5cb85c'] }] }});
-        
-        const ctx3 = document.getElementById('fieldTripsChart').getContext('2d');
-        new Chart(ctx3, { type: 'bar', data: { labels: [0,1,2,3,4,5,6,7,8,9], datasets: [{ data: [1500, 3200, 2000, 1800, 3000, 5000], backgroundColor: 'orange' }] }});
+        const ctx3 = document.getElementById('reasonChart').getContext('2d');
+        new Chart(ctx3, {
+            type: 'doughnut',
+            data: {
+                labels: <?php echo json_encode($reasons); ?>,
+                datasets: [{
+                    data: <?php echo json_encode($totals); ?>,
+                    backgroundColor: [
+                        '#d9534f',
+                        '#5bc0de',
+                        '#5cb85c',
+                        '#f0ad4e',
+                        '#0275d8',
+                        '#292b2c'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
     </script>
 </body>
 
