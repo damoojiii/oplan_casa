@@ -407,6 +407,7 @@
         });
 
         $(".view-btn").click(function () {
+            var id = $(this).data("id");
             var name = $(this).data("name");
             var city = $(this).data("city");
             var gender = $(this).data("gender");
@@ -435,17 +436,46 @@
             $("#visitorPhoto").attr("src", imagePath); // Prevent browser cache issues
 
             $("#generateCertificateBtn").attr("data-visitor-id", id);
+            $("#generateCertificateBtn").attr("data-visitor-name", name);
 
             $("#viewVisitorModal").modal("show");
         });
 
         $("#generateCertificateBtn").click(function () {
-            var visitorId = $(this).attr("data-visitor-id");
-            if (visitorId) {
-                window.location.href = "certificate.php?id=" + visitorId;
-            } else {
-                alert("No visitor ID found.");
+            var visitorName = $(this).attr("data-visitor-name");
+
+            if (!visitorName) {
+                alert("Visitor name is missing!");
+                return;
             }
+
+            // Open a new print window
+            var printWindow = window.open('', '', 'width=1200,height=850');
+
+            // HTML content for the certificate
+            printWindow.document.write('<html><head><title>Visitor Certificate</title>');
+            printWindow.document.write('<style>');
+            printWindow.document.write('@page { size: A4 landscape; margin: 0; }'); 
+            printWindow.document.write('body { margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }');
+            printWindow.document.write('.certificate { position: relative; width: 100%; height: 100vh; overflow: hidden; }');
+            printWindow.document.write('img { width: 100%; height: 100vh; object-fit: cover; }');
+            printWindow.document.write('.name { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 70px; font-weight: bold; white-space: nowrap; }'); // Name position
+            printWindow.document.write('</style></head><body>');
+
+            // Certificate layout
+            printWindow.document.write('<div class="certificate">');
+            printWindow.document.write('<img src="img/cert.png" alt="Certificate Background">');
+            printWindow.document.write('<div class="name">' + visitorName + '</div>');
+            printWindow.document.write('</div>');
+
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+
+            // Wait for the certificate to load before printing
+            printWindow.onload = function () {
+                printWindow.print();
+                printWindow.close();
+            };
         });
 
         $(document).ready(function () {
