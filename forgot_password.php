@@ -62,7 +62,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['code'])) {
     $email = $_SESSION['email'];
     $input_code = $_POST['code'];
 
-    $result = $conn->query("SELECT otp FROM users WHERE email = '$email' AND otp = '$input_code'");
+    $stmt = $conn->prepare("SELECT otp FROM users WHERE email = ? AND otp = ?");
+    $stmt->bind_param("ss", $email, $input_code);
+    $stmt->execute();
+    $result = $stmt->get_result();
     if ($result->num_rows > 0) {
         $conn->query("UPDATE users SET otp = NULL WHERE email = '$email'");
         echo '<script>alert("OTP verified successfully!");</script>';
@@ -80,18 +83,71 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['code'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forgot Password</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: url('img/casabg.jpg') no-repeat center center/cover;
+        }
+        .forgot-password-box {
+            background-color: #d9f47d;
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 40px;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .forgot-password-box h2 {
+            font-weight: bold;
+        }
+        .email-input {
+            height: 50px;
+            font-size: 16px;
+            text-align: center;
+        }
+        .btn-send {
+            background-color: #2dd9e8;
+            color: #222;
+            font-weight: bold;
+            width: 100%;
+            height: 45px;
+            font-size: 16px;
+            border: none;
+        }
+        .btn-send:hover {
+            background-color: #24c2d0;
+        }
+        .cancel-link {
+            display: block;
+            margin-top: 15px;
+            text-decoration: underline;
+            color: #333;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #5D9C5933;
+            z-index: -1;
+        }
+    </style>
 </head>
 <body>
 
-<div class="container mt-5">
-    <h2>Forgot Password</h2>
-    <form id="emailForm">
-        <div class="mb-3">
-            <label for="email" class="form-label">Enter your email address</label>
-            <input type="email" class="form-control" id="email" name="email" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Send OTP</button>
-    </form>
+<div class="overlay"></div>
+
+<div class="forgot-password-box">
+  <img src="https://cdn-icons-png.flaticon.com/512/542/542638.png" alt="Envelope" width="80">
+  <h2>FORGOT PASSWORD?</h2>
+  <p>Don’t worry! Enter your email below and we’ll email you with instructions on how to reset your password.</p>
+  <form id="emailForm">
+    <input type="email" class="form-control email-input mb-3" id="email" name="email" placeholder="ENTER YOUR EMAIL" required>
+    <button type="submit" class="btn btn-send">SEND</button>
+  </form>
+  <a href="#" class="cancel-link">CANCEL</a>
 </div>
 
 <!-- OTP Modal -->
@@ -103,10 +159,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['code'])) {
           <h5 class="modal-title" id="otpModalLabel">Enter OTP</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label for="otp" class="form-label">OTP Code</label>
-            <input type="text" class="form-control" id="otp" name="code" required maxlength="4">
+        <div class="modal-body text-center">
+          <label class="form-label d-block mb-2">OTP Code</label>
+          <div class="d-flex justify-content-center gap-2">
+            <input type="hidden" name="code" id="otpFull">
+            <input type="text" class="form-control text-center otp-input" name="digit1" maxlength="1" required>
+            <input type="text" class="form-control text-center otp-input" name="digit2" maxlength="1" required>
+            <input type="text" class="form-control text-center otp-input" name="digit3" maxlength="1" required>
+            <input type="text" class="form-control text-center otp-input" name="digit4" maxlength="1" required>
           </div>
         </div>
         <div class="modal-footer">
@@ -156,6 +216,30 @@ document.getElementById('otpForm').addEventListener('submit', async function(e) 
         alert('An error occurred during OTP verification.');
     }
 });
+
+const otpInputs = document.querySelectorAll('.otp-input');
+  const otpForm = document.getElementById('otpForm');
+  const otpFull = document.getElementById('otpFull');
+
+  otpInputs.forEach((input, index) => {
+    input.addEventListener('input', () => {
+      if (input.value.length === 1 && index < otpInputs.length - 1) {
+        otpInputs[index + 1].focus();
+      }
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === "Backspace" && input.value === "" && index > 0) {
+        otpInputs[index - 1].focus();
+      }
+    });
+  });
+
+  otpForm.addEventListener('submit', function (e) {
+    let otpCode = '';
+    otpInputs.forEach(input => otpCode += input.value);
+    otpFull.value = otpCode;
+  });
 </script>
 
 </body>
