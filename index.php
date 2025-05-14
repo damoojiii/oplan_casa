@@ -190,10 +190,6 @@
             border-bottom-right-radius: 10px;
         }
 
-        #visitorTable tbody td {
-
-        }
-
         thead,
         th {
             background-color: #5D9C59 !important;
@@ -329,7 +325,7 @@
 
                             <?php
                                 // Query to get the cities
-                                $sql = "SELECT cityID, city_name FROM cities"; // Assuming your table is 'cities' and has 'id' and 'city_name' columns
+                                $sql = "SELECT cityID, city_name FROM cities ORDER BY city_name ASC"; // Assuming your table is 'cities' and has 'id' and 'city_name' columns
                                 $result = $conn->query($sql);
                             
                                 // Loop through the results and display them as options
@@ -415,9 +411,9 @@
                             echo "<tr>
                                 <td>{$row['daily_counter']}</td>
                                 <td>" . ucwords(strtolower($row['fullName'])) . "</td>
-                                <td>{$row['city']}</td>
+                                <td>" .ucwords(strtolower($row['city']))."</td>
                                 <td>{$row['gender']}</td>
-                                <td>{$row['reason']}</td>
+                                <td>" .ucwords(strtolower($row['reason']))."</td>
                                 <td>{$formattedTime}</td>
                             </tr>";
                         }
