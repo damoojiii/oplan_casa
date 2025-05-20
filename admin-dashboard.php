@@ -3,33 +3,21 @@
     include("connection.php");
     include "loader.php";
 
-    $sql1 = "SELECT DATE_FORMAT(time, '%M %Y') as month, COUNT(visitor_id) as count 
-            FROM visitors 
-            GROUP BY month 
-            ORDER BY month ASC";
+    $sql2 = "
+        SELECT name, date, status
+        FROM scheduled_tbl
+        WHERE date >= CURDATE()  -- Only upcoming or current
+        ORDER BY date ASC
+        LIMIT 5
+    ";
 
-    $result = $conn->query($sql1);
-
-    $months = [];
-    $counts = [];
-
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $months[] = $row['month']; // Format: 2025-04
-            $counts[] = $row['count'];
-        }
-    }
-
-    $sql2 = "SELECT name, num_bus FROM scheduled_tbl ORDER BY date ASC";
     $result = $conn->query($sql2);
 
-    $tripNames = [];
-    $busCounts = [];
+    $schedules = [];
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            $tripNames[] = $row['name'];      // trip names
-            $busCounts[] = $row['num_bus'];    // number of buses for each trip
+            $schedules[] = $row;
         }
     }
 
@@ -41,8 +29,8 @@
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            $reasons[] = $row['reason'];   // 'Tour', 'Business', 'Education', etc.
-            $totals[] = $row['total'];      // how many visitors for each reason
+            $reasons[] = $row['reason']; 
+            $totals[] = $row['total'];  
         }
     }
 
@@ -54,8 +42,8 @@
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $scheduledDates[] = [
-                'date' => $row['scheduled_date'], // e.g., '2025-05-15'
-                'status' => strtolower($row['status']) // e.g., 'upcoming' or 'completed'
+                'date' => $row['scheduled_date'], 
+                'status' => strtolower($row['status'])
             ];
         }
     }
@@ -288,10 +276,27 @@
                             <div class="card mt-3">
                                 <div class="card-header header-title">Upcoming Schedules</div>
                                 <div class="card-body">
-                                    <ul>
-                                        <li>School Name High School - Feb 23, 2025 <span class="text-success">Ongoing</span></li>
-                                        <li>School Name High School - Feb 26, 2025 <span class="text-primary">Upcoming</span></li>
-                                        <li>School Name High School - Feb 28, 2025 <span class="text-danger">Cancelled</span></li>
+                                    <ul class="list-unstyled">
+                                        <?php if (count($schedules) > 0): ?>
+                                            <?php foreach ($schedules as $row): ?>
+                                                <?php
+                                                    $dateFormatted = date('M d, Y', strtotime($row['date']));
+                                                    $status = strtolower($row['status']);
+
+                                                    // Choose badge color based on status
+                                                    $statusClass = 'text-secondary';
+                                                    if ($status == 'ongoing') $statusClass = 'text-success';
+                                                    elseif ($status == 'upcoming') $statusClass = 'text-primary';
+                                                    elseif ($status == 'cancelled') $statusClass = 'text-danger';
+                                                ?>
+                                                <li>
+                                                    <?= htmlspecialchars($row['name']) ?> - <?= $dateFormatted ?>
+                                                    <span class="<?= $statusClass ?>"><?= ucfirst($status) ?></span>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <li>No upcoming schedules.</li>
+                                        <?php endif; ?>
                                     </ul>
                                 </div>
                             </div>
@@ -300,12 +305,31 @@
                         <div class="col-md-8">
                             <div class="card mt-3">
                                 <div class="card-header header-title">Visitor Chart</div>
+                                <label for="year" class="form-label">Filter by Year:</label>
+                                <select name="year" id="yearSelect" class="form-select d-inline-block w-auto">
+                                    <?php
+                                    $currentYear = date('Y');
+                                    for ($y = $currentYear; $y >= $currentYear - 10; $y--) {
+                                        $selected = ($selectedYear == $y) ? 'selected' : '';
+                                        echo "<option value='$y' $selected>$y</option>";
+                                    }
+                                    ?>
+                                </select>
                                 <div class="card-body">
                                     <canvas id="visitorChart"></canvas>
                                 </div>
                             </div>
                             <div class="card mt-3">
                                 <div class="card-header header-title">Appointed Field Trips</div>
+                                <label for="apptYearSelect" class="form-label">Filter by Year:</label>
+                                <select name="apptYear" id="apptYearSelect" class="form-select d-inline-block w-auto">
+                                    <?php
+                                    $currentYear = date('Y');
+                                    for ($y = $currentYear; $y >= $currentYear - 10; $y--) {
+                                        echo "<option value='$y'>$y</option>";
+                                    }
+                                    ?>
+                                </select>
                                 <div class="card-body">
                                     <canvas id="fieldTripsChart"></canvas>
                                 </div>
@@ -328,9 +352,14 @@
                     <div class="calendar-container">
                         <div class="calendar">
                             <div class="legend mt-2" style="margin-top: 10px;">
-                                <span style="display: inline-block; width: 15px; height: 15px; background-color: #273E26; border-radius: 50%; margin-right: 5px;"></span> Today
-                                <span style="display: inline-block; width: 15px; height: 15px; background-color: #f0ad4e; border-radius: 50%; margin-left: 15px; margin-right: 5px;"></span> Upcoming Trip
-                                <span style="display: inline-block; width: 15px; height: 15px; background-color: #5cb85c; border-radius: 50%; margin-left: 15px; margin-right: 5px;"></span> Completed Trip
+                                <span style="display: inline-block; width: 15px; height: 15px; background-color: #273E26; border-radius: 50%; margin-right: 5px;"></span>
+                                <span style="font-size: 12px;">Today</span>
+
+                                <span style="display: inline-block; width: 15px; height: 15px; background-color: #f0ad4e; border-radius: 50%; margin-left: 15px; margin-right: 5px;"></span>
+                                <span style="font-size: 12px;">Upcoming Trip</span>
+
+                                <span style="display: inline-block; width: 15px; height: 15px; background-color: #5cb85c; border-radius: 50%; margin-left: 15px; margin-right: 5px;"></span>
+                                <span style="font-size: 12px;">Completed Trip</span>
                             </div>
                             <div class="header">
                                 <button id="prevBtn"><i class="fa-solid fa-chevron-left"></i></button>
@@ -371,10 +400,10 @@
             const currentYear = currentDate.getFullYear();
             const currentMonth = currentDate.getMonth();
 
-            const firstDay = new Date(currentYear, currentMonth, 1); // ❗ Fix: should be day 1, not 0
+            const firstDay = new Date(currentYear, currentMonth, 1);
             const lastDay = new Date(currentYear, currentMonth + 1, 0);
             const totalDays = lastDay.getDate();
-            const firstDayIndex = firstDay.getDay(); // Monday = 1, Sunday = 0
+            const firstDayIndex = firstDay.getDay(); 
             const lastDayIndex = lastDay.getDay();
 
             const monthYearString = currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
@@ -383,7 +412,7 @@
             let datesHTML = '';
 
             // Fill previous month inactive dates
-            let prevMonthDays = (firstDayIndex + 6) % 7; // adjust for Monday as start
+            let prevMonthDays = (firstDayIndex + 6) % 7;
             const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
             for (let i = prevMonthDays; i > 0; i--) {
                 datesHTML += `<div class="date inactive">${prevMonthLastDay - i + 1}</div>`;
@@ -392,20 +421,20 @@
             // Fill current month days
             for (let i = 1; i <= totalDays; i++) {
                 const date = new Date(currentYear, currentMonth, i);
-                const dateString = date.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+                const dateString = date.toISOString().split('T')[0]; 
 
                 let extraClass = '';
                 const todayString = new Date().toISOString().split('T')[0];
 
                 if (dateString === todayString) {
-                    extraClass = 'active'; // today highlight (blue)
+                    extraClass = 'active';
                 } else {
                     const scheduled = scheduledDates.find(s => s.date === dateString);
                     if (scheduled) {
                         if (scheduled.status === 'upcoming') {
-                            extraClass = 'upcoming'; // orange
+                            extraClass = 'upcoming'; 
                         } else if (scheduled.status === 'completed') {
-                            extraClass = 'completed'; // light green
+                            extraClass = 'completed'; 
                         }
                     }
                 }
@@ -456,66 +485,124 @@
         updateCalendar();
     </script>
     <script>
-        const ctx1 = document.getElementById('visitorChart').getContext('2d');
-        new Chart(ctx1, {
-            type: 'line',
-            data: {
-                labels: <?php echo json_encode($months); ?>, // X-axis = months
-                datasets: [{
-                    label: 'Visitors per Month',
-                    data: <?php echo json_encode($counts); ?>, // Y-axis = visitor count
-                    borderColor: 'blue',
-                    fill: false,
-                    tension: 0.3
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Number of Visitors'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Month'
-                        }
-                    }
-                }
-            }
+        let chart;
+
+        document.getElementById('yearSelect').addEventListener('change', function () {
+            const selectedYear = this.value;
+
+            fetch('getVisitorChart.php?year=' + selectedYear)
+                .then(response => response.json())
+                .then(data => {
+                    updateChart(data.months, data.counts);
+                });
         });
 
-        const ctx2 = document.getElementById('fieldTripsChart').getContext('2d');
-        new Chart(ctx2, {
-            type: 'bar',
-            data: {
-                labels: <?php echo json_encode($tripNames); ?>, // X-axis = trip names
-                datasets: [{
-                    label: 'Number of Buses',
-                    data: <?php echo json_encode($busCounts); ?>, // Y-axis = number of buses
-                    backgroundColor: 'orange'
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Number of Buses'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Field Trip'
+        function createChart(months, counts) {
+            const ctx = document.getElementById('visitorChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Visitors per Month',
+                        data: counts,
+                        borderColor: 'blue',
+                        fill: false,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Visitors'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Month'
+                            }
                         }
                     }
                 }
-            }
+            });
+        }
+
+        function updateChart(months, counts) {
+            chart.data.labels = months;
+            chart.data.datasets[0].data = counts;
+            chart.update();
+        }
+
+        // Initialize chart on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('getVisitorChart.php?year=' + document.getElementById('yearSelect').value)
+                .then(response => response.json())
+                .then(data => {
+                    createChart(data.months, data.counts);
+                });
+        });
+
+        let appointmentChart;
+
+        document.getElementById('apptYearSelect').addEventListener('change', function () {
+            const selectedYear = this.value;
+            fetch('getAppointmentData.php?year=' + selectedYear)
+                .then(response => response.json())
+                .then(data => {
+                    updateAppointmentChart(data.months, data.counts);
+                });
+        });
+
+        function createAppointmentChart(months, counts) {
+            const ctx = document.getElementById('fieldTripsChart').getContext('2d');
+            appointmentChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Number of Appointments',
+                        data: counts,
+                        backgroundColor: 'orange'
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Appointments'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Month'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateAppointmentChart(months, counts) {
+            appointmentChart.data.labels = months;
+            appointmentChart.data.datasets[0].data = counts;
+            appointmentChart.update();
+        }
+
+        // Load initial chart on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const year = document.getElementById('apptYearSelect').value;
+            fetch('getAppointmentData.php?year=' + year)
+                .then(response => response.json())
+                .then(data => {
+                    createAppointmentChart(data.months, data.counts);
+                });
         });
         
         const ctx3 = document.getElementById('reasonChart').getContext('2d');

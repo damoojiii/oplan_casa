@@ -135,14 +135,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['code'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-        body {
-            background: url('img/casabg.jpg') no-repeat center center/cover;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
+      body {
+        background: url('img/casabg.jpg') no-repeat center center/cover;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
 
         .forgot-password-box {
             background-color: #5D9C59;

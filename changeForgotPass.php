@@ -1,64 +1,88 @@
-<?php
-// Include database connection
-include 'connection.php';
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = $_POST['email'];
-    $newPassword = $_POST['new_password'];
-    $confirmPassword = $_POST['confirm_password'];
-
-    if ($newPassword !== $confirmPassword) {
-        echo "Passwords do not match.";
-        exit;
-    }
-
-    // Hash the new password
-    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-
-    // Check if the email exists
-    $query = "SELECT * FROM users WHERE email = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        // Update the password
-        $updateQuery = "UPDATE users SET password = ? WHERE email = ?";
-        $updateStmt = $conn->prepare($updateQuery);
-        $updateStmt->bind_param("ss", $hashedPassword, $email);
-
-        if ($updateStmt->execute()) {
-            echo "Password updated successfully.";
-        } else {
-            echo "Error updating password.";
-        }
-    } else {
-        echo "Email not found.";
-    }
-
-    $stmt->close();
-    $conn->close();
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Change Forgot Password</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Change Password</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+        background: url('img/casabg.jpg') no-repeat center center/cover;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    .card-custom {
+        background-color: #4a7c4f;
+        color: #fff;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+    }
+
+    .card-custom .form-control {
+        border: none;
+        border-radius: 8px;
+        padding: 12px;
+    }
+
+    .card-custom .btn-success {
+        background-color: #2e4c2f;
+        border: none;
+        font-weight: bold;
+    }
+
+    .card-custom .btn-success:hover {
+        background-color: #1f361f;
+    }
+
+    .cancel-link {
+      color: #eee;
+      font-size: 14px;
+      margin-top: 10px;
+      display: block;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .icon {
+      font-size: 48px;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    h4 {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 <body>
-    <form method="POST" action="">
-
-        <label for="new_password">New Password:</label>
-        <input type="password" id="new_password" name="new_password" required><br><br>
-
-        <label for="confirm_password">Confirm Password:</label>
-        <input type="password" id="confirm_password" name="confirm_password" required><br><br>
-
-        <button type="submit">Change Password</button>
+  <div class="card-custom">
+    <div class="icon">
+      📩
+    </div>
+    <h4>CHANGE<br>PASSWORD</h4>
+    <p class="mb-4">Enter your new password below and confirm it to update your account.</p>
+    <form action="/change-password" method="POST">
+      <!-- If using Laravel: @csrf -->
+      <div class="mb-3">
+        <input type="password" class="form-control" name="new_password" placeholder="New Password" required>
+      </div>
+      <div class="mb-3">
+        <input type="password" class="form-control" name="confirm_password" placeholder="Confirm Password" required>
+      </div>
+      <button type="submit" class="btn btn-success w-100">UPDATE</button>
     </form>
+    <a class="cancel-link" href="#">Cancel</a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
