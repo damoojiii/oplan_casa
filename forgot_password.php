@@ -61,56 +61,66 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['email']) && !isset($_P
 
 // Resend OTP (uses email from session)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['resend_otp'])) {
-  if (!isset($_SESSION['email'])) {
-    echo json_encode(['status' => 'error', 'message' => 'Session expired. Please enter your email again.']);
-    exit;
-  }
+  error_log('Resend OTP request received: ' . print_r($_POST, true));
+    if (!isset($_SESSION['email'])) {
+        echo json_encode(['status' => 'error', 'message' => 'Session expired. Please enter your email again.']);
+        exit;
+    }
+
     header('Content-Type: application/json');
     $email = $_SESSION['email'];
     $response = ['status' => 'error', 'message' => ''];
 
     $mail = new PHPMailer(true);
     try {
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'casahacienda393@gmail.com';
-        $mail->Password = 'eeji rjxr fjwv mobp';
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-        $mail->Port = 465;
+      $mail->isSMTP();
+      $mail->Host = 'smtp.gmail.com';
+      $mail->SMTPAuth = true;
+      $mail->Username = 'casahacienda393@gmail.com';
+      $mail->Password = 'eeji rjxr fjwv mobp';
+      $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+      $mail->Port = 465;
 
-        $mail->setFrom('casahacienda393@gmail.com', 'Casa Hacienda de Tejeros');
-        $mail->addAddress($email);
+      $mail->setFrom('casahacienda393@gmail.com', 'Casa Hacienda de Tejeros');
+      $mail->addAddress($email);
 
-        $otp = substr(str_shuffle('1234567890'), 0, 4);
-        $mail->isHTML(true);
-        $mail->Subject = 'Password Reset OTP';
-        $mail->Body = 'Your new OTP code is: <strong>' . $otp . '</strong>';
+      // Your PHPMailer setup
+      $otp = substr(str_shuffle('1234567890'), 0, 4);
+      $mail->isHTML(true);
+      $mail->Subject = 'Password Reset OTP';
+      $mail->Body = 'Your new OTP code is: <strong>' . $otp . '</strong>';
 
-        $conn->query("UPDATE users SET otp = '$otp' WHERE email = '$email'");
-        $mail->send();
-        $response = ['status' => 'success', 'message' => 'OTP resent successfully'];
+      $conn->query("UPDATE users SET otp = '$otp' WHERE email = '$email'");
+      $mail->send();
+      $response = ['status' => 'success', 'message' => 'OTP resent successfully'];
     } catch (Exception $e) {
-        $response['message'] = "Resend failed. Mailer Error: {$mail->ErrorInfo}";
+      $response['message'] = "Resend failed. Mailer Error: {$mail->ErrorInfo}";
     }
 
-    echo json_encode($response);
+    ob_end_clean();
+    echo json_encode($response);  // Check that the response is being sent correctly
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['code'])) {
-    $email = $_SESSION['email'];
-    $input_code = $_POST['code'];
+    $email = $_SESSION['email'];  // Get email from session
+    $input_code = $_POST['code']; // Get OTP from POST request
 
+    // Prepare statement to prevent SQL injection
     $stmt = $conn->prepare("SELECT otp FROM users WHERE email = ? AND otp = ?");
-    $stmt->bind_param("ss", $email, $input_code);
+    $stmt->bind_param("ss", $email, $input_code);  // Bind parameters
     $stmt->execute();
     $result = $stmt->get_result();
-    if ($result->num_rows > 0) {
+    
+    if ($result->num_rows > 0) {  // OTP match found
+        // Update the database to remove OTP once verified
         $conn->query("UPDATE users SET otp = NULL WHERE email = '$email'");
+        
+        // JavaScript to alert success and redirect to password change page
         echo '<script>alert("OTP verified successfully!");</script>';
         echo '<script>window.location.href = "changeForgotPass.php";</script>';
     } else {
+        // JavaScript to alert invalid OTP
         echo '<script>alert("Invalid OTP. Please try again.");</script>';
     }
 }
@@ -245,15 +255,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['code'])) {
 <div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content rounded shadow">
-      <div class="bg-warning text-white text-center py-3 rounded-top">
+      <div class="text-white text-center py-3 rounded-top">
         <img src="https://cdn-icons-png.flaticon.com/512/3064/3064197.png" alt="OTP Icon" width="50">
         <h5 class="mt-2 mb-0">OTP Verification</h5>
-        <small>Code has been sent to ******3838</small>
+        <small>Code has been sent to Leonardo DiCarpa</small>
       </div>
       <form id="otpForm">
         <input type="hidden" name="code" id="otpFull">
         <div class="modal-body text-center">
-          <h3 id="countdown" class="mb-3">1:30</h3>
+          <h3 id="countdown" class="mb-3" style="color: white;"></h3>
           <div class="d-flex justify-content-center gap-2 mb-3">
             <input type="text" class="form-control text-center otp-input" maxlength="1" required>
             <input type="text" class="form-control text-center otp-input" maxlength="1" required>
@@ -292,22 +302,6 @@ document.getElementById('emailForm').addEventListener('submit', async function(e
     }
 });
 
-document.getElementById('otpForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const code = document.getElementById('otp').value;
-
-    try {
-        const response = await axios.post('forgotPass.php', new URLSearchParams({ code }));
-
-        // Since your PHP file uses echo + script for OTP, no need to handle response here.
-        // If you want to improve, you can change PHP to JSON response style for better AJAX handling.
-
-    } catch (error) {
-        console.error(error);
-        alert('An error occurred during OTP verification.');
-    }
-});
-
 const otpInputs = document.querySelectorAll('.otp-input');
   const otpForm = document.getElementById('otpForm');
   const otpFull = document.getElementById('otpFull');
@@ -333,7 +327,7 @@ const otpInputs = document.querySelectorAll('.otp-input');
   });
 
   let timer;
-  let timeLeft = 90;
+  let timeLeft = 15;
 
   const countdownElement = document.getElementById('countdown');
   const resendBtn = document.getElementById('resendBtn');
@@ -341,7 +335,7 @@ const otpInputs = document.querySelectorAll('.otp-input');
   function startTimer() {
     clearInterval(timer);
     resendBtn.disabled = true;
-    timeLeft = 90;
+    timeLeft = 15;
 
     updateCountdownText(timeLeft);
 
@@ -363,39 +357,70 @@ const otpInputs = document.querySelectorAll('.otp-input');
     countdownElement.textContent = `${minutes}:${remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds}`;
   }
 
-  resendBtn.addEventListener('click', function () {
-    if (resendBtn.disabled) return;
+ resendBtn.addEventListener('click', function () {
+  // Ensure the button is not clicked multiple times
+  if (resendBtn.disabled) return;
 
-    resendBtn.disabled = true;
+  // Disable the button to prevent multiple requests
+  resendBtn.disabled = true;
 
-    fetch('', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: 'resend_otp=1'
-    })
-    .then(res => {
-      if (!res.ok) throw new Error('Network error');
-      return res.json();
-    })
-    .then(data => {
-      if (data.status === 'success') {
-        alert('OTP resent successfully!');
-        startTimer();
-      } else {
-        alert(data.message || 'Failed to resend OTP.');
-        resendBtn.disabled = false;
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Failed to resend OTP.');
-      resendBtn.disabled = false;
-    });
+  console.log('Sending request to resend OTP...');
+  
+  // Perform the fetch request to resend OTP
+  fetch('forgot_password.php', { 
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: 'resend_otp=1'
+  })
+  .then(res => {
+    console.log('Response received:', res); 
+    return res.text(); 
+  })
+  .then(text => {
+    console.log('Raw Response Text:', text); 
+    
+    let data;
+    try {
+      data = JSON.parse(text); 
+    } catch (e) {
+      throw new Error('Failed to parse JSON response');
+    }
+
+    console.log('Data received from server:', data); 
+    
+    if (data.status === 'success') {
+      alert('OTP resent successfully!');
+      startTimer();
+    } else {
+      alert(data.message || 'Failed to resend OTP.');
+    }
+  })
+  .catch(error => {
+    console.error('Error during OTP resend:', error);  // Log any error during the process
+    alert('Failed to resend OTP. Check console for details.');
+  })
+  .finally(() => {
+    resendBtn.disabled = false;  // Re-enable the button after the request completes
   });
+});
 
   startTimer();
+
+  // Collect OTP input and submit it
+  document.querySelector('#otpForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevent form from reloading page
+    let otpCode = '';
+    const otpInputs = document.querySelectorAll('.otp-input');
+    otpInputs.forEach(input => otpCode += input.value);
+
+    // Set the OTP value to hidden input for submission
+    document.getElementById('otpFull').value = otpCode;
+
+    // Submit the form (POST request with OTP)
+    this.submit();
+  });
 </script>
 
 </body>
