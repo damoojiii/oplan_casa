@@ -291,40 +291,6 @@
                         </div>
                     </div>
 
-                    <hr class="mt-3">
-
-                    <div class="col-md-4">
-                        <div class="excel-container">
-                        <h3 class="header-title">Excel Upload</h3>
-                        <form method="POST" enctype="multipart/form-data" action="upload-excel.php">
-                            <label for="school">School/Company Name</label>
-                            <select id="school" name="school" class="form-control" required>
-                                <option value="" hidden selected>Select a school</option>
-                                <?php
-                                    // Query to get the cities
-                                    $sql = "SELECT scheduled_id, name FROM scheduled_tbl WHERE status = 'Upcoming' OR status ='Ongoing'"; 
-                                    $result = $conn->query($sql);
-                                
-                                    // Loop through the results and display them as options
-                                    if ($result->num_rows > 0) {
-                                        while($row = $result->fetch_assoc()) {
-                                            echo '<option value="' . $row["scheduled_id"] . '">' . ucwords($row["name"]) . '</option>';
-                                        }
-                                    } else {
-                                        echo '<option value="">No cities found</option>';
-                                    }
-                                ?>
-                            </select>
-
-                            <!-- Excel File Upload -->
-                            <label for="excel_file" class="mt-3">Upload Excel File</label>
-                            <input type="file" name="excel_file" id="excel_file" class="form-control" accept=".xls,.xlsx" required>
-
-                            <button type="submit" class="btn btn-primary mt-3">Submit</button>
-                        </form>
-                        </div>
-                    </div>
-
                     <div id="supervisor-form" style="display: none;">
                         <div class="supervisor-container">
                             <h3 class="header-title">Add a Supervisor</h3>
@@ -368,6 +334,42 @@
                             </form>
                         </div>
                     </div>
+
+                    <hr class="mt-3">
+
+                    <div class="col-md-4">
+                        <div class="excel-container">
+                        <h3 class="header-title">Excel Upload</h3>
+                        <form method="POST" enctype="multipart/form-data" action="upload-excel.php">
+                            <label for="school">School/Company Name</label>
+                            <select id="school" name="school" class="form-control" required>
+                                <option value="" hidden selected>Select a school</option>
+                                <?php
+                                    // Query to get the cities
+                                    $sql = "SELECT scheduled_id, name FROM scheduled_tbl WHERE status = 'Upcoming' OR status ='Ongoing'"; 
+                                    $result = $conn->query($sql);
+                                
+                                    // Loop through the results and display them as options
+                                    if ($result->num_rows > 0) {
+                                        while($row = $result->fetch_assoc()) {
+                                            echo '<option value="' . $row["scheduled_id"] . '">' . ucwords($row["name"]) . '</option>';
+                                        }
+                                    } else {
+                                        echo '<option value="">No cities found</option>';
+                                    }
+                                ?>
+                            </select>
+
+                            <!-- Excel File Upload -->
+                            <label for="excel_file" class="mt-3">Upload Excel File</label>
+                            <input type="file" name="excel_file" id="excel_file" class="form-control" accept=".xls,.xlsx" required>
+
+                            <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                        </form>
+                        </div>
+                    </div>
+
+                    
                 </div>
             </div>
         </div>
