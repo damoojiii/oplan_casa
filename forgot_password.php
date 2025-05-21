@@ -115,10 +115,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['code'])) {
     if ($result->num_rows > 0) {  // OTP match found
         // Update the database to remove OTP once verified
         $conn->query("UPDATE users SET otp = NULL WHERE email = '$email'");
+        $_SESSION['email'] = $email;
         
-        // JavaScript to alert success and redirect to password change page
         echo '<script>alert("OTP verified successfully!");</script>';
-        echo '<script>window.location.href = "changeForgotPass.php";</script>';
+        echo '<script>window.location.href = "resetPassword.php";</script>';
     } else {
         // JavaScript to alert invalid OTP
         echo '<script>alert("Invalid OTP. Please try again.");</script>';
@@ -260,7 +260,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['code'])) {
         <h5 class="mt-2 mb-0">OTP Verification</h5>
         <small>Code has been sent to Leonardo DiCarpa</small>
       </div>
-      <form id="otpForm">
+      <form id="otpForm" action="#" method="POST">
         <input type="hidden" name="code" id="otpFull">
         <div class="modal-body text-center">
           <h3 id="countdown" class="mb-3" style="color: white;"></h3>

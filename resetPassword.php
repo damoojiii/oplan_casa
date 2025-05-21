@@ -1,3 +1,44 @@
+<?php
+session_start();
+require 'connection.php'; // database connection
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $newPassword = $_POST['new_password'];
+    $confirmPassword = $_POST['confirm_password'];
+
+    // Use email from verified session
+    $email = $_SESSION['email'] ?? null;
+
+    if (!$email) {
+      echo "Invalid session. Please restart the reset process.";
+      exit;
+    }
+
+    if ($newPassword !== $confirmPassword) {
+      echo "Passwords do not match.";
+      exit;
+    }
+
+    // Hash and update password
+    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+    $update = $conn->prepare("UPDATE users SET password = ? WHERE email = ?");
+    $update->bind_param("ss", $hashedPassword, $email);
+
+    if ($update->execute()) {
+      // Clear session values related to reset
+      unset($_SESSION['email']);
+      echo "Password updated successfully. <a href='login.php'>Login now</a>.";
+    } else {
+      echo "Error updating password.";
+    }
+
+    $update->close();
+    $conn->close();
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -70,8 +111,7 @@
     </div>
     <h4>CHANGE<br>PASSWORD</h4>
     <p class="mb-4">Enter your new password below and confirm it to update your account.</p>
-    <form action="/change-password" method="POST">
-      <!-- If using Laravel: @csrf -->
+    <form action="#" method="POST">
       <div class="mb-3">
         <input type="password" class="form-control" name="new_password" placeholder="New Password" required>
       </div>
