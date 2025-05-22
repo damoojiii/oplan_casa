@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($update->execute()) {
       // Clear session values related to reset
       unset($_SESSION['email']);
-      echo "";
+      echo "<script>window.location.href = 'login.php';</script>";
     } else {
       echo "Error updating password.";
     }
@@ -48,39 +48,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-        background: url('img/casabg.jpg') no-repeat center center/cover;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
+      background: url('img/casabg.jpg') no-repeat center center/cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
 
     .card-custom {
-        background-color: #4a7c4f;
-        color: #fff;
-        padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.3);
-        width: 100%;
-        max-width: 400px;
-        text-align: center;
+      background-color: #5D9C59;
+      color: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
     }
 
     .card-custom .form-control {
-        border: none;
-        border-radius: 8px;
-        padding: 12px;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
     }
 
     .card-custom .btn-success {
-        background-color: #2e4c2f;
-        border: none;
-        font-weight: bold;
+      background-color: #2e4c2f;
+      border: none;
+      font-weight: bold;
     }
 
     .card-custom .btn-success:hover {
-        background-color: #1f361f;
+      background-color: #1f361f;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #5D9C5933;
+      z-index: -1;
     }
 
     .cancel-link {
@@ -105,6 +115,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   </style>
 </head>
 <body>
+  <div class="overlay"></div>
+
   <div class="card-custom">
     <div class="icon">
       📩

@@ -79,6 +79,7 @@
             z-index: 10;
             background: linear-gradient(to bottom, #5D9C59 90%, #DF2E38 10%);
         }
+
         .login{
             padding-inline: 15px;
         }
@@ -105,13 +106,15 @@
             background: #273E26;
             border-color: #5D9C59;
         }
+
         .login-container {
             color: white;
             background: #5D9C59;
-            padding: 2rem;
+            padding: 3rem; 
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: auto;
+            width: 400px;
+            max-width: 90%;
             z-index: 1000;
         }
 
