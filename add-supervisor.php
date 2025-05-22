@@ -26,7 +26,7 @@
         $sql_insert = "INSERT INTO `supervisor_tbl` (`scheduled_id`, `firstname`, `lastname`, `position`, `contact`, `gender`) VALUES (?, ?, ?, ?, ?, ?)";
         if ($stmt = $conn->prepare($sql_insert)) {
             $stmt->bind_param("isssss", $school, $firstname, $lastname, $position, $contact, $gender);   
-            // Execute the query and check if successful
+            // Execute the query and check if successful    
             if ($stmt->execute()) {
                 $_SESSION['message'] = "Supervisor added successfully!";
                 $_SESSION['message_type'] = "Success";
