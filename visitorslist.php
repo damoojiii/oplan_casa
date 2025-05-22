@@ -226,7 +226,7 @@
                 </thead>
                 <tbody>
                     <?php
-                        $sql = "SELECT visitor_id, fullName, city, gender, reason, time, photo FROM visitors ORDER BY visitor_id ASC";
+                        $sql = "SELECT visitor_id, fullName, city, gender, reason, time, photo FROM visitors ORDER BY visitor_id DESC";
 
                         $stmt = $conn->prepare($sql);
                         $stmt->execute();

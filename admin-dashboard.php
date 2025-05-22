@@ -3,10 +3,43 @@
     include("connection.php");
     include "loader.php";
 
+    $dateToday = date("l, F j, Y");
+
+    //Todays Visitor
+    $todaysVisitor = "SELECT COUNT(*) AS todays_visitor FROM visitors WHERE DATE(time) = CURDATE()";
+    $result = $conn->query($todaysVisitor);
+    $row = $result->fetch_assoc();
+
+    $todays_count = $row['todays_visitor'];
+
+    //Overall Visitor
+    $overallVisitor = "SELECT COUNT(*) AS overall_visitor FROM visitors WHERE DATE(time)";
+    $result = $conn->query($overallVisitor);
+    $row = $result->fetch_assoc();
+
+    $overall_count = $row['overall_visitor'];
+
+    //Fetch total student
+    $overallStudent = "SELECT COUNT(*) AS overall_student FROM student_tbl";
+    $result = $conn->query($overallStudent);
+    $row = $result->fetch_assoc();
+
+    $overall_student = $row['overall_student'];
+
+    //Sum of overall visitors and students nganiii
+    $total = $overall_count + $overall_student;
+
+    //Overall Scheduled Trips
+    $scheduledTrips = "SELECT COUNT(*) AS overall_trips FROM scheduled_tbl";
+    $result = $conn->query($scheduledTrips);
+    $row = $result->fetch_assoc();
+
+    $total_trips = $row['overall_trips'];
+    
     $sql2 = "
         SELECT name, date, status
         FROM scheduled_tbl
-        WHERE date >= CURDATE()  -- Only upcoming or current
+        WHERE date >= CURDATE()
         ORDER BY date ASC
         LIMIT 5
     ";
@@ -240,7 +273,7 @@
     <div id="main-content" class="container mt-1">
         <div class="container-fluid">
             <h2 class="mt-3 header-title">Hello, Admin!</h2>
-            <p>Lorem ipsum dolor</p>
+            <p>Today is <?php echo $dateToday ?></p>
             
             <div class="row">
                 <!-- Left Column -->
@@ -250,21 +283,24 @@
                         <div class="col-md-4">
                             <div class="card text-center">
                                 <div class="card-body">
-                                    <h3>0</h3>
+                                    <h3><?php echo $todays_count ?></h3>
+                                    <p>Today's Visitor</p>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="card text-center">
                                 <div class="card-body">
-                                    <h3>0</h3>
+                                    <h3><?php echo $total_trips ?></h3>
+                                    <p>Scheduled Trips</p>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="card text-center">
                                 <div class="card-body">
-                                    <h3>0</h3>
+                                    <h3><?php echo $total ?></h3>
+                                    <p>Overall Visitors</p>
                                 </div>
                             </div>
                         </div>

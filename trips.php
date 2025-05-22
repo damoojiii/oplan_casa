@@ -366,7 +366,6 @@
                 <table class="table table-bordered text-center">
                     <thead class="table-header">
                         <tr>
-                            <th>ID</th>
                             <th>School/Company Name</th>
                             <th>Date</th>
                             <th>Time</th>
@@ -394,7 +393,6 @@
                                 $formattedTime = date("h:i A", strtotime($row['time']));
                         ?>
                         <tr>
-                            <td><?php echo $row['scheduled_id'] ?></td>
                             <td><?php echo $row['name'] ?></td>
                             <td><?php echo $formattedDate ?></td>
                             <td><?php echo $formattedTime ?></td>

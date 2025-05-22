@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($update->execute()) {
       // Clear session values related to reset
       unset($_SESSION['email']);
-      echo "Password updated successfully. <a href='login.php'>Login now</a>.";
+      echo "";
     } else {
       echo "Error updating password.";
     }
