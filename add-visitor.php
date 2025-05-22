@@ -163,11 +163,12 @@
         <div class="tab-content mt-3">
             <div class="tab-pane fade show active">
                 <div class="mb-3">
-                <label for="visitor-type" class="form-label">Select Visitor Type</label>
+                <label for="visitor-type" class="form-label">Select Form Type</label>
                 <select id="visitor-type" class="form-select" onchange="toggleForm(this.value)">
-                    <option value="" disabled selected hidden>Select visitor type</option>
+                    <option value="" disabled selected hidden>Select Form type</option>
                     <option value="student">Student</option>
                     <option value="supervisor">Supervisor</option>
+                    <option value="excel">Excel Upload</option>
                 </select>
                 </div>
                 <div class="row">
@@ -300,10 +301,7 @@
                                 <label>Enter Last Name</label>
                                 <input type="text" name="lastname" class="form-control" required>
                                 <label for="position">Position</label>
-                                <select id="position" name="position" class="form-control" required>
-                                    <option value="" hidden selected>Select a position</option>
-                                    <option value="Teacher">Teacher</option>
-                                </select>
+                                <input type="text" name="position" class="form-control" required>
                                 <label for="school">School/Company Name</label>
                                 <select id="school" name="school" class="form-control" required>
                                     <option value="" hidden selected>Select a school</option>
@@ -334,10 +332,8 @@
                             </form>
                         </div>
                     </div>
-
-                    <hr class="mt-3">
-
-                    <div class="col-md-4">
+                    
+                    <div class="col-md-4" id="excel-form" style="display: none;">
                         <div class="excel-container">
                         <h3 class="header-title">Excel Upload</h3>
                         <form method="POST" enctype="multipart/form-data" action="upload-excel.php">
@@ -366,10 +362,15 @@
 
                             <button type="submit" class="btn btn-primary mt-3">Submit</button>
                         </form>
+                        <a href="template/casa_hacienda_template.xlsx" class="btn btn-success mt-3" download>
+                            <i class="bi bi-download"></i> Download Excel Template
+                        </a>
+
                         </div>
                     </div>
 
-                    
+                    <hr class="mt-3">
+        
                 </div>
             </div>
         </div>
@@ -383,13 +384,16 @@
             // Get both form containers
             const studentFormContainer = document.getElementById('student-form');
             const supervisorFormContainer = document.getElementById('supervisor-form');
+            const excelFormContainer = document.getElementById('excel-form');
 
             // Reset both forms (if they exist and are shown)
             const studentForm = studentFormContainer.querySelector('form');
             const supervisorForm = supervisorFormContainer.querySelector('form');
+            const excelForm = excelFormContainer.querySelector('form');
 
             if (studentForm) studentForm.reset();
             if (supervisorForm) supervisorForm.reset();
+            if (excelForm) excelForm.reset();
 
             // Also reset any file input (Excel upload)
             const excelFileInput = document.getElementById('excel_file');
@@ -398,6 +402,7 @@
             // Hide both, then show selected
             studentFormContainer.style.display = (value === 'student') ? 'flex' : 'none';
             supervisorFormContainer.style.display = (value === 'supervisor') ? 'block' : 'none';
+            excelFormContainer.style.display = (value === 'excel') ? 'block' : 'none';
         }
     </script>
 </body>

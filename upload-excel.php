@@ -9,8 +9,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['excel_file'])) {
 
     try {
         $spreadsheet = IOFactory::load($file);
-        $sheet = $spreadsheet->getActiveSheet();
-        $data = $sheet->toArray();
+
+        // Read student data from first sheet
+        $studentSheet = $spreadsheet->getSheet(0);
+        $studentData = $studentSheet->toArray();
+
+        // Read supervisor data from second sheet
+        $supervisorSheet = $spreadsheet->getSheet(1);
+        $supervisorData = $supervisorSheet->toArray();
 
         $conn = new mysqli("localhost", "root", "", "casadb");
 
@@ -18,40 +24,46 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['excel_file'])) {
             die("Connection failed: " . $conn->connect_error);
         }
 
-        for ($i = 1; $i < count($data); $i++) {
-            $row = $data[$i];
-        
-            // Skip empty rows (all cells empty)
-            if (empty(array_filter($row))) {
-                continue;
-            }
-        
-            // Extract and sanitize fields
+        for ($i = 1; $i < count($studentData); $i++) {
+            $row = $studentData[$i];
+
+            if (empty(array_filter($row))) continue;
+
             $firstname = $conn->real_escape_string(trim($row[0] ?? ''));
             $lastname = $conn->real_escape_string(trim($row[1] ?? ''));
             $guardian = $conn->real_escape_string(trim($row[2] ?? ''));
             $contact = $conn->real_escape_string(trim($row[3] ?? ''));
             $gender = $conn->real_escape_string(trim($row[4] ?? ''));
-            $school = $conn->real_escape_string($schoolId);
             $grade = $conn->real_escape_string(trim($row[5] ?? ''));
-        
-            // Validation: Check required fields
-            if ($firstname === '' || $lastname === '' || $gender === '' || $grade === '') {
-                echo "Skipping row $i: missing required fields.<br>";
-                continue;
-            }
-        
-            // Allow guardian to be N/A or none
+
+            if ($firstname === '' || $lastname === '' || $gender === '' || $grade === '') continue;
+
             if (strtolower($guardian) === 'n/a' || strtolower($guardian) === 'none') {
                 $guardian = 'N/A';
             }
-        
-            $sql = "INSERT INTO student_tbl (scheduled_id, firstname, lastname, guardian, contact, gender, grade_level) 
-                    VALUES ('$school', '$firstname', '$lastname', '$guardian', '$contact', '$gender', '$grade')";
-        
-            if (!$conn->query($sql)) {
-                echo "Error on row $i: " . $conn->error . "<br>";
-            }
+
+            $sql = "INSERT INTO student_tbl (scheduled_id, firstname, lastname, guardian, contact, gender, grade_level)
+                    VALUES ('$schoolId', '$firstname', '$lastname', '$guardian', '$contact', '$gender', '$grade')";
+            $conn->query($sql);
+        }
+
+        // Insert Supervisors
+        for ($j = 1; $j < count($supervisorData); $j++) {
+            $row = $supervisorData[$j];
+
+            if (empty(array_filter($row))) continue;
+
+            $firstname = $conn->real_escape_string(trim($row[0] ?? ''));
+            $lastname = $conn->real_escape_string(trim($row[1] ?? ''));
+            $position = $conn->real_escape_string(trim($row[2] ?? ''));
+            $contact = $conn->real_escape_string(trim($row[3] ?? ''));
+            $gender = $conn->real_escape_string(trim($row[4] ?? ''));
+
+            if ($firstname === '' || $lastname === '' || $position === '' || $gender === '') continue;
+
+            $sql = "INSERT INTO supervisor_tbl (scheduled_id, firstname, lastname, position, contact, gender)
+                    VALUES ('$schoolId', '$firstname', '$lastname', '$position', '$contact', '$gender')";
+            $conn->query($sql);
         }
 
         echo "<script>alert('Data imported successfully!'); window.location.href='add-visitor.php';</script>";
