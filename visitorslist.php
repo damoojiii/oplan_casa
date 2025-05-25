@@ -13,6 +13,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="vendor/datables/datatables.min.css">
     <link rel="icon" href="img/rosariologo.png">
     
     <style>
@@ -61,6 +62,21 @@
             --bs-btn-bg: #5D9C59 !important;
             --bs-btn-border-color: #5D9C59 !important;
             --bs-btn-hover-bg: #5D9C59 !important;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 6px;
+        }
+
+        .label {
+            width: 150px; 
+            font-weight: bold;
+        }
+
+        .colon {
+            width: 10px;
+            text-align: center;
         }
     </style>
 </head>
@@ -283,21 +299,21 @@
         <div class="modal fade" id="viewVisitorModal" tabindex="-1" aria-labelledby="viewVisitorModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content" style="margin-left: auto; margin-right: auto;">
-                    <div class="modal-header">
+                    <div class="modal-header text-center">
                         <h5 class="modal-title" id="viewVisitorModalLabel">Visitor Profile</h5>
                     </div>
                     <div class="modal-body">
-                        <div class="row text-center">
+                        <div class="row">
                             <!-- Centered Image above information -->
-                            <div class="col-12 mb-3">
+                            <div class="col-12 mb-3 text-center">
                                 <img id="visitorPhoto" src="uploads/default.jpg" alt="Visitor Photo" class="img-fluid" style="width: 150px; height: 150px; border-radius: 10px; border: 2px solid #ddd;">
                             </div>
                             <div class="col-12">
-                                <p><strong>Full Name:</strong> <span id="viewFullName"></span></p>
-                                <p><strong>City:</strong> <span id="viewCity"></span></p>
-                                <p><strong>Gender:</strong> <span id="viewGender"></span></p>
-                                <p><strong>Purpose for Visit:</strong> <span id="viewReason"></span></p>
-                                <p><strong>Time:</strong> <span id="viewTime"></span></p>
+                                <div class="info-row"><span class="label">Full Name</span><span class="colon">:</span><span id="viewFullName"></span></div>
+                                <div class="info-row"><span class="label">City</span><span class="colon">:</span><span id="viewCity"></span></div>
+                                <div class="info-row"><span class="label">Gender</span><span class="colon">:</span><span id="viewGender"></span></div>
+                                <div class="info-row"><span class="label">Purpose for Visit</span><span class="colon">:</span><span id="viewReason"></span></div>
+                                <div class="info-row"><span class="label">Time</span><span class="colon">:</span><span id="viewTime"></span></div>
                             </div>
                         </div>
                     </div>
@@ -327,9 +343,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="editVisitorModalLabel">Edit Visitor</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form id="editVisitorForm">
@@ -363,7 +377,6 @@
                                 </select>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                 <button type="submit" class="btn btn-primary">Update</button>
                             </div>
                         </form>
@@ -378,6 +391,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="vendor/datables/datatables.min.js"></script>
     <script>
         $(document).ready(function () {
             setTimeout(function () {
