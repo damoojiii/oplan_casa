@@ -15,6 +15,20 @@
             $blocked_dates[] = $row['date'];
         }
     }
+
+    $sql2 = "SELECT DATE(date) as scheduled_date, status FROM scheduled_tbl";
+    $result = $conn->query($sql2);
+
+    $scheduledDates = [];
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $scheduledDates[] = [
+                'date' => $row['scheduled_date'], 
+                'status' => strtolower($row['status'])
+            ];
+        }
+    }
 ?>
 
 <!DOCTYPE html>
@@ -142,6 +156,22 @@
         color: #fff;
     }
 
+    .date.active {
+        background-color: #103E13; /* Today */
+        color: white;
+    }
+    .date.upcoming {
+        background-color: #FBBF24; /* Yellow */
+        color: white;
+    }
+    .date.completed {
+        background-color: #22C55E; /* Green */
+        color: white;
+    }
+    .date.inactive {
+        color: #ccc;
+    }
+
     thead,
     th {
         background-color: #5D9C59 !important;
@@ -241,13 +271,13 @@
         <!-- Tabs Navigation -->
         <ul class="nav nav-tabs" id="scheduleTabs">
             <li class="nav-item tabs">
-                <a class="nav-link active" id="tab1" data-bs-toggle="tab" href="trips.php">Scheduled Trips</a>
+                <a class="nav-link active" id="tab1" href="trips.php">Scheduled Trips</a>
             </li>
             <li class="nav-item tabs">
-                <a class="nav-link" id="tab2" data-bs-toggle="tab" href="add-visitor.php">Add Visitor</a>
+                <a class="nav-link" id="tab2" href="add-visitor.php">Add Visitor</a>
             </li>
             <li class="nav-item tabs">
-                <a class="nav-link" id="tab3" data-bs-toggle="tab" href="trip-info.php">Trip Info</a>
+                <a class="nav-link" id="tab3" href="trip-info.php">Trip Info</a>
             </li>
         </ul>
 
@@ -339,6 +369,20 @@
                     <div class="col-md-4">
                         <div class="border p-3">
                             <div class="calendar">
+                                <div class="legend mt-2 d-flex align-items-center" style="gap: 20px; flex-wrap: wrap;">
+                                    <div class="d-flex align-items-center">
+                                        <span style="width: 15px; height: 15px; background-color: #273E26; border-radius: 50%; margin-right: 5px;"></span>
+                                        <span style="font-size: 15px;">Today</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <span style="width: 15px; height: 15px; background-color: #f0ad4e; border-radius: 50%; margin-right: 5px;"></span>
+                                        <span style="font-size: 15px;">Upcoming Trip</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <span style="width: 15px; height: 15px; background-color: #5cb85c; border-radius: 50%; margin-right: 5px;"></span>
+                                        <span style="font-size: 15px;">Completed Trip</span>
+                                    </div>
+                                </div>
                                 <div class="header">
                                     <button id="prevBtn"><i class="fa-solid fa-chevron-left"></i></button>
                                     <div class="monthYear header-title" id="monthYear"></div>
@@ -400,9 +444,15 @@
                             <td><?php echo $row['num_visitors'] ?? 0 ?></td>
                             <td><span class="badge bg-warning text-dark"><?php echo $row['status'] ?></span></td>
                             <td>
-                                <button class="btn btn-success btn-sm"><i class="fa-solid fa-check"></i></button>
-                                <button class="btn btn-warning btn-sm"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn btn-danger btn-sm"><i class="fa-solid fa-x"></i></button>
+                                <button class="btn btn-success btn-sm approve-btn" data-id="<?php echo $row['scheduled_id']; ?>">
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                                <button class="btn btn-warning btn-sm edit-btn" data-id="<?php echo $row['scheduled_id']; ?>">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['scheduled_id']; ?>">
+                                    <i class="fa-solid fa-x"></i>
+                                </button>
                             </td>
                         </tr>
                         <?php } ?>
@@ -411,10 +461,60 @@
             </div>
         </div>
     </div>
+
+    <!-- Edit Schedule Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="editForm" method="POST" action="updateSchedule.php">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Schedule</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                <!-- Hidden ID -->
+                <input type="hidden" name="scheduled_id" id="editScheduledId">
+                
+                <div class="mb-3">
+                    <label for="editName" class="form-label">School/Company Name</label>
+                    <input type="text" class="form-control" name="name" id="editName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="editDate" class="form-label">Date</label>
+                    <input type="date" class="form-control" name="date" id="editDate" required>
+                </div>
+                <div class="mb-3">
+                    <label for="editTime" class="form-label">Time</label>
+                    <select class="form-select" name="time" id="editTime" required>
+                        <?php
+                        $start = strtotime("06:00");
+                        $end = strtotime("16:00");
+                        for ($t = $start; $t <= $end; $t += 60 * 60) { // 60 minutes
+                            $value = date("H:i", $t); // 24-hour format
+                            $label = date("g:i A", $t); // 12-hour display format
+                            echo "<option value=\"$value\">$label</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="editNumBus" class="form-label">No. of Bus(es)</label>
+                    <input type="number" class="form-control" name="num_bus" id="editNumBus" required>
+                </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
     
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Disable specific dates based on the database data
         document.addEventListener('DOMContentLoaded', function() {
@@ -483,6 +583,7 @@
         const datesElement = document.getElementById('dates');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
+        const scheduledDates = <?php echo json_encode($scheduledDates); ?>;
 
         let currentDate = new Date();
 
@@ -490,66 +591,126 @@
             const currentYear = currentDate.getFullYear();
             const currentMonth = currentDate.getMonth();
 
-            const firstDay = new Date(currentYear, currentMonth, 0);
+            const firstDay = new Date(currentYear, currentMonth, 1);
             const lastDay = new Date(currentYear, currentMonth + 1, 0);
             const totalDays = lastDay.getDate();
-            const firstDayIndex = firstDay.getDay();
+            const firstDayIndex = firstDay.getDay(); 
             const lastDayIndex = lastDay.getDay();
 
-            const monthYearString = currentDate.toLocaleString('default', {month: 'long', year: 'numeric'});
+            const monthYearString = currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
             monthYearElement.textContent = monthYearString;
 
             let datesHTML = '';
 
-            for(let i = firstDayIndex; i > 0; i--){
-                const prevDate = new Date(currentYear, currentMonth, 0 - i + 1);
-                datesHTML += `<div class="date inactive">${prevDate.getDate()}</div>`;
+            // Fill previous month inactive dates
+            let prevMonthDays = (firstDayIndex + 6) % 7;
+            const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
+            for (let i = prevMonthDays; i > 0; i--) {
+                datesHTML += `<div class="date inactive">${prevMonthLastDay - i + 1}</div>`;
             }
 
-            for(let i = 1; i <= totalDays; i++){
+            // Fill current month days
+            for (let i = 1; i <= totalDays; i++) {
                 const date = new Date(currentYear, currentMonth, i);
-                const activeClass = date.toDateString() === new Date().toDateString() ? 'active' : '';
-                datesHTML += `<div class="date ${activeClass}">${i}</div>`;
+                function formatLocalDate(date) {
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
+
+                const dateString = formatLocalDate(date); 
+                let extraClass = '';
+                const todayString = formatLocalDate(new Date());
+
+                if (dateString === todayString) {
+                    extraClass = 'active';
+                } else {
+                    const scheduled = scheduledDates.find(s => s.date === dateString);
+                    if (scheduled) {
+                        if (scheduled.status === 'upcoming') {
+                            extraClass = 'upcoming'; 
+                        } else if (scheduled.status === 'completed') {
+                            extraClass = 'completed'; 
+                        }
+                    }
+                }
+
+                datesHTML += `<div class="date ${extraClass}">${i}</div>`;
             }
 
-            for(let i = 1; i <= 7 - lastDayIndex; i++){
-                const nextDate = new Date(currentYear, currentMonth + 1, i);
-                datesHTML += `<div class="date inactive">${nextDate.getDate()}</div>`;
+            // Fill next month inactive dates
+            for (let i = 1; i <= (7 - ((firstDayIndex + totalDays - 1) % 7) - 1); i++) {
+                datesHTML += `<div class="date inactive">${i}</div>`;
             }
 
+            // ✅ Now update the page!
             datesElement.innerHTML = datesHTML;
-        }   
+        };  
 
         prevBtn.addEventListener('click', () => {
-            const today = new Date();
-            if (
-                currentDate.getFullYear() > today.getFullYear() ||
-                (currentDate.getFullYear() === today.getFullYear() && currentDate.getMonth() > today.getMonth())
-            ) {
-                currentDate.setMonth(currentDate.getMonth() - 1);
-                updateCalendar();
-            }
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            updateCalendar();
             togglePrevButton();
         });
+
         nextBtn.addEventListener('click', () => {
             currentDate.setMonth(currentDate.getMonth()+1);
             updateCalendar();
             togglePrevButton();
         });
-        const togglePrevButton = () => {
-            const today = new Date();
-            if (
-                currentDate.getFullYear() === today.getFullYear() &&
-                currentDate.getMonth() === today.getMonth()
-            ) {
-                prevBtn.disabled = true; // Disable if it's the current month
-            } else {
-                prevBtn.disabled = false; // Enable if it's a future month
-            }
-        };
-
-        togglePrevButton();
+        
+        
         updateCalendar();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Approve
+            document.querySelectorAll('.approve-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    let id = this.dataset.id;
+                    if(confirm("Approve this schedule?")) {
+                        window.location.href = 'approveSchedule.php?id=' + id;
+                    }
+                });
+            });
+
+            // Delete
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    let id = this.dataset.id;
+                    if(confirm("Are you sure you want to delete this schedule?")) {
+                        window.location.href = 'deleteSchedule.php?id=' + id;
+                    }
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const id = this.getAttribute('data-id');
+
+                    fetch('getSchedule.php?id=' + id)
+                        .then(response => response.json())
+                        .then(data => {
+                            // Populate modal inputs
+                            document.getElementById('editScheduledId').value = data.scheduled_id;
+                            document.getElementById('editName').value = data.name;
+                            document.getElementById('editDate').value = data.date;
+                            document.getElementById('editTime').value = data.time.slice(0, 5);
+                            document.getElementById('editNumBus').value = data.num_bus;
+
+                            // Show modal
+                            const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+                            editModal.show();
+                        })
+                        .catch(error => {
+                            alert('Error fetching schedule data.');
+                            console.error(error);
+                        });
+                });
+            });
+        });
     </script>
 </body>
 
