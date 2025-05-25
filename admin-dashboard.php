@@ -483,7 +483,10 @@
     
 
     <script src="vendor/chart.js/Chart.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="vendor/fontawesome-free/js/all.min.js"></script>
+    <script src="vendor/fontawesome-free/js/fontawesome.min.js"></script>
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script>
         const monthYearElement = document.getElementById('monthYear');
         const datesElement = document.getElementById('dates');
