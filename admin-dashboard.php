@@ -385,16 +385,24 @@
                             </div>
                             <div class="card mt-3">
                                 <div class="card-header header-title">Appointed Field Trips</div>
-                                <div class="mx-2 pt-3 d-flex justify-content-end">
-                                    <label for="apptYearSelect" class="me-1 py-2">Filter by Year:</label>
-                                    <select name="apptYear" id="apptYearSelect" class="form-select d-inline-block w-auto">
+                                <div class="d-flex justify-content-between align-items-center px-3 py-2">
+                                    <select name="apptYear" id="apptYearSelect" class="form-select w-50 me-2">
                                         <?php
-                                        $currentYear = date('Y');
-                                        for ($y = $currentYear; $y >= $currentYear - 10; $y--) {
-                                            echo "<option value='$y'>$y</option>";
+                                        $selectedYear = isset($_GET['apptYear']) ? $_GET['apptYear'] : '';
+                                        $query = "SELECT DISTINCT YEAR(date) AS year FROM scheduled_tbl ORDER BY year DESC";
+                                        $result = mysqli_query($conn, $query);
+
+                                        while ($row = mysqli_fetch_assoc($result)) {
+                                            $year = $row['year'];
+                                            $selected = ($selectedYear == $year) ? 'selected' : '';
+                                            echo "<option value='$year' $selected>$year</option>";
                                         }
                                         ?>
                                     </select>
+
+                                    <button type="button" class="btn btn-primary w-50" id="printFieldTripReportBtn">
+                                        <i class="fa-solid fa-print"></i> Print Report
+                                    </button>
                                 </div>
                                 <div class="card-body">
                                     <canvas id="fieldTripsChart"></canvas>
@@ -409,6 +417,25 @@
                     <!-- Reason for Visit Pie Chart -->
                     <div class="card">
                         <div class="card-header header-title">Reason for Visit</div>
+                        <div class="d-flex justify-content-between align-items-center px-3 py-2">
+                            <select name="reasonYear" id="reasonYearSelect" class="form-select w-50 me-2">
+                                <?php
+                                $selectedReasonYear = isset($_GET['reasonYear']) ? $_GET['reasonYear'] : '';
+                                $query = "SELECT DISTINCT YEAR(time) AS year FROM visitors ORDER BY year DESC";
+                                $result = mysqli_query($conn, $query);
+
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                    $year = $row['year'];
+                                    $selected = ($selectedReasonYear == $year) ? 'selected' : '';
+                                    echo "<option value='$year' $selected>$year</option>";
+                                }
+                                ?>
+                            </select>
+
+                            <button type="button" class="btn btn-primary w-50" id="printReasonReportBtn">
+                                <i class="fa-solid fa-print"></i> Print Report
+                            </button>
+                        </div>
                         <div class="card-body">
                             <canvas id="reasonChart"></canvas>
                         </div>
@@ -606,15 +633,6 @@
 
         let appointmentChart;
 
-        document.getElementById('apptYearSelect').addEventListener('change', function () {
-            const selectedYear = this.value;
-            fetch('getAppointmentData.php?year=' + selectedYear)
-                .then(response => response.json())
-                .then(data => {
-                    updateAppointmentChart(data.months, data.counts);
-                });
-        });
-
         function createAppointmentChart(months, counts) {
             const ctx = document.getElementById('fieldTripsChart').getContext('2d');
             appointmentChart = new Chart(ctx, {
@@ -653,6 +671,31 @@
             appointmentChart.update();
         }
 
+        // Fetch chart data on load and on year change
+        function fetchAndRenderChart(year) {
+            fetch(`get_field_trip_data.php?year=${year}`)
+                .then(response => response.json())
+                .then(data => {
+                    const months = data.map(item => item.month);
+                    const counts = data.map(item => item.count);
+                    if (appointmentChart) {
+                        updateAppointmentChart(months, counts);
+                    } else {
+                        createAppointmentChart(months, counts);
+                    }
+                });
+        }
+
+        document.getElementById('apptYearSelect').addEventListener('change', function () {
+            fetchAndRenderChart(this.value);
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const year = document.getElementById('apptYearSelect').value;
+            fetchAndRenderChart(year);
+        });
+
         // Load initial chart on page load
         window.addEventListener('DOMContentLoaded', () => {
             const year = document.getElementById('apptYearSelect').value;
@@ -663,31 +706,62 @@
                 });
         });
         
-        const ctx3 = document.getElementById('reasonChart').getContext('2d');
-        new Chart(ctx3, {
-            type: 'doughnut',
-            data: {
-                labels: <?php echo json_encode($reasons); ?>,
-                datasets: [{
-                    data: <?php echo json_encode($totals); ?>,
-                    backgroundColor: [
-                        '#d9534f',
-                        '#5bc0de',
-                        '#5cb85c',
-                        '#f0ad4e',
-                        '#0275d8',
-                        '#292b2c'
-                    ]
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
+        let reasonChart;
+
+        function createReasonChart(labels, data) {
+            const ctx3 = document.getElementById('reasonChart').getContext('2d');
+            reasonChart = new Chart(ctx3, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#d9534f', '#5bc0de', '#5cb85c',
+                            '#f0ad4e', '#0275d8', '#292b2c'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
                     }
                 }
-            }
+            });
+        }
+
+        function updateReasonChart(labels, data) {
+            reasonChart.data.labels = labels;
+            reasonChart.data.datasets[0].data = data;
+            reasonChart.update();
+        }
+
+        function fetchReasonData(year) {
+            fetch(`get_reason_data.php?year=${year}`)
+                .then(response => response.json())
+                .then(data => {
+                    const labels = data.map(item => item.reason);
+                    const counts = data.map(item => item.total);
+                    if (reasonChart) {
+                        updateReasonChart(labels, counts);
+                    } else {
+                        createReasonChart(labels, counts);
+                    }
+                });
+        }
+
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const year = document.getElementById('reasonYearSelect').value;
+            fetchReasonData(year);
+        });
+
+        // Filter on change
+        document.getElementById('reasonYearSelect').addEventListener('change', function () {
+            fetchReasonData(this.value);
         });
 
         document.getElementById('printReportBtn').addEventListener('click', function () {
@@ -699,6 +773,116 @@
                 <html>
                 <head>
                     <title>Print Visitor Chart</title>
+                    <style>
+                        @media print {
+                            body, html {
+                                margin: 0;
+                                padding: 0;
+                                width: 100%;
+                                height: 100%;
+                            }
+                            img {
+                                width: 100vw;
+                                height: 100vh;
+                                object-fit: contain;
+                            }
+                        }
+
+                        body, html {
+                            margin: 0;
+                            padding: 0;
+                            width: 100%;
+                            height: 100%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            background: white;
+                        }
+
+                        img {
+                            max-width: 100%;
+                            max-height: 100%;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <img src="${dataUrl}" alt="Visitor Chart"/>
+                    <script>
+                        window.onload = function () {
+                            window.print();
+                            window.onafterprint = function () { window.close(); };
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        });
+
+        document.getElementById('printFieldTripReportBtn').addEventListener('click', function () {
+            const canvas = document.getElementById('fieldTripsChart');
+            const dataUrl = canvas.toDataURL();
+
+            const printWindow = window.open('', '', 'width=800,height=600');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Print Fieldtrip Chart</title>
+                    <style>
+                        @media print {
+                            body, html {
+                                margin: 0;
+                                padding: 0;
+                                width: 100%;
+                                height: 100%;
+                            }
+                            img {
+                                width: 100vw;
+                                height: 100vh;
+                                object-fit: contain;
+                            }
+                        }
+
+                        body, html {
+                            margin: 0;
+                            padding: 0;
+                            width: 100%;
+                            height: 100%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            background: white;
+                        }
+
+                        img {
+                            max-width: 100%;
+                            max-height: 100%;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <img src="${dataUrl}" alt="Visitor Chart"/>
+                    <script>
+                        window.onload = function () {
+                            window.print();
+                            window.onafterprint = function () { window.close(); };
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        });
+
+        document.getElementById('printReasonReportBtn').addEventListener('click', function () {
+            const canvas = document.getElementById('reasonChart');
+            const dataUrl = canvas.toDataURL();
+
+            const printWindow = window.open('', '', 'width=800,height=600');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Print Fieldtrip Chart</title>
                     <style>
                         @media print {
                             body, html {
