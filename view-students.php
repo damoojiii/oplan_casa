@@ -5,11 +5,17 @@
 
     $scheduled_id = $_GET['scheduled_id'];
 
-    $sql_fetch = "SELECT * FROM student_tbl WHERE scheduled_id = ?";
+    $sql_fetch = "SELECT * FROM student_tbl WHERE scheduled_id = ? ORDER BY lastname ASC";
     $stmt = $conn->prepare($sql_fetch);
     $stmt->bind_param("i", $scheduled_id);
     $stmt->execute();
-    $result_fetch = $stmt->get_result();
+    $student_result = $stmt->get_result();
+
+    $sql_fetch1 = "SELECT * FROM supervisor_tbl WHERE scheduled_id = ?";
+    $stmt = $conn->prepare($sql_fetch1);
+    $stmt->bind_param("i", $scheduled_id);
+    $stmt->execute();
+    $supervisor_result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -190,49 +196,115 @@
         <!-- Tabs Navigation -->
         <ul class="nav nav-tabs" id="scheduleTabs">
             <li class="nav-item tabs">
-                <a class="nav-link" id="tab1" data-bs-toggle="tab" href="trips.php">Scheduled Trips</a>
+                <a class="nav-link" href="trips.php">Scheduled Trips</a>
             </li>
             <li class="nav-item tabs">
-                <a class="nav-link" id="tab2" data-bs-toggle="tab" href="add-visitor.php">Add Visitor</a>
+                <a class="nav-link" href="add-visitor.php">Add Visitor</a>
             </li>
             <li class="nav-item tabs">
-                <a class="nav-link active" id="tab3" data-bs-toggle="tab" href="trip-info.php">Trip Info</a>
+                <a class="nav-link active" href="trip-info.php">Trip Info</a>
             </li>
         </ul>
 
         <div class="container mt-4">
-            <h2 class="text-center">Students List</h2>
-            <table class="table table-bordered">
-                <thead class="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Grade Level</th>
-                        <th>Guardian</th>
-                        <th>Contact</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php while ($row = $result_fetch->fetch_assoc()) { ?>
-                    <tr>
-                        <td><?php echo $row['student_id']; ?></td>
-                        <td><?php echo $row['firstname']; ?></td>
-                        <td><?php echo $row['lastname']; ?></td>
-                        <td><?php echo $row['grade_level']; ?></td>
-                        <td><?php echo $row['guardian']; ?></td>
-                        <td><?php echo $row['contact']; ?></td>
-                    </tr>
-                    <?php } ?>
-                </tbody>
-            </table>
+            <ul class="nav nav-tabs" id="dataTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button" role="tab">Students</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="supervisors-tab" data-bs-toggle="tab" data-bs-target="#supervisors" type="button" role="tab">Supervisors</button>
+                </li>
+            </ul>
+
+            <div class="tab-content mt-3" id="dataTabsContent">
+                <!-- Students Tab -->
+                <div class="tab-pane fade show active" id="students" role="tabpanel">
+                    <h4 class="text-center">Students List</h4>
+                    <a href="export_students_pdf.php?id=<?php echo $scheduled_id?>" class="btn btn-danger mb-3"><i class="fa fa-file-pdf"></i> Export to PDF</a>
+                    <?php if ($student_result->num_rows > 0): ?>
+                        <table class="table table-bordered">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Last Name</th>
+                                    <th>First Name</th>
+                                    <th>Grade Level</th>
+                                    <th>Guardian</th>
+                                    <th>Contact</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while ($row = $student_result->fetch_assoc()): ?>
+                                    <tr>
+                                        <td><?= $row['student_id'] ?></td>
+                                        <td><?= $row['lastname'] ?></td>
+                                        <td><?= $row['firstname'] ?></td>
+                                        <td><?= $row['grade_level'] ?></td>
+                                        <td><?= $row['guardian'] ?></td>
+                                        <td><?= $row['contact'] ?></td>
+                                        <td>
+                                            <a href="#" class="btn btn-info btn-sm"><i class='fa-solid fa-print'></i></a>
+                                            <a href="#" class="btn btn-warning btn-sm"><i class='fa-solid fa-pen-to-square'></i></a>
+                                            <a href="deleteVisitor.php?id=<?= $row['student_id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')"><i class='fa-solid fa-trash'></i></a>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <div class="alert alert-warning text-center">No student records found.</div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Supervisors Tab -->
+                <div class="tab-pane fade" id="supervisors" role="tabpanel">
+                    <h4 class="text-center">Supervisors List</h4>
+                    <?php if ($supervisor_result->num_rows > 0): ?>
+                        <table class="table table-bordered">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Position</th>
+                                    <th>Contact</th>
+                                    <th>Gender</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while ($row = $supervisor_result->fetch_assoc()): ?>
+                                    <tr>
+                                        <td><?= $row['supervisor_id'] ?></td>
+                                        <td><?= $row['firstname'] ?></td>
+                                        <td><?= $row['lastname'] ?></td>
+                                        <td><?= $row['position'] ?></td>
+                                        <td><?= $row['contact'] ?></td>
+                                        <td><?= $row['gender'] ?></td>
+                                        <td>
+                                            <a href="#" class="btn btn-info btn-sm"><i class='fa-solid fa-print'></i></a>
+                                            <a href="#" class="btn btn-warning btn-sm"><i class='fa-solid fa-pen-to-square'></i></a>
+                                            <a href="deleteSupervisor.php?id=<?= $row['supervisor_id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')"><i class='fa-solid fa-trash'></i></a>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <div class="alert alert-warning text-center">No supervisor records found.</div>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
+
 
         
     </div>
     
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script>
         

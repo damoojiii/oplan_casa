@@ -380,6 +380,16 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const nameFields = document.querySelectorAll('input[name="firstname"], input[name="lastname"], input[name="guardian"],input[name="position"]');
+
+            nameFields.forEach(field => {
+                field.addEventListener('input', function () {
+                    this.value = this.value.replace(/[^a-zA-Z\s'-]/g, '');
+                });
+            });
+        });
+
         function toggleForm(value) {
             // Get both form containers
             const studentFormContainer = document.getElementById('student-form');

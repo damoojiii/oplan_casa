@@ -197,11 +197,15 @@
             <ol class="schedule-list">
                 <?php
                     $sql = "SELECT s.*, 
-                            COALESCE(COUNT(st.student_id), 0) AS num_visitors 
-                    FROM scheduled_tbl s
-                    LEFT JOIN student_tbl st ON s.scheduled_id = st.scheduled_id
-                    GROUP BY s.scheduled_id
-                    ORDER BY s.scheduled_id ASC";
+                                    (
+                                        SELECT COUNT(*) FROM student_tbl st WHERE st.scheduled_id = s.scheduled_id
+                                    ) +
+                                    (
+                                        SELECT COUNT(*) FROM supervisor_tbl sv WHERE sv.scheduled_id = s.scheduled_id
+                                    ) AS num_visitors
+                            FROM scheduled_tbl s
+                            WHERE s.status = 'Upcoming'
+                            ORDER BY s.scheduled_id ASC";
                     $stmt = $conn->prepare($sql);
                     $stmt->execute();
                     $result = $stmt->get_result();

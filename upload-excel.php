@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['excel_file'])) {
             die("Connection failed: " . $conn->connect_error);
         }
 
-        for ($i = 1; $i < count($studentData); $i++) {
+        for ($i = 2; $i < count($studentData); $i++) {
             $row = $studentData[$i];
 
             if (empty(array_filter($row))) continue;
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['excel_file'])) {
         }
 
         // Insert Supervisors
-        for ($j = 1; $j < count($supervisorData); $j++) {
+        for ($j = 2; $j < count($supervisorData); $j++) {
             $row = $supervisorData[$j];
 
             if (empty(array_filter($row))) continue;
