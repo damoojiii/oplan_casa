@@ -359,19 +359,25 @@
                         <div class="col-md-7">
                             <div class="card mt-3">
                                 <div class="card-header header-title">Visitor Chart</div>
-                                <div class="mx-2 pt-3 d-flex justify-content-end">
-                                    <label for="year" class="me-1 py-2">Filter by Year:</label>
-                                    <select name="year" id="yearSelect" class="form-select d-inline-block w-auto">
-                                        <?php
-                                        $currentYear = date('Y');
-                                        for ($y = $currentYear; $y >= $currentYear - 10; $y--) {
-                                            $selected = ($selectedYear == $y) ? 'selected' : '';
-                                            echo "<option value='$y' $selected>$y</option>";
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-                                
+                                    <div class="d-flex justify-content-between align-items-center px-3 py-2">
+                                        <select name="year" id="yearSelect" class="form-select w-50 me-2">
+                                            <?php
+                                            $selectedYear = isset($_GET['year']) ? $_GET['year'] : '';
+                                            $query = "SELECT DISTINCT YEAR(time) AS year FROM visitors ORDER BY year DESC";
+                                            $result = mysqli_query($conn, $query);
+
+                                            while ($row = mysqli_fetch_assoc($result)) {
+                                                $year = $row['year'];
+                                                $selected = ($selectedYear == $year) ? 'selected' : '';
+                                                echo "<option value='$year' $selected>$year</option>";
+                                            }
+                                            ?>
+                                        </select>
+
+                                        <button type="button" class="btn btn-primary w-50" id="printReportBtn">
+                                            <i class="fa-solid fa-print"></i> Print Report
+                                        </button>
+                                    </div>
                                 <div class="card-body">
                                     <canvas id="visitorChart"></canvas>
                                 </div>
@@ -410,15 +416,19 @@
                     <!-- Calendar -->
                     <div class="calendar-container">
                         <div class="calendar">
-                            <div class="legend mt-2" style="margin-top: 10px;">
-                                <span style="display: inline-block; width: 15px; height: 15px; background-color: #273E26; border-radius: 50%; margin-right: 5px;"></span>
-                                <span style="font-size: 12px;">Today</span>
-
-                                <span style="display: inline-block; width: 15px; height: 15px; background-color: #f0ad4e; border-radius: 50%; margin-left: 15px; margin-right: 5px;"></span>
-                                <span style="font-size: 12px;">Upcoming Trip</span>
-
-                                <span style="display: inline-block; width: 15px; height: 15px; background-color: #5cb85c; border-radius: 50%; margin-left: 15px; margin-right: 5px;"></span>
-                                <span style="font-size: 12px;">Completed Trip</span>
+                            <div class="legend mt-2 d-flex align-items-center" style="gap: 20px; flex-wrap: wrap;">
+                                <div class="d-flex align-items-center">
+                                    <span style="width: 15px; height: 15px; background-color: #273E26; border-radius: 50%; margin-right: 5px;"></span>
+                                    <span style="font-size: 12px;">Today</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span style="width: 15px; height: 15px; background-color: #f0ad4e; border-radius: 50%; margin-right: 5px;"></span>
+                                    <span style="font-size: 12px;">Upcoming Trip</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span style="width: 15px; height: 15px; background-color: #5cb85c; border-radius: 50%; margin-right: 5px;"></span>
+                                    <span style="font-size: 12px;">Completed Trip</span>
+                                </div>
                             </div>
                             <div class="header">
                                 <button id="prevBtn"><i class="fa-solid fa-chevron-left"></i></button>
@@ -480,10 +490,17 @@
             // Fill current month days
             for (let i = 1; i <= totalDays; i++) {
                 const date = new Date(currentYear, currentMonth, i);
-                const dateString = date.toISOString().split('T')[0]; 
+                
+                function formatLocalDate(date) {
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
 
+                const dateString = formatLocalDate(date); 
                 let extraClass = '';
-                const todayString = new Date().toISOString().split('T')[0];
+                const todayString = formatLocalDate(new Date());
 
                 if (dateString === todayString) {
                     extraClass = 'active';
@@ -511,14 +528,8 @@
         };  
 
         prevBtn.addEventListener('click', () => {
-            const today = new Date();
-            if (
-                currentDate.getFullYear() > today.getFullYear() ||
-                (currentDate.getFullYear() === today.getFullYear() && currentDate.getMonth() > today.getMonth())
-            ) {
-                currentDate.setMonth(currentDate.getMonth() - 1);
-                updateCalendar();
-            }
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            updateCalendar();
             togglePrevButton();
         });
 
@@ -527,20 +538,7 @@
             updateCalendar();
             togglePrevButton();
         });
-        
-        const togglePrevButton = () => {
-            const today = new Date();
-            if (
-                currentDate.getFullYear() === today.getFullYear() &&
-                currentDate.getMonth() === today.getMonth()
-            ) {
-                prevBtn.disabled = true; // Disable if it's the current month
-            } else {
-                prevBtn.disabled = false; // Enable if it's a future month
-            }
-        };
 
-        togglePrevButton();
         updateCalendar();
     </script>
     <script>
@@ -689,6 +687,61 @@
                     }
                 }
             }
+        });
+
+        document.getElementById('printReportBtn').addEventListener('click', function () {
+            const canvas = document.getElementById('visitorChart');
+            const dataUrl = canvas.toDataURL();
+
+            const printWindow = window.open('', '', 'width=800,height=600');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Print Visitor Chart</title>
+                    <style>
+                        @media print {
+                            body, html {
+                                margin: 0;
+                                padding: 0;
+                                width: 100%;
+                                height: 100%;
+                            }
+                            img {
+                                width: 100vw;
+                                height: 100vh;
+                                object-fit: contain;
+                            }
+                        }
+
+                        body, html {
+                            margin: 0;
+                            padding: 0;
+                            width: 100%;
+                            height: 100%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            background: white;
+                        }
+
+                        img {
+                            max-width: 100%;
+                            max-height: 100%;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <img src="${dataUrl}" alt="Visitor Chart"/>
+                    <script>
+                        window.onload = function () {
+                            window.print();
+                            window.onafterprint = function () { window.close(); };
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
         });
     </script>
 </body>

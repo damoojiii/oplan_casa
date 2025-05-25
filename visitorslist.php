@@ -311,6 +311,16 @@
         </div>
 
 
+        <?php
+            $purposeOptions = [];
+            $sql = "SELECT purpose_id, purpose FROM purpose_tbl";
+            $result = $conn->query($sql);
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $purposeOptions[] = $row;
+                }
+            }
+        ?>
         <!-- Edit Visitor Modal -->
         <div class="modal fade" id="editVisitorModal" tabindex="-1" aria-labelledby="editVisitorModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -343,7 +353,14 @@
                             </div>
                             <div class="form-group">
                                 <label for="editReason">Reason</label>
-                                <input type="text" class="form-control" id="editReason" name="reason" required>
+                                <select class="form-control" id="editReason" name="reason" required>
+                                    <option value="">Select Reason</option>
+                                    <?php foreach ($purposeOptions as $purpose): ?>
+                                        <option value="<?= htmlspecialchars($purpose['purpose']) ?>">
+                                            <?= htmlspecialchars($purpose['purpose']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -517,7 +534,7 @@
                 
                 setTimeout(() => {
                     $("#editCity").val(city); // Set selected city
-                }, 500); // Delay to ensure dropdown is populated
+                }, 500);
 
                 $("#editVisitorModal").modal("show");
             });
