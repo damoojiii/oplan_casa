@@ -1,7 +1,6 @@
 <?php
     include "session.php";
     include("connection.php");
-    include "loader.php";
 ?>
 
 <!DOCTYPE html>
@@ -13,7 +12,6 @@
     <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="vendor/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="vendor/fontawesome-free/css/fontawesome.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="vendor/datables/datatables.min.css">
     <link rel="icon" href="img/rosariologo.png">
@@ -388,10 +386,10 @@
         </div>
     </div>
 
-    <script src="vendor/fontawesome-free/js/all.min.js"></script>
-    <script src="vendor/fontawesome-free/js/fontawesome.min.js"></script>
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="vendor/datables/datatables.min.js"></script>
     <script>

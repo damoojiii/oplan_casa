@@ -294,7 +294,7 @@
                 <div class="col-md-8">
                     <!-- Statistic Cards -->
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-4" onclick="window.location.href='visitorslist.php';" style="cursor: pointer;">
                             <div class="card text-center">
                                 <div class="card-body">
                                     <h3><?php echo $todays_count ?></h3>
@@ -302,7 +302,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-4" onclick="window.location.href='trips.php';" style="cursor: pointer;">
                             <div class="card text-center">
                                 <div class="card-body">
                                     <h3><?php echo $total_trips ?></h3>
@@ -310,7 +310,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-4" onclick="window.location.href='visitorslist.php';" style="cursor: pointer;">
                             <div class="card text-center">
                                 <div class="card-body">
                                     <h3><?php echo $total ?></h3>
