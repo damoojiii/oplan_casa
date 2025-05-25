@@ -183,7 +183,20 @@
     .date.inactive {
         opacity: 0.4;
     }
-    
+    .upcom::before {
+        content: '';
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background-color: #1b311b; /* dark green */
+        border-radius: 50%;
+        margin-right: 10px;
+        vertical-align: middle !important;
+    }
+    .card-header.header-title{
+        color: white;
+        background-color: #273E26;
+    }
     </style>
 </head>
 
@@ -308,7 +321,7 @@
 
                     <div class="row">
                         <!-- Left Inner Column (Upcoming Schedules) -->
-                        <div class="col-md-4">
+                        <div class="col-md-5">
                             <div class="card mt-3">
                                 <div class="card-header header-title">Upcoming Schedules</div>
                                 <div class="card-body">
@@ -319,15 +332,20 @@
                                                     $dateFormatted = date('M d, Y', strtotime($row['date']));
                                                     $status = strtolower($row['status']);
 
-                                                    // Choose badge color based on status
+                                                    // Badge color logic
                                                     $statusClass = 'text-secondary';
-                                                    if ($status == 'ongoing') $statusClass = 'text-success';
-                                                    elseif ($status == 'upcoming') $statusClass = 'text-primary';
-                                                    elseif ($status == 'cancelled') $statusClass = 'text-danger';
+                                                    if ($status === 'ongoing') $statusClass = 'text-success';
+                                                    elseif ($status === 'upcoming') $statusClass = 'text-warning';
+                                                    elseif ($status === 'cancelled') $statusClass = 'text-danger';
                                                 ?>
-                                                <li>
-                                                    <?= htmlspecialchars($row['name']) ?> - <?= $dateFormatted ?>
-                                                    <span class="<?= $statusClass ?>"><?= ucfirst($status) ?></span>
+                                                <li class="mb-3 d-flex align-items-center justify-content-evenly upcom">
+                                                    <div class="">
+                                                        <div class="fw-semibold"><?= htmlspecialchars($row['name']) ?></div>
+                                                        <small class="text-muted"><?= $dateFormatted ?></small>
+                                                    </div>
+                                                    <div class="mt-1">
+                                                        <span class="<?= $statusClass ?> fw-semibold"><?= ucfirst($status) ?></span>
+                                                    </div>
                                                 </li>
                                             <?php endforeach; ?>
                                         <?php else: ?>
@@ -338,34 +356,39 @@
                             </div>
                         </div>
                         <!-- Right Inner Column (Charts) -->
-                        <div class="col-md-8">
+                        <div class="col-md-7">
                             <div class="card mt-3">
                                 <div class="card-header header-title">Visitor Chart</div>
-                                <label for="year" class="form-label">Filter by Year:</label>
-                                <select name="year" id="yearSelect" class="form-select d-inline-block w-auto">
-                                    <?php
-                                    $currentYear = date('Y');
-                                    for ($y = $currentYear; $y >= $currentYear - 10; $y--) {
-                                        $selected = ($selectedYear == $y) ? 'selected' : '';
-                                        echo "<option value='$y' $selected>$y</option>";
-                                    }
-                                    ?>
-                                </select>
+                                <div class="mx-2 pt-3 d-flex justify-content-end">
+                                    <label for="year" class="me-1 py-2">Filter by Year:</label>
+                                    <select name="year" id="yearSelect" class="form-select d-inline-block w-auto">
+                                        <?php
+                                        $currentYear = date('Y');
+                                        for ($y = $currentYear; $y >= $currentYear - 10; $y--) {
+                                            $selected = ($selectedYear == $y) ? 'selected' : '';
+                                            echo "<option value='$y' $selected>$y</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                
                                 <div class="card-body">
                                     <canvas id="visitorChart"></canvas>
                                 </div>
                             </div>
                             <div class="card mt-3">
                                 <div class="card-header header-title">Appointed Field Trips</div>
-                                <label for="apptYearSelect" class="form-label">Filter by Year:</label>
-                                <select name="apptYear" id="apptYearSelect" class="form-select d-inline-block w-auto">
-                                    <?php
-                                    $currentYear = date('Y');
-                                    for ($y = $currentYear; $y >= $currentYear - 10; $y--) {
-                                        echo "<option value='$y'>$y</option>";
-                                    }
-                                    ?>
-                                </select>
+                                <div class="mx-2 pt-3 d-flex justify-content-end">
+                                    <label for="apptYearSelect" class="me-1 py-2">Filter by Year:</label>
+                                    <select name="apptYear" id="apptYearSelect" class="form-select d-inline-block w-auto">
+                                        <?php
+                                        $currentYear = date('Y');
+                                        for ($y = $currentYear; $y >= $currentYear - 10; $y--) {
+                                            echo "<option value='$y'>$y</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
                                 <div class="card-body">
                                     <canvas id="fieldTripsChart"></canvas>
                                 </div>

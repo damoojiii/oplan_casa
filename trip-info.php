@@ -93,6 +93,11 @@
     .upcoming { background-color: #ffc107; color: #000; }
     .ongoing { background-color: #28a745; color: #fff; }
     .completed { background-color: #6c757d; color: #fff; }
+
+    .active>.page-link, .page-link.active {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
     
     </style>
 </head>
@@ -192,28 +197,42 @@
             </li>
         </ul>
 
+        <?php
+        $limit = 5; // Number of records per page
+        $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
+        $offset = ($page - 1) * $limit;
+
+        // Count total upcoming schedules
+        $count_query = "SELECT COUNT(*) AS total FROM scheduled_tbl WHERE status = 'Upcoming'";
+        $count_result = $conn->query($count_query);
+        $total_rows = $count_result->fetch_assoc()['total'];
+        $total_pages = ceil($total_rows / $limit);
+
+        // Fetch paginated records
+        $sql = "SELECT s.*, 
+                (
+                    SELECT COUNT(*) FROM student_tbl st WHERE st.scheduled_id = s.scheduled_id
+                ) +
+                (
+                    SELECT COUNT(*) FROM supervisor_tbl sv WHERE sv.scheduled_id = s.scheduled_id
+                ) AS num_visitors
+                FROM scheduled_tbl s
+                WHERE s.status = 'Upcoming'
+                ORDER BY s.scheduled_id ASC
+                LIMIT ? OFFSET ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ii", $limit, $offset);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        ?>
+
         <div class="container mt-4">
             <h2 class="text-center">Scheduled Trips</h2>
             <ol class="schedule-list">
-                <?php
-                    $sql = "SELECT s.*, 
-                                    (
-                                        SELECT COUNT(*) FROM student_tbl st WHERE st.scheduled_id = s.scheduled_id
-                                    ) +
-                                    (
-                                        SELECT COUNT(*) FROM supervisor_tbl sv WHERE sv.scheduled_id = s.scheduled_id
-                                    ) AS num_visitors
-                            FROM scheduled_tbl s
-                            WHERE s.status = 'Upcoming'
-                            ORDER BY s.scheduled_id ASC";
-                    $stmt = $conn->prepare($sql);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-
-                    while ($row = $result->fetch_assoc()) {
-                        $formattedDate = date("F j, Y", strtotime($row['date']));
-                        $formattedTime = date("h:i A", strtotime($row['time']));
-                        $statusClass = strtolower($row['status']); // Convert status to lowercase for class name
+                <?php while ($row = $result->fetch_assoc()) {
+                    $formattedDate = date("F j, Y", strtotime($row['date']));
+                    $formattedTime = date("h:i A", strtotime($row['time']));
+                    $statusClass = strtolower($row['status']);
                 ?>
                 <li>
                     <a href="view-students.php?scheduled_id=<?php echo $row['scheduled_id']; ?>" class="text-decoration-none text-dark">
@@ -230,9 +249,26 @@
                 </li>
                 <?php } ?>
             </ol>
-        </div>
 
-        
+            <!-- Pagination -->
+            <nav>
+                <ul class="pagination justify-content-center">
+                    <?php if ($page > 1): ?>
+                        <li class="page-item"><a class="page-link" href="?page=<?php echo $page - 1; ?>">&laquo; Prev</a></li>
+                    <?php endif; ?>
+
+                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                        <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
+                            <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                        </li>
+                    <?php endfor; ?>
+
+                    <?php if ($page < $total_pages): ?>
+                        <li class="page-item"><a class="page-link" href="?page=<?php echo $page + 1; ?>">Next &raquo;</a></li>
+                    <?php endif; ?>
+                </ul>
+            </nav>
+        </div>
     </div>
     
 

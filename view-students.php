@@ -243,10 +243,10 @@
                                         <td><?= $row['grade_level'] ?></td>
                                         <td><?= $row['guardian'] ?></td>
                                         <td><?= $row['contact'] ?></td>
-                                        <td>
+                                        <td class="d-flex justify-content-evenly">
                                             <a href="#" class="btn btn-info btn-sm"><i class='fa-solid fa-print'></i></a>
                                             <a href="#" class="btn btn-warning btn-sm"><i class='fa-solid fa-pen-to-square'></i></a>
-                                            <a href="deleteVisitor.php?id=<?= $row['student_id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')"><i class='fa-solid fa-trash'></i></a>
+                                            <a href="deleteStudent.php?id=<?php echo $row['student_id']; ?>&scheduled_id=<?php echo $scheduled_id; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this student?')"><i class='fa-solid fa-trash'></i></a>
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
@@ -282,10 +282,10 @@
                                         <td><?= $row['position'] ?></td>
                                         <td><?= $row['contact'] ?></td>
                                         <td><?= $row['gender'] ?></td>
-                                        <td>
+                                        <td class="d-flex justify-content-evenly">
                                             <a href="#" class="btn btn-info btn-sm"><i class='fa-solid fa-print'></i></a>
                                             <a href="#" class="btn btn-warning btn-sm"><i class='fa-solid fa-pen-to-square'></i></a>
-                                            <a href="deleteSupervisor.php?id=<?= $row['supervisor_id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')"><i class='fa-solid fa-trash'></i></a>
+                                            <a href="deleteSupervisor.php?id=<?php echo $row['supervisor_id']; ?>&scheduled_id=<?php echo $scheduled_id; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this supervisor?')"><i class='fa-solid fa-trash'></i></a>
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>

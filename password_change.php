@@ -14,129 +14,48 @@
     <link rel="icon" href="img/rosariologo.png">
     
     <style>
-        @font-face {
-            font-family: 'Inter';
-            src: url('fonts/Inter/Inter-VariableFont_opsz\,wght.ttf') format('truetype');
-            font-weight: 100 900;
-            font-stretch: normal;
-            font-style: normal;
-        }
-        @font-face {
-            font-family: 'Karla';
-            src: url('fonts/Karla/Karla-VariableFont_wght.ttf') format('truetype');
-            font-weight: 100 900;
-            font-stretch: normal;
-            font-style: normal;
-        }
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
-        *, p{
-            margin: 0;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-        }
-
-        #sidebar .font-logo {
-            font-family: 'nautigal';
-            font-size: 20px !important;
-        }
-        #sidebar {
-            width: 250px;
-            position: fixed;
-            top: 0; 
-            height: 100vh;
-            overflow-y: auto; 
-            transition: transform 0.3s ease;
-            background: #273E26;
-            z-index: 199;
-        }
-
-        header {
-            position: none;
-            top: 0;
-            left: 0;
-            right: 0; 
+        <?php include 'sidebarcss.php'; ?>
+        .parent {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: auto;
+            gap: 15px;
+            padding: 20px;
             width: 100%;
-            height: 50px;
-            transition: margin-left 0.3s ease;
-            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+         /* Logo content */   
+        .logo-main {
+            grid-column: span 2;
+            grid-row: span 1;
+            background-color: #5D9C59;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 200px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
             display: flex;
+            flex-direction: column;
         }
-        #header{
-            transition: margin-left 0.3s ease, width 0.3s ease;
+        
+        .logo h4 {
+            color: white !important;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 15px;
         }
-
-        #hamburger {
-            border: none;
-            background: none;
-            cursor: pointer;
-            margin-left: 15px;
-            display: none;
-        }
-
-        #main-content {
-            transition: margin-left 0.3s ease;
-            margin-left: 250px; 
-            max-width: 80%;
-        }
-
-        hr {
-            background-color: #ffff;
-            height: 1.5px;
-        }
-
-        #sidebar .nav-link {
-            font-family: 'Karla';
-            color: #fff;
+        
+        .current-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-inline: auto;
             padding: 10px;
-            border-radius: 4px;
-            transition: background-color 0.3s, color 0.3s;
-            margin-bottom: 2px;
-        }
-
-        #sidebar .collapse {
-            transition: height 0.3s ease-out, opacity 0.3s ease-out;
-        }
-        #sidebar .collapse.show {
-            height: auto !important;
-            opacity: 1;
-        }
-        #sidebar .collapse:not(.show) {
-            height: 0;
-            opacity: 0;
-            overflow: hidden;
-        }
-        #sidebar .drop{
-            height: 50px;
-        }
-        .caret-icon .fa-caret-down {
-            display: inline-block;
-            font-size: 20px;
-        }
-        .navcircle{
-            font-size: 7px;
-            text-align: justify;
-        }
-        .main-menu{
-            font-family: 'Karla';
-            margin-bottom: 10px;
-        }
-        #sidebar .nav-link:hover, #sidebar .nav-link.active {
-            background-color: #fff !important;
-            color: #000 !important;
-        }
-
-        .dropdown-item {
-            color: #fff !important;
-            margin-bottom: 10px;
-        }
-
-        .dropdown-item:hover{
-            background-color: #fff !important;
-            color: #000 !important;
+            width: 45%;
+            background-color: #77ac67;
+            border-radius: 50%;
         }
         
         .password-container {
@@ -197,32 +116,77 @@
     </header>
 
     <!-- Sidebar -->
-    <div id="sidebar" class="d-flex flex-column p-3 text-white vh-100">
-        <a href="#" class="mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-            <span class="font-logo">Tourism Office - Municipality of Rosario</span>
-        </a>
+    <div id="sidebar" class="d-flex flex-column p-3 vh-100">
+        <!-- Logo/Icon -->
+        <div class="text-center">
+            <div class="logo-circle">
+                <?php
+                    $db = new mysqli('localhost', 'root', '', 'casadb');
+
+                    if ($db->connect_error) {
+                    die("Connection failed: " . $db->connect_error);
+                    }
+
+                    $sql = "SELECT logo_path FROM site_settings WHERE id = 1";
+                    $result = $db->query($sql);
+
+                    if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                            $logo = !empty($row['logo_path']) ? $row['logo_path'] : 'img/rosariologo.png'; // Use default if empty
+                            echo "<div class='logo-item'>";
+                            echo "<img src='$logo' alt='Logo' class='logo-circle' style='width: 90px; height: 90px;'>";
+                            echo "</div>";
+                        }
+                    } else {
+                        // If walay logong makita, display the default logo nganii para di empty yung logo
+                        echo "<div class='logo-item'>";
+                        echo "<img src='img/rosariologo.png' alt='Default Logo' style='width: 80px; height: 80px;'>";
+                        echo "</div>";
+                    }
+                ?>
+            </div>
+        </div>
+
+        <h6 class="text-white text-center mt-2">Tourism Office</h6>
+        <p class="text-white text-center small">Municipality of Rosario</p>
+        
         <hr>
+
         <div class="text-white main-menu">Main Menu</div>
-        <ul class="nav nav-pills flex-column mb-auto">
+        <ul class="nav flex-column mb-auto">
             <li class="nav-item">
-                <a href="admin-dashboard.php" class="nav-link text-white"><i class="fa-brands fa-flipboard"></i> Dashboard</a>
+                <a href="admin-dashboard.php" class="nav-link">
+                    <i class="fa-solid fa-list"></i> Dashboard
+                </a>
             </li>
             <li>
-                <a href="visitorslist.php" class="nav-link text-white target"><i class="fa-solid fa-user-group"></i> Visitor's List</a>
+                <a href="visitorslist.php" class="nav-link">
+                    <i class="fa-solid fa-user-group"></i> Visitor's List
+                </a>
             </li>
             <li>
-                <a href="#.php" class="nav-link text-white chat"><i class="fa-solid fa-bus"></i> Scheduled Field Trips</a>
+                <a href="trips.php" class="nav-link">
+                    <i class="fa-solid fa-bus"></i> Scheduled Field Trips
+                </a>
             </li>
             <li>
-                <a href="#.php" class="nav-link text-white"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+                <a href="history.php" class="nav-link">
+                    <i class="fa-solid fa-clock-rotate-left"></i> History
+                </a>
             </li>
             <li>
-                <a href="settings.php" class="nav-link active text-white"><i class="fa-solid fa-gear"></i> Settings</a>
+                <a href="settings.php" class="nav-link active">
+                    <i class="fa-solid fa-gear"></i> Settings
+                </a>
             </li>
         </ul>
+
         <hr>
-        <div class ="logout">
-            <a href="logout.php" class="nav-link text-white"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log out</a>
+
+        <div class="logout">
+            <a href="logout.php" class="nav-link">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Log out
+            </a>
         </div>
     </div>
 

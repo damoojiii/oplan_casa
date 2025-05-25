@@ -296,38 +296,44 @@
                         <div class="supervisor-container">
                             <h3 class="header-title">Add a Supervisor</h3>
                             <form method="POST" action="add-supervisor.php">
-                                <label>Enter First Name</label>
-                                <input type="text" name="firstname" class="form-control" required>
-                                <label>Enter Last Name</label>
-                                <input type="text" name="lastname" class="form-control" required>
-                                <label for="position">Position</label>
-                                <input type="text" name="position" class="form-control" required>
-                                <label for="school">School/Company Name</label>
-                                <select id="school" name="school" class="form-control" required>
-                                    <option value="" hidden selected>Select a school</option>
-                                    <?php
-                                        // Query to get the cities
-                                        $sql = "SELECT scheduled_id, name FROM scheduled_tbl WHERE status = 'Upcoming' OR status ='Ongoing'"; 
-                                        $result = $conn->query($sql);
-                                    
-                                        // Loop through the results and display them as options
-                                        if ($result->num_rows > 0) {
-                                            while($row = $result->fetch_assoc()) {
-                                                echo '<option value="' . $row["scheduled_id"] . '">' . ucwords($row["name"]) . '</option>';
-                                            }
-                                        } else {
-                                            echo '<option value="">No cities found</option>';
-                                        }
-                                    ?>
-                                </select>
-                                <label for="gender" class="form-label input-label">Gender</label>
-                                <select id="gender" name="gender" class="form-select" required>
-                                    <option value="" disabled selected hidden>Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-                                <label>Enter Contact No.</label>
-                                <input type="tel" name="contact" class="form-control" required>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Enter First Name</label>
+                                        <input type="text" name="firstname" class="form-control" required>
+                                        <label>Enter Last Name</label>
+                                        <input type="text" name="lastname" class="form-control" required>
+                                        <label for="position">Position</label>
+                                        <input type="text" name="position" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="school">School/Company Name</label>
+                                        <select id="school" name="school" class="form-control" required>
+                                            <option value="" hidden selected>Select a school</option>
+                                            <?php
+                                                // Query to get the cities
+                                                $sql = "SELECT scheduled_id, name FROM scheduled_tbl WHERE status = 'Upcoming' OR status ='Ongoing'"; 
+                                                $result = $conn->query($sql);
+                                            
+                                                // Loop through the results and display them as options
+                                                if ($result->num_rows > 0) {
+                                                    while($row = $result->fetch_assoc()) {
+                                                        echo '<option value="' . $row["scheduled_id"] . '">' . ucwords($row["name"]) . '</option>';
+                                                    }
+                                                } else {
+                                                    echo '<option value="">No cities found</option>';
+                                                }
+                                            ?>
+                                        </select>
+                                        <label for="gender" class="form-label input-label">Gender</label>
+                                        <select id="gender" name="gender" class="form-select" required>
+                                            <option value="" disabled selected hidden>Select Gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                        </select>
+                                        <label>Enter Contact No.</label>
+                                        <input type="tel" name="contact" class="form-control" required>
+                                    </div>
+                                </div>
                                 <button type="submit" name="supervisor" class="btn btn-primary mt-3">Submit</button>
                             </form>
                         </div>
