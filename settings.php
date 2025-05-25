@@ -1,7 +1,6 @@
 <?php
     include "session.php";
     include("connection.php");
-    include "loader.php";
 ?>
 
 <!DOCTYPE html>

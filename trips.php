@@ -1,7 +1,6 @@
 <?php
     include "session.php";
     include("connection.php");
-    include "loader.php";
 
     date_default_timezone_set("Asia/Manila");
     $today = date('Y-m-d');
@@ -183,6 +182,16 @@
         font-size: 15px !important;
     }
     
+    #searchInput {
+        max-width: 300px;
+        margin-bottom: 15px !important;
+        border: 2px solid #5D9C59;
+    }
+
+    #paginationControls button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
     </style>
 </head>
 
@@ -407,6 +416,7 @@
 
                 <!-- Schedule Table -->
                 <h3 class="header-title">View Schedule</h3>
+                <input type="text" id="searchInput" placeholder="Search by name, date, time, etc." class="form-control mb-3">
                 <table class="table table-bordered text-center">
                     <thead class="table-header">
                         <tr>
@@ -458,10 +468,76 @@
                         <?php } ?>
                     </tbody>
                 </table>
+                <div id="paginationControls" class="d-flex justify-content-center mt-3">
+                    <button id="prevPage" class="btn btn-primary me-2">Previous</button>
+                    <span id="pageNumber" class="align-self-center mx-2">Page 1</span>
+                    <button id="nextPage" class="btn btn-primary ms-2">Next</button>
+                </div>
             </div>
         </div>
     </div>
 
+    <script>
+        // Search and Pagination Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tableRows = Array.from(document.querySelectorAll('tbody tr'));
+            let currentPage = 1;
+            const rowsPerPage = 5;
+            let filteredRows = [...tableRows];
+
+            function updateTableDisplay() {
+                // Hide all rows
+                tableRows.forEach(row => row.style.display = 'none');
+                
+                // Show current page rows
+                const start = (currentPage - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                filteredRows.slice(start, end).forEach(row => {
+                    row.style.display = '';
+                });
+
+                // Update page info
+                const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+                document.getElementById('pageNumber').textContent = `Page ${currentPage} of ${totalPages}`;
+                
+                // Toggle button states
+                document.getElementById('prevPage').disabled = currentPage === 1;
+                document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
+            }
+
+            // Search input handler
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                filteredRows = tableRows.filter(row => {
+                    const cells = Array.from(row.cells).slice(0, -1); // Exclude Action column
+                    return cells.some(cell => 
+                        cell.textContent.toLowerCase().includes(searchTerm)
+                    );
+                });
+                currentPage = 1;
+                updateTableDisplay();
+            });
+
+            // Pagination controls
+            document.getElementById('prevPage').addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    updateTableDisplay();
+                }
+            });
+
+            document.getElementById('nextPage').addEventListener('click', () => {
+                const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    updateTableDisplay();
+                }
+            });
+
+            // Initial setup
+            updateTableDisplay();
+        });
+        </script>
     <!-- Edit Schedule Modal -->
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog">
