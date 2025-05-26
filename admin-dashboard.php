@@ -92,7 +92,8 @@
     <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="vendor/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="vendor/fontawesome-free/css/fontawesome.min.css">
-    <link rel="icon" href="img/rosariologo.png">
+    
+    <link rel="icon" type="image/png" href="img/rosariologo.png">
 
     <style>
     <?php include 'sidebarcss.php'; ?>
@@ -327,29 +328,27 @@
                                 <div class="card-header header-title">Upcoming Schedules</div>
                                 <div class="card-body">
                                     <ul class="list-unstyled">
-                                        <?php if (count($schedules) > 0): ?>
-                                            <?php foreach ($schedules as $row): ?>
-                                                <?php
-                                                    $dateFormatted = date('M d, Y', strtotime($row['date']));
-                                                    $status = strtolower($row['status']);
+                                        <?php
+                                        $hasUpcoming = false;
+                                        foreach ($schedules as $row):
+                                            if (strtolower($row['status']) !== 'upcoming') continue;
+                                            $hasUpcoming = true;
 
-                                                    // Badge color logic
-                                                    $statusClass = 'text-secondary';
-                                                    if ($status === 'ongoing') $statusClass = 'text-success';
-                                                    elseif ($status === 'upcoming') $statusClass = 'text-warning';
-                                                    elseif ($status === 'cancelled') $statusClass = 'text-danger';
-                                                ?>
-                                                <li class="mb-3 d-flex align-items-center justify-content-evenly upcom">
-                                                    <div class="">
-                                                        <div class="fw-semibold"><?= htmlspecialchars($row['name']) ?></div>
-                                                        <small class="text-muted"><?= $dateFormatted ?></small>
-                                                    </div>
-                                                    <div class="mt-1">
-                                                        <span class="<?= $statusClass ?> fw-semibold"><?= ucfirst($status) ?></span>
-                                                    </div>
-                                                </li>
-                                            <?php endforeach; ?>
-                                        <?php else: ?>
+                                            $dateFormatted = date('M d, Y', strtotime($row['date']));
+                                            $statusClass = 'text-warning'; // for 'upcoming'
+                                        ?>
+                                            <li class="mb-3 d-flex align-items-center justify-content-evenly upcom">
+                                                <div>
+                                                    <div class="fw-semibold"><?= htmlspecialchars($row['name']) ?></div>
+                                                    <small class="text-muted"><?= $dateFormatted ?></small>
+                                                </div>
+                                                <div class="mt-1">
+                                                    <span class="<?= $statusClass ?> fw-semibold">Upcoming</span>
+                                                </div>
+                                            </li>
+                                        <?php endforeach; ?>
+
+                                        <?php if (!$hasUpcoming): ?>
                                             <li>No upcoming schedules.</li>
                                         <?php endif; ?>
                                     </ul>
