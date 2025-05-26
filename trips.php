@@ -1,6 +1,7 @@
 <?php
     include "session.php";
     include("connection.php");
+    include("loader.php");
 
     date_default_timezone_set("Asia/Manila");
     $today = date('Y-m-d');
@@ -303,7 +304,7 @@
                             $date = $_POST['date'];
                             $time = $_POST['time'];
                             $num_bus = filter_var($_POST['num_bus'], FILTER_SANITIZE_NUMBER_INT); // Sanitize number of buses
-                            $status = "Upcoming"; 
+                            $status = "Upcoming";
                             
                             // Validate that all fields have data
                             if (empty($schoolname) || empty($date) || empty($time) || empty($num_bus)) {
@@ -319,7 +320,7 @@
                             }
                         
                             // Prepare SQL query for insertion
-                            $sql = "INSERT INTO `scheduled_tbl` (`name`, `date`, `time`, `num_bus`, `status`) VALUES (?, ?, ?, ?, ?)";
+                            $sql = "INSERT INTO `scheduled_tbl` (`name`, `date`, `time`, `num_bus`, `status`, `created_at`, `updated_at`) VALUES (?, ?, ?, ?, ?, NOW(), NOW())";
                             if ($stmt = $conn->prepare($sql)) {
                                 $stmt->bind_param("sssis", $schoolname, $date, $time, $num_bus, $status);
                         
@@ -368,7 +369,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label>Enter Number of Bus(es)</label>
-                                    <input type="number" name="num_bus" class="form-control" min="1" max="10" required>
+                                    <input type="number" name="num_bus" class="form-control" min="1" max="5" required>
                                 </div>
                             </div>
                             <button class="btn btn-primary mt-3" type="submit" name="create">Submit</button>
@@ -379,18 +380,18 @@
                     <div class="col-md-4">
                         <div class="border p-3">
                             <div class="calendar">
-                                <div class="legend mt-2 d-flex align-items-center" style="gap: 20px; flex-wrap: wrap;">
+                                <div class="legend mt-2 px-2 d-flex align-items-center justify-content-between" style="gap: 5px; flex-wrap: wrap;">
                                     <div class="d-flex align-items-center">
-                                        <span style="width: 15px; height: 15px; background-color: #273E26; border-radius: 50%; margin-right: 5px;"></span>
-                                        <span style="font-size: 15px;">Today</span>
+                                        <span style="width: 13px; height: 13px; background-color: #273E26; border-radius: 50%; margin-right: 5px;"></span>
+                                        <span style="font-size: 13px;">Today</span>
                                     </div>
                                     <div class="d-flex align-items-center">
-                                        <span style="width: 15px; height: 15px; background-color: #f0ad4e; border-radius: 50%; margin-right: 5px;"></span>
-                                        <span style="font-size: 15px;">Upcoming Trip</span>
+                                        <span style="width: 13px; height: 13px; background-color: #f0ad4e; border-radius: 50%; margin-right: 5px;"></span>
+                                        <span style="font-size: 13px;">Upcoming Trip</span>
                                     </div>
                                     <div class="d-flex align-items-center">
-                                        <span style="width: 15px; height: 15px; background-color: #5cb85c; border-radius: 50%; margin-right: 5px;"></span>
-                                        <span style="font-size: 15px;">Completed Trip</span>
+                                        <span style="width: 13px; height: 13px; background-color: #5cb85c; border-radius: 50%; margin-right: 5px;"></span>
+                                        <span style="font-size: 13px;">Completed Trip</span>
                                     </div>
                                 </div>
                                 <div class="header">
@@ -433,11 +434,12 @@
                     <tbody>
                         <?php 
                             $sql = "SELECT s.*, 
-                                            COALESCE(COUNT(st.student_id), 0) AS num_visitors
-                                    FROM scheduled_tbl s
-                                    LEFT JOIN student_tbl st ON s.scheduled_id = st.scheduled_id
-                                    GROUP BY s.scheduled_id
-                                    ORDER BY s.scheduled_id ASC";
+                                    COALESCE(COUNT(st.student_id), 0) AS num_visitors
+                            FROM scheduled_tbl s
+                            LEFT JOIN student_tbl st ON s.scheduled_id = st.scheduled_id
+                            WHERE s.status = 'Upcoming'
+                            GROUP BY s.scheduled_id
+                            ORDER BY s.updated_at DESC";
 
                             $stmt = $conn->prepare($sql);
                             $stmt->execute();
@@ -453,7 +455,18 @@
                             <td><?php echo $formattedTime ?></td>
                             <td><?php echo $row['num_bus'] ?></td>
                             <td><?php echo $row['num_visitors'] ?? 0 ?></td>
-                            <td><span class="badge bg-warning text-dark"><?php echo $row['status'] ?></span></td>
+                            <td>
+                                <?php 
+                                    $status = $row['status'];
+                                    $badgeClass = match ($status) {
+                                        'Cancelled' => 'bg-danger',
+                                        'Completed' => 'bg-success',
+                                        'Upcoming' => 'bg-warning text-dark',
+                                        default     => 'bg-secondary'
+                                    };
+                                ?>
+                                <span class="badge <?php echo $badgeClass; ?>"><?php echo $status; ?></span>
+                            </td>
                             <td>
                                 <button class="btn btn-success btn-sm approve-btn" data-id="<?php echo $row['scheduled_id']; ?>">
                                     <i class="fa-solid fa-check"></i>
@@ -539,6 +552,7 @@
             updateTableDisplay();
         });
         </script>
+
     <!-- Edit Schedule Modal -->
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -598,16 +612,23 @@
         // Disable specific dates based on the database data
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('date').setAttribute('min', '<?php echo $today; ?>');
+            document.getElementById('editDate').setAttribute('min', '<?php echo $today; ?>');
             const blockedDates = <?php echo json_encode($blocked_dates); ?>;
             
             const dateInput = document.getElementById('date');
+            const editDateInput = document.getElementById('editDate');
             
             function disableBlockedDates() {
                 const blockedSet = new Set(blockedDates); // Create a Set for faster lookup
                 const date = dateInput.value; // Get the currently selected date
+                const editDate = editDateInput.value; // Get the currently selected date
                 
                 // Check if the selected date is blocked
                 if (blockedSet.has(date)) {
+                    alert("This date is already booked. Please choose another date.");
+                    dateInput.value = ''; // Reset the date input if blocked
+                }
+                if (blockedSet.has(editDate)) {
                     alert("This date is already booked. Please choose another date.");
                     dateInput.value = ''; // Reset the date input if blocked
                 }
@@ -757,7 +778,7 @@
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     let id = this.dataset.id;
-                    if(confirm("Are you sure you want to delete this schedule?")) {
+                    if(confirm("Are you sure you want to cancel this schedule?")) {
                         window.location.href = 'deleteSchedule.php?id=' + id;
                     }
                 });

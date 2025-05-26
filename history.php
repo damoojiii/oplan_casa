@@ -1,6 +1,7 @@
 <?php
     include "session.php";
     include("connection.php");
+    include "loader.php";
 ?>
 
 <!DOCTYPE html>
@@ -17,7 +18,9 @@
     
     <style>
         <?php include 'sidebarcss.php'; ?>
-
+        .header-title{
+            font-weight: bolder;
+        }
         .table {
             margin-top: 30px !important;
         }
@@ -148,183 +151,64 @@
     </div>
 
     <div id="main-content" class="container">
-        <!-- Filtering Section -->
-        <div class="row mb-3">
-            <div class="col-md-3">
-                <label for="yearFilter" class="form-label">Filter by Year:</label>
-                <select id="yearFilter" class="form-select">
-                    <option value="">All Years</option>
-                    <?php
-                        $yearQuery = "SELECT DISTINCT YEAR(time) AS year FROM visitors ORDER BY year DESC";
-                        $yearResult = $conn->query($yearQuery);
-                        while ($yearRow = $yearResult->fetch_assoc()) {
-                            echo "<option value='" . htmlspecialchars($yearRow['year'], ENT_QUOTES, 'UTF-8') . "'>" . htmlspecialchars($yearRow['year'], ENT_QUOTES, 'UTF-8') . "</option>";
-                        }
-                    ?>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label for="monthFilter" class="form-label">Filter by Month:</label>
-                <select id="monthFilter" class="form-select">
-                    <option value="">All Months</option>
-                    <option value="01">January</option>
-                    <option value="02">February</option>
-                    <option value="03">March</option>
-                    <option value="04">April</option>
-                    <option value="05">May</option>
-                    <option value="06">June</option>
-                    <option value="07">July</option>
-                    <option value="08">August</option>
-                    <option value="09">September</option>
-                    <option value="10">October</option>
-                    <option value="11">November</option>
-                    <option value="12">December</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label for="cityFilter" class="form-label">Filter by City:</label>
-                <select id="cityFilter" class="form-select">
-                    <option value="">All Cities</option>
-                    <?php
-                        $cityQuery = "SELECT DISTINCT city FROM visitors ORDER BY city ASC";
-                        $cityResult = $conn->query($cityQuery);
-                        while ($cityRow = $cityResult->fetch_assoc()) {
-                            echo "<option value='" . htmlspecialchars($cityRow['city'], ENT_QUOTES, 'UTF-8') . "'>" . htmlspecialchars($cityRow['city'], ENT_QUOTES, 'UTF-8') . "</option>";
-                        }
-                    ?>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label for="purposeFilter" class="form-label">Filter by Purpose:</label>
-                <select id="purposeFilter" class="form-select">
-                    <option value="">All Purposes</option>
-                    <?php
-                        $purposeQuery = "SELECT DISTINCT reason FROM visitors ORDER BY reason ASC";
-                        $purposeResult = $conn->query($purposeQuery);
-                        while ($purposeRow = $purposeResult->fetch_assoc()) {
-                            echo "<option value='" . htmlspecialchars($purposeRow['reason'], ENT_QUOTES, 'UTF-8') . "'>" . htmlspecialchars($purposeRow['reason'], ENT_QUOTES, 'UTF-8') . "</option>";
-                        }
-                    ?>
-                </select>
-            </div>
-        </div>
-
+        <h3 class="header-title">Field Trip History</h3>
         <!-- Table Section -->
         <div id="table-container" class="container-fluid">
-            <table id="visitorTable" class="table table-bordered text-center">
-                <thead class="bg-dark text-white">
+            <table class="table table-bordered text-center" id="historyTable">
+                <thead class="table-header">
                     <tr>
-                        <th>Visitor No.</th>
-                        <th>Visitor Name</th>
-                        <th>City</th>
-                        <th>Gender</th>
-                        <th>Purpose for Visit</th>
+                        <th>School/Company Name</th>
                         <th>Date</th>
                         <th>Time</th>
+                        <th>No. of Bus(es)</th>
+                        <th>No. of Visitors</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php
-                        $sql = "SELECT visitor_id, fullName, city, gender, reason, time, photo FROM visitors ORDER BY visitor_id DESC";
+                    <?php 
+                        $sql = "SELECT s.*, 
+                                (
+                                    SELECT COUNT(*) FROM student_tbl st WHERE st.scheduled_id = s.scheduled_id
+                                ) +
+                                (
+                                    SELECT COUNT(*) FROM supervisor_tbl sv WHERE sv.scheduled_id = s.scheduled_id
+                                ) AS num_visitors
+                                FROM scheduled_tbl s
+                                LEFT JOIN student_tbl st ON s.scheduled_id = st.scheduled_id
+                                GROUP BY s.scheduled_id
+                                ORDER BY s.updated_at DESC";
 
                         $stmt = $conn->prepare($sql);
                         $stmt->execute();
                         $result = $stmt->get_result();
 
-                        while ($row = $result->fetch_assoc()) {
-                            $formattedDate = date("F j, Y", strtotime($row['time']));
+                        while($row = $result->fetch_assoc()){
+                            $formattedDate = date("F j, Y", strtotime($row['date']));
                             $formattedTime = date("h:i A", strtotime($row['time']));
-                            $month = date("m", strtotime($row['time']));
-
-                            echo "<tr data-month='$month' data-city='" . htmlspecialchars($row['city'], ENT_QUOTES, 'UTF-8') . "' data-reason='" . htmlspecialchars($row['reason'], ENT_QUOTES, 'UTF-8') . "'>
-                                <td>{$row['visitor_id']}</td>
-                                <td>" . ucwords(strtolower($row['fullName'])) . "</td>
-                                <td>{$row['city']}</td>
-                                <td>{$row['gender']}</td>
-                                <td>{$row['reason']}</td>
-                                <td>{$formattedDate}</td>
-                                <td>{$formattedTime}</td>
-                            </tr>";
-                        }
                     ?>
+                    <tr onclick="window.location.href='view-trip.php?id=<?php echo $row['scheduled_id']; ?>'" style="cursor: pointer;">
+                        <td><?php echo $row['name'] ?></td>
+                        <td><?php echo $formattedDate ?></td>
+                        <td><?php echo $formattedTime ?></td>
+                        <td><?php echo $row['num_bus'] ?></td>
+                        <td><?php echo $row['num_visitors'] ?? 0 ?></td>
+                        <td>
+                            <?php 
+                                $status = $row['status'];
+                                $badgeClass = match ($status) {
+                                    'Cancelled' => 'bg-danger',
+                                    'Completed' => 'bg-success',
+                                    'Upcoming' => 'bg-warning text-dark',
+                                    default     => 'bg-secondary'
+                                };
+                            ?>
+                            <span class="badge <?php echo $badgeClass; ?>"><?php echo $status; ?></span>
+                        </td>
+                    </tr>
+                    <?php } ?>
                 </tbody>
             </table>
-        </div>
-
-        <!-- View Visitor Modal -->
-        <div class="modal fade" id="viewVisitorModal" tabindex="-1" aria-labelledby="viewVisitorModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content" style="margin-left: auto; margin-right: auto;">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="viewVisitorModalLabel">Visitor Profile</h5>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row text-center">
-                            <!-- Centered Image above information -->
-                            <div class="col-12 mb-3">
-                                <img id="visitorPhoto" src="uploads/default.jpg" alt="Visitor Photo" class="img-fluid" style="width: 150px; height: 150px; border-radius: 10px; border: 2px solid #ddd;">
-                            </div>
-                            <div class="col-12">
-                                <p><strong>Full Name:</strong> <span id="viewFullName"></span></p>
-                                <p><strong>City:</strong> <span id="viewCity"></span></p>
-                                <p><strong>Gender:</strong> <span id="viewGender"></span></p>
-                                <p><strong>Purpose for Visit:</strong> <span id="viewReason"></span></p>
-                                <p><strong>Time:</strong> <span id="viewTime"></span></p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer" style="margin-left: auto; margin-right: auto;">
-                        <!-- Button to generate certificate, with data-visitor-id -->
-                        <button type="button" class="btn btn-secondary" id="generateCertificateBtn" data-visitor-id="">Certificate</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <!-- Edit Visitor Modal -->
-        <div class="modal fade" id="editVisitorModal" tabindex="-1" aria-labelledby="editVisitorModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editVisitorModalLabel">Edit Visitor</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="editVisitorForm">
-                            <input type="hidden" id="editVisitorId" name="visitor_id">
-                            <div class="form-group">
-                                <label for="editFullName">Full Name</label>
-                                <input type="text" class="form-control" id="editFullName" name="fullName" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="editCity">City</label>
-                                <select class="form-control" id="editCity" name="city" required>
-                                    <option value="">Select City</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="editGender">Gender</label>
-                                <select class="form-control" id="editGender" name="gender">
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="editReason">Reason</label>
-                                <input type="text" class="form-control" id="editReason" name="reason" required>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">Update</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -336,7 +220,7 @@
     <script>
         $(document).ready(function () {
             setTimeout(function () {
-                let table = $('#visitorTable').DataTable({
+                let table = $('#historyTable').DataTable({
                     "paging": true,
                     "searching": true, // Keep DataTables' built-in search
                     "lengthChange": false,

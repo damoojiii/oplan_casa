@@ -187,13 +187,13 @@
         <!-- Tabs Navigation -->
         <ul class="nav nav-tabs" id="scheduleTabs">
             <li class="nav-item tabs">
-                <a class="nav-link" id="tab1" data-bs-toggle="tab" href="trips.php">Scheduled Trips</a>
+                <a class="nav-link" href="trips.php">Scheduled Trips</a>
             </li>
             <li class="nav-item tabs">
-                <a class="nav-link" id="tab2" data-bs-toggle="tab" href="add-visitor.php">Add Visitor</a>
+                <a class="nav-link" href="add-visitor.php">Add Visitor</a>
             </li>
             <li class="nav-item tabs">
-                <a class="nav-link active" id="tab3" data-bs-toggle="tab" href="trip-info.php">Trip Info</a>
+                <a class="nav-link active" href="trip-info.php">Trip Info</a>
             </li>
         </ul>
 

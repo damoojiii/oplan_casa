@@ -269,6 +269,7 @@
                                         data-city='" . htmlspecialchars($row['city'], ENT_QUOTES, 'UTF-8') . "' 
                                         data-gender='{$row['gender']}' 
                                         data-reason='" . htmlspecialchars($row['reason'], ENT_QUOTES, 'UTF-8') . "' 
+                                        data-date='{$formattedDate}' 
                                         data-time='{$formattedTime}' 
                                         data-photo='" . (!empty($row['photo']) ? $row['photo'] : 'default.jpg') . "' 
                                         data-bs-toggle='modal' 
@@ -443,6 +444,7 @@
             var city = $(this).data("city");
             var gender = $(this).data("gender");
             var reason = $(this).data("reason");
+            var date = $(this).data("date");
             var time = $(this).data("time");
             var photo = $(this).data("photo");
 
@@ -468,12 +470,14 @@
 
             $("#generateCertificateBtn").attr("data-visitor-id", id);
             $("#generateCertificateBtn").attr("data-visitor-name", name);
+            $("#generateCertificateBtn").attr("data-visitor-date", date);
 
             $("#viewVisitorModal").modal("show");
         });
 
         $("#generateCertificateBtn").click(function () {
             var visitorName = $(this).attr("data-visitor-name");
+            var rawDate = $(this).attr("data-visitor-date");
 
             if (!visitorName) {
                 alert("Visitor name is missing!");
@@ -486,17 +490,20 @@
             // HTML content for the certificate
             printWindow.document.write('<html><head><title>Visitor Certificate</title>');
             printWindow.document.write('<style>');
+            printWindow.document.write('@font-face { font-family: "Nova"; src: url("fonts/Nova/Arial-Nova.ttf") format("truetype"); }');
             printWindow.document.write('@page { size: A4 landscape; margin: 0; }'); 
             printWindow.document.write('body { margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }');
             printWindow.document.write('.certificate { position: relative; width: 100%; height: 100vh; overflow: hidden; }');
             printWindow.document.write('img { width: 100%; height: 100vh; object-fit: cover; }');
-            printWindow.document.write('.name { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 70px; font-weight: bold; white-space: nowrap; }'); // Name position
+            printWindow.document.write('.name { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 70px; font-weight: bold; white-space: nowrap; }');
+            printWindow.document.write('.date { position: absolute; top: 69%; left: 50%; transform: translateX(-50%); font-size: 25px; font-family: Nova; font-weight: normal; }');
             printWindow.document.write('</style></head><body>');
 
             // Certificate layout
             printWindow.document.write('<div class="certificate">');
-            printWindow.document.write('<img src="img/cert.png" alt="Certificate Background">');
+            printWindow.document.write('<img src="img/certificate.png" alt="Certificate Background">');
             printWindow.document.write('<div class="name">' + visitorName + '</div>');
+            printWindow.document.write('<div class="date">' + rawDate + '</div>');
             printWindow.document.write('</div>');
 
             printWindow.document.write('</body></html>');
