@@ -298,7 +298,46 @@
             </div>
         </div>
 
-
+        <div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editStudentModalLabel">Edit Visitor</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editStudentForm">
+                            <input type="hidden" id="editStudentId" name="student_id">
+                            <div class="form-group">
+                                <label for="editFirstName">First Name</label>
+                                <input type="text" class="form-control" id="editFirstName" name="firstname" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editLastName">Last Name</label>
+                                <input type="text" class="form-control" id="editLastName" name="lastname" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editGradeLevel">Grade Level</label>
+                                <select class="form-control" id="editGradeLevel" name="grade_name" required>
+                                    <option value="">Select City</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="editGuardian">Guardian</label>
+                                <input type="text" class="form-control" id="editGuardian" name="guardian" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editContact">Contact</label>
+                                <input type="tel" class="form-control" id="editContact" name="contact" required>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
         
     </div>
     
