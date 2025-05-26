@@ -245,7 +245,15 @@
                                         <td><?= $row['contact'] ?></td>
                                         <td class="d-flex justify-content-evenly">
                                             <a href="#" class="btn btn-info btn-sm"><i class='fa-solid fa-print'></i></a>
-                                            <a href="#" class="btn btn-warning btn-sm"><i class='fa-solid fa-pen-to-square'></i></a>
+                                            <a href="#" class="btn btn-warning btn-sm edit-btn" data-bs-toggle='modal' 
+                                            data-bs-target='#editStudentModal'
+                                            data-studentid='<?= htmlspecialchars($row['student_id'], ENT_QUOTES, 'UTF-8') ?>'
+                                            data-firstname='<?= htmlspecialchars($row['firstname'], ENT_QUOTES, 'UTF-8') ?>'
+                                            data-lastname='<?= htmlspecialchars($row['lastname'], ENT_QUOTES, 'UTF-8') ?>'
+                                            data-grade='<?= htmlspecialchars($row['grade_level'], ENT_QUOTES, 'UTF-8') ?>'
+                                            data-guardian='<?= htmlspecialchars($row['guardian'], ENT_QUOTES, 'UTF-8') ?>'
+                                            data-contact='<?= htmlspecialchars($row['contact']) ?>'
+                                            ><i class='fa-solid fa-pen-to-square'></i></a>
                                             <a href="deleteStudent.php?id=<?php echo $row['student_id']; ?>&scheduled_id=<?php echo $scheduled_id; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this student?')"><i class='fa-solid fa-trash'></i></a>
                                         </td>
                                     </tr>
@@ -284,7 +292,16 @@
                                         <td><?= $row['gender'] ?></td>
                                         <td class="d-flex justify-content-evenly">
                                             <a href="#" class="btn btn-info btn-sm"><i class='fa-solid fa-print'></i></a>
-                                            <a href="#" class="btn btn-warning btn-sm"><i class='fa-solid fa-pen-to-square'></i></a>
+                                            <a href="#" class="btn btn-warning btn-sm edit-btn1"
+                                            data-bs-toggle='modal' 
+                                            data-bs-target='#editSuperVisorModal'
+                                            data-supervisorid='<?= htmlspecialchars($row['supervisor_id'], ENT_QUOTES, 'UTF-8') ?>'
+                                            data-firstname='<?= htmlspecialchars($row['firstname'], ENT_QUOTES, 'UTF-8') ?>'
+                                            data-lastname='<?= htmlspecialchars($row['lastname'], ENT_QUOTES, 'UTF-8') ?>'
+                                            data-position='<?= htmlspecialchars($row['position'], ENT_QUOTES, 'UTF-8') ?>'
+                                            data-contact='<?= htmlspecialchars($row['contact'], ENT_QUOTES, 'UTF-8') ?>'
+                                            data-gender='<?= htmlspecialchars($row['gender']) ?>' 
+                                            ><i class='fa-solid fa-pen-to-square'></i></a>
                                             <a href="deleteSupervisor.php?id=<?php echo $row['supervisor_id']; ?>&scheduled_id=<?php echo $scheduled_id; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this supervisor?')"><i class='fa-solid fa-trash'></i></a>
                                         </td>
                                     </tr>
@@ -302,7 +319,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editStudentModalLabel">Edit Visitor</h5>
+                        <h5 class="modal-title" id="editStudentModalLabel">Edit Student</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -319,7 +336,7 @@
                             <div class="form-group">
                                 <label for="editGradeLevel">Grade Level</label>
                                 <select class="form-control" id="editGradeLevel" name="grade_name" required>
-                                    <option value="">Select City</option>
+                                    <option value="" selected hidden>Select City</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -338,6 +355,49 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="editSuperVisorModal" tabindex="-1" aria-labelledby="editSuperVisorModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editSuperVisorModalLabel">Edit Supervisor</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editSuperVisorForm">
+                            <input type="hidden" id="editSuperVisorId" name="supervisor_id">
+                            <div class="form-group">
+                                <label for="editFirstName1">First Name</label>
+                                <input type="text" class="form-control" id="editFirstName1" name="firstname" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editLastName1">Last Name</label>
+                                <input type="text" class="form-control" id="editLastName1" name="lastname" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editPosition1">Position</label>
+                                <input type="text" class="form-control" id="editPosition1" name="position" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editContact1">Contact</label>
+                                <input type="tel" class="form-control" id="editContact1" name="contact" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editGender1">Gender</label>
+                                <select class="form-control" id="editGender1" name="gender" required>
+                                    <option value="" selected hidden>Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
         
     </div>
     
@@ -347,6 +407,115 @@
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script>
+
+        $(document).ready(function () {
+            function gradeLevel() {
+                $.ajax({
+                    url: "fetch_grade.php", 
+                    type: "GET",
+                    dataType: "json",
+                    success: function (data) {
+                        var gradeSelect = $("#editGradeLevel");
+                        gradeSelect.empty(); // Clear existing options
+                        gradeSelect.append('<option value="">Select Grade Level</option>'); // Default option
+                        
+                        data.forEach(grade => {
+                            gradeSelect.append(`<option value="${grade.grade_name}">${grade.grade_name}</option>`);
+                        });
+                    },
+                    error: function () {
+                        console.error("Error fetching grades.");
+                    }
+                });
+            }
+            
+            $(".edit-btn").click(function () {
+                var id = $(this).data("studentid");
+                var firstname = $(this).data("firstname");
+                var lastname = $(this).data("lastname");
+                var grade = $(this).data("grade");
+                var guardian = $(this).data("guardian");
+                var contact = $(this).data("contact");
+
+                $("#editStudentId").val(id);
+                $("#editFirstName").val(firstname);
+                $("#editLastName").val(lastname);
+                $("#editGradeLevel").val(grade);
+                $("#editGuardian").val(guardian);
+                $("#editContact").val(contact);
+
+                gradeLevel();
+                
+                setTimeout(() => {
+                    $("#editGradeLevel").val(grade); 
+                }, 500);
+
+                $("#editStudentModal").modal("show");
+            });
+
+            $("#editStudentForm").submit(function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: 'update_student.php',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            alert(response.message);
+                            location.reload(); // or refresh just the table list
+                        } else {
+                            alert("Error: " + response.message);
+                        }
+                    },
+                    error: function () {
+                        alert("An error occurred while updating.");
+                    }
+                });
+            });
+
+            $(".edit-btn1").click(function () {
+                var id = $(this).data("supervisorid");
+                var firstname = $(this).data("firstname");
+                var lastname = $(this).data("lastname");
+                var position = $(this).data("position");
+                var contact = $(this).data("contact");
+                var gender = $(this).data("gender");
+
+                $("#editSuperVisorId").val(id);
+                $("#editFirstName1").val(firstname);
+                $("#editLastName1").val(lastname);
+                $("#editPosition1").val(position);
+                $("#editContact1").val(contact);
+                $("#editGender1").val(gender);
+
+
+                $("#editSuperVisorModal").modal("show");
+            });
+
+            $("#editSuperVisorForm").submit(function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: 'update_supervisor.php',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            alert(response.message);
+                            location.reload(); // or refresh only the supervisor table
+                        } else {
+                            alert("Error: " + response.message);
+                        }
+                    },
+                    error: function () {
+                        alert("An error occurred while updating.");
+                    }
+                });
+            });
+        });
         
     </script>
 </body>
