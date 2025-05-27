@@ -28,6 +28,8 @@
     <link rel="stylesheet" href="vendor/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="vendor/fontawesome-free/css/fontawesome.min.css">
     <link rel="icon" href="img/rosariologo.png">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
 
     <style>
     <?php include 'sidebarcss.php'; ?>
@@ -107,6 +109,16 @@
     .upcoming { background-color: #ffc107; color: #000; }
     .ongoing { background-color: #28a745; color: #fff; }
     .completed { background-color: #6c757d; color: #fff; }
+
+    .search-box {
+        border: 2px solid #5D9C59;
+        width: 300px;
+    }
+
+    .search-box:focus {
+        border: 2px solid green;
+        box-shadow: 0 0 10px green;
+    }
     
     </style>
 </head>
@@ -220,9 +232,16 @@
                 <!-- Students Tab -->
                 <div class="tab-pane fade show active" id="students" role="tabpanel">
                     <h4 class="text-center">Students List</h4>
-                    <a href="export_students_pdf.php?id=<?php echo $scheduled_id?>" class="btn btn-danger mb-3"><i class="fa fa-file-pdf"></i> Export to PDF</a>
+                    <div class="d-flex justify-content-between mb-3">
+                        <a href="export_students_pdf.php?id=<?php echo $scheduled_id?>" class="btn btn-danger">
+                            <i class="fa fa-file-pdf"></i> Export to PDF
+                        </a>
+                        
+                        <input type="text" id="customSearchBox" class="form-control search-box" placeholder="Search students">
+                    </div>
                     <?php if ($student_result->num_rows > 0): ?>
-                        <table class="table table-bordered">
+                        
+                        <table id="studentTable" class="table table-bordered text-center">
                             <thead class="table-dark">
                                 <tr>
                                     <th>ID</th>
@@ -269,7 +288,8 @@
                 <div class="tab-pane fade" id="supervisors" role="tabpanel">
                     <h4 class="text-center">Supervisors List</h4>
                     <?php if ($supervisor_result->num_rows > 0): ?>
-                        <table class="table table-bordered">
+                        <input type="text" id="customSearchBoxSupervisor" class="form-control search-box" placeholder="Search students" style="margin-bottom: 16px;">
+                        <table id="supervisorTable" class="table table-bordered text-center">
                             <thead class="table-secondary">
                                 <tr>
                                     <th>ID</th>
@@ -406,7 +426,57 @@
     <script src="vendor/fontawesome-free/js/fontawesome.min.js"></script>
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+
     <script>
+
+        $(document).ready(function() {
+            // Initialize the DataTable and store it in a variable
+            var studentTable = $('#studentTable').DataTable({
+                "paging": true, 
+                "ordering": true, 
+                "info": false, 
+                "lengthChange": false,  
+                "searching": true, 
+                "pageLength": 10,
+                "language": {
+                    "paginate": {
+                        "previous": "<i class='fas fa-chevron-left'></i>",
+                        "next": "<i class='fas fa-chevron-right'></i>"
+                    }
+                },
+                dom: 'rt<"bottom"p><"clear">'
+            });
+
+            // Initialize the Supervisor Table
+            var supervisorTable = $('#supervisorTable').DataTable({
+                "paging": true, 
+                "ordering": true, 
+                "info": false, 
+                "lengthChange": false,  
+                "searching": true, 
+                "pageLength": 10,
+                "language": {
+                    "paginate": {
+                        "previous": "<i class='fas fa-chevron-left'></i>",
+                        "next": "<i class='fas fa-chevron-right'></i>"
+                    }
+                },
+                dom: 'rt<"bottom"p><"clear">'
+            });
+
+            // Custom search for the Student Table
+            $('#customSearchBox').on('keyup', function() {
+                studentTable.search(this.value).draw();  // Trigger the DataTable search and redraw for student table
+            });
+
+            // Custom search for the Supervisor Table (if needed)
+            $('#customSearchBoxSupervisor').on('keyup', function() {
+                supervisorTable.search(this.value).draw();  // Trigger the DataTable search and redraw for supervisor table
+            });
+        });
 
         $(document).ready(function () {
             function gradeLevel() {

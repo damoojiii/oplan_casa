@@ -120,6 +120,16 @@ if (isset($_GET['id'])) {
             --bs-btn-border-color: #5D9C59 !important;
             --bs-btn-hover-bg: #5D9C59 !important;
         }
+
+        .search-box {
+            border: 2px solid #5D9C59;
+            width: 300px;
+        }
+
+        .search-box:focus {
+            border: 2px solid green;
+            box-shadow: 0 0 10px green;
+        }
     </style>
 </head>
 <body>
@@ -223,9 +233,15 @@ if (isset($_GET['id'])) {
                 <!-- Students Tab -->
                 <div class="tab-pane fade show active" id="students" role="tabpanel">
                     <h4 class="text-center"><?php echo htmlspecialchars($school_name); ?>'s Students List</h4>
-                    <a href="export_students_pdf.php?id=<?php echo $id?>" class="btn btn-danger"><i class="fa fa-file-pdf"></i> Export to PDF</a>
+                    <div class="d-flex justify-content-between mb-3">
+                        <a href="export_students_pdf.php?id=<?php echo $scheduled_id?>" class="btn btn-danger">
+                            <i class="fa fa-file-pdf"></i> Export to PDF
+                        </a>
+                        
+                        <input type="text" id="customSearchBox" class="form-control search-box" placeholder="Search students">
+                    </div>
                     <?php if ($student_result->num_rows > 0): ?>
-                        <table class="table table-bordered">
+                        <table id="studentTable" class="table text-center table-bordered">
                             <thead class="table-dark">
                                 <tr>
                                     <th>ID</th>
@@ -257,8 +273,9 @@ if (isset($_GET['id'])) {
                 <!-- Supervisors Tab -->
                 <div class="tab-pane fade" id="supervisors" role="tabpanel">
                     <h4 class="text-center"><?php echo htmlspecialchars($school_name); ?>'s Supervisors List</h4>
+                    <input type="text" id="customSearchBoxSupervisor" class="form-control search-box" placeholder="Search students" style="margin-bottom: 16px;">
                     <?php if ($supervisor_result->num_rows > 0): ?>
-                        <table class="table table-bordered">
+                        <table id="supervisorTable" class="table text-center table-bordered">
                             <thead class="table-secondary">
                                 <tr>
                                     <th>ID</th>
@@ -296,7 +313,51 @@ if (isset($_GET['id'])) {
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
-        
+        $(document).ready(function() {
+            // Initialize the DataTable and store it in a variable
+            var studentTable = $('#studentTable').DataTable({
+                "paging": true, 
+                "ordering": true, 
+                "info": false, 
+                "lengthChange": false,  
+                "searching": true, 
+                "pageLength": 10,
+                "language": {
+                    "paginate": {
+                        "previous": "<i class='fas fa-chevron-left'></i>",
+                        "next": "<i class='fas fa-chevron-right'></i>"
+                    }
+                },
+                dom: 'rt<"bottom"p><"clear">'
+            });
+
+            // Initialize the Supervisor Table
+            var supervisorTable = $('#supervisorTable').DataTable({
+                "paging": true, 
+                "ordering": true, 
+                "info": false, 
+                "lengthChange": false,  
+                "searching": true, 
+                "pageLength": 10,
+                "language": {
+                    "paginate": {
+                        "previous": "<i class='fas fa-chevron-left'></i>",
+                        "next": "<i class='fas fa-chevron-right'></i>"
+                    }
+                },
+                dom: 'rt<"bottom"p><"clear">'
+            });
+
+            // Custom search for the Student Table
+            $('#customSearchBox').on('keyup', function() {
+                studentTable.search(this.value).draw();  // Trigger the DataTable search and redraw for student table
+            });
+
+            // Custom search for the Supervisor Table (if needed)
+            $('#customSearchBoxSupervisor').on('keyup', function() {
+                supervisorTable.search(this.value).draw();  // Trigger the DataTable search and redraw for supervisor table
+            });
+        });
     </script>
 </body>
 </html>

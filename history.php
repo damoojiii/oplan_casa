@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="vendor/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="vendor/fontawesome-free/css/fontawesome.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
     <link rel="icon" href="img/rosariologo.png">
     
     <style>
@@ -70,6 +71,16 @@
             --bs-btn-bg: #5D9C59 !important;
             --bs-btn-border-color: #5D9C59 !important;
             --bs-btn-hover-bg: #5D9C59 !important;
+        }
+
+        .search-box {
+            border: 2px solid #5D9C59;
+            width: 300px;
+        }
+
+        .search-box:focus {
+            border: 2px solid green;
+            box-shadow: 0 0 10px green;
         }
     </style>
 </head>
@@ -160,7 +171,8 @@
         <h3 class="header-title">Field Trip History</h3>
         <!-- Table Section -->
         <div id="table-container" class="container-fluid">
-            <table class="table table-bordered table-hover text-center" id="historyTable">
+            <input type="text" id="customSearchBox" class="form-control mb-3 search-box" placeholder="Search visitors...">
+            <table id="historyTable" class="table table-bordered table-hover text-center">
                 <thead class="table-header">
                     <tr>
                         <th>School/Company Name</th>
@@ -223,50 +235,34 @@
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
     <script>
-        $(document).ready(function () {
-            setTimeout(function () {
-                let table = $('#historyTable').DataTable({
-                    "paging": true,
-                    "searching": true, // Keep DataTables' built-in search
-                    "lengthChange": false,
-                    "pageLength": 10,
-                    "ordering": false, // Allow sorting
-                    "info": false,
-                    "language": {
-                        "paginate": {
-                            "previous": "<i class='fas fa-chevron-left'></i>",
-                            "next": "<i class='fas fa-chevron-right'></i>"
-                        }
-                    },
-                    "dom": '<"top"f>rt<"bottom"p><"clear">'
-                });
+        $(document).ready(function() {
+            // Initialize the DataTable and store it in a variable
+            var table = $('#historyTable').DataTable({
+                "paging": true, 
+                "ordering": true, 
+                "info": false, 
+                "lengthChange": false,  
+                "searching": true, 
+                "pageLength": 10,
+                "language": {
+                    "paginate": {
+                        "previous": "<i class='fas fa-chevron-left'></i>",
+                        "next": "<i class='fas fa-chevron-right'></i>"
+                    }
+                },
+                dom: 'rt<"bottom"p><"clear">'
+            });
 
-                // Custom filtering function
-                $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-                    let row = table.row(dataIndex).node(); // Get the actual row element
-                    let selectedMonth = $("#monthFilter").val();
-                    let selectedCity = $.trim($("#cityFilter").val().toLowerCase());
-                    let selectedPurpose = $.trim($("#purposeFilter").val().toLowerCase());
-
-                    let rowMonth = $(row).attr("data-month") || "";
-                    let rowCity = ($(row).attr("data-city") || "").toLowerCase().trim();
-                    let rowPurpose = ($(row).attr("data-reason") || "").toLowerCase().trim();
-
-                    let monthMatch = selectedMonth === "" || rowMonth === selectedMonth;
-                    let cityMatch = selectedCity === "" || rowCity.includes(selectedCity);
-                    let purposeMatch = selectedPurpose === "" || rowPurpose.includes(selectedPurpose);
-
-                    return monthMatch && cityMatch && purposeMatch;
-                });
-
-                // Apply filter on change
-                $("#monthFilter, #cityFilter, #purposeFilter").on("change", function () {
-                    table.draw(); // Redraw table with filters applied
-                });
-
-            }, 500);
+            // Custom search for the DataTable
+            $('#customSearchBox').on('keyup', function () {
+                table.search(this.value).draw();  // Trigger the DataTable search and redraw
+            });
         });
+
+        
 
         $(".view-btn").click(function () {
             var id = $(this).data("id");

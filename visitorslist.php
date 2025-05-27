@@ -80,8 +80,22 @@
         }
 
         .search-box {
-            border: 1px solid #5D9C59;
-            width: 500px;
+            border: 2px solid #5D9C59;
+            width: 272.55px;
+        }
+
+        .search-box:focus {
+            border: 2px solid green;
+            box-shadow: 0 0 10px green;
+        }
+
+        .filters {
+            border: 2px solid #5D9C59;
+        }
+
+        .filters:focus {
+            border: 2px solid green;
+            box-shadow: 0 0 10px green;
         }
     </style>
 </head>
@@ -169,69 +183,69 @@
     </div>
 
     <div id="main-content" class="container">
-        <!-- Filtering Section -->
-        <div class="row mb-3">
-            <div class="col-md-3">
-                <label for="yearFilter" class="form-label">Filter by Year:</label>
-                <select id="yearFilter" class="form-select">
-                    <option value="">All Years</option>
-                    <?php
-                        $yearQuery = "SELECT DISTINCT YEAR(time) AS year FROM visitors ORDER BY year DESC";
-                        $yearResult = $conn->query($yearQuery);
-                        while ($yearRow = $yearResult->fetch_assoc()) {
-                            echo "<option value='" . htmlspecialchars($yearRow['year'], ENT_QUOTES, 'UTF-8') . "'>" . htmlspecialchars($yearRow['year'], ENT_QUOTES, 'UTF-8') . "</option>";
-                        }
-                    ?>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label for="monthFilter" class="form-label">Filter by Month:</label>
-                <select id="monthFilter" class="form-select">
-                    <option value="">All Months</option>
-                    <option value="01">January</option>
-                    <option value="02">February</option>
-                    <option value="03">March</option>
-                    <option value="04">April</option>
-                    <option value="05">May</option>
-                    <option value="06">June</option>
-                    <option value="07">July</option>
-                    <option value="08">August</option>
-                    <option value="09">September</option>
-                    <option value="10">October</option>
-                    <option value="11">November</option>
-                    <option value="12">December</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label for="cityFilter" class="form-label">Filter by City:</label>
-                <select id="cityFilter" class="form-select">
-                    <option value="">All Cities</option>
-                    <?php
-                        $cityQuery = "SELECT DISTINCT city FROM visitors ORDER BY city ASC";
-                        $cityResult = $conn->query($cityQuery);
-                        while ($cityRow = $cityResult->fetch_assoc()) {
-                            echo "<option value='" . htmlspecialchars($cityRow['city'], ENT_QUOTES, 'UTF-8') . "'>" . htmlspecialchars($cityRow['city'], ENT_QUOTES, 'UTF-8') . "</option>";
-                        }
-                    ?>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label for="purposeFilter" class="form-label">Filter by Purpose:</label>
-                <select id="purposeFilter" class="form-select">
-                    <option value="">All Purposes</option>
-                    <?php
-                        $purposeQuery = "SELECT DISTINCT reason FROM visitors ORDER BY reason ASC";
-                        $purposeResult = $conn->query($purposeQuery);
-                        while ($purposeRow = $purposeResult->fetch_assoc()) {
-                            echo "<option value='" . htmlspecialchars($purposeRow['reason'], ENT_QUOTES, 'UTF-8') . "'>" . htmlspecialchars($purposeRow['reason'], ENT_QUOTES, 'UTF-8') . "</option>";
-                        }
-                    ?>
-                </select>
-            </div>
-        </div>
 
         <!-- Table Section -->
         <div id="table-container" class="container-fluid">
+            <!-- Filtering Section -->
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label for="yearFilter" class="form-label">Filter by Year:</label>
+                    <select id="yearFilter" class="form-select filters">
+                        <option value="">All Years</option>
+                        <?php
+                            $yearQuery = "SELECT DISTINCT YEAR(time) AS year FROM visitors ORDER BY year DESC";
+                            $yearResult = $conn->query($yearQuery);
+                            while ($yearRow = $yearResult->fetch_assoc()) {
+                                echo "<option value='" . htmlspecialchars($yearRow['year'], ENT_QUOTES, 'UTF-8') . "'>" . htmlspecialchars($yearRow['year'], ENT_QUOTES, 'UTF-8') . "</option>";
+                            }
+                        ?>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="monthFilter" class="form-label">Filter by Month:</label>
+                    <select id="monthFilter" class="form-select filters">
+                        <option value="">All Months</option>
+                        <option value="01">January</option>
+                        <option value="02">February</option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="cityFilter" class="form-label">Filter by City:</label>
+                    <select id="cityFilter" class="form-select filters">
+                        <option value="">All Cities</option>
+                        <?php
+                            $cityQuery = "SELECT DISTINCT city FROM visitors ORDER BY city ASC";
+                            $cityResult = $conn->query($cityQuery);
+                            while ($cityRow = $cityResult->fetch_assoc()) {
+                                echo "<option value='" . htmlspecialchars($cityRow['city'], ENT_QUOTES, 'UTF-8') . "'>" . htmlspecialchars($cityRow['city'], ENT_QUOTES, 'UTF-8') . "</option>";
+                            }
+                        ?>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="purposeFilter" class="form-label">Filter by Purpose:</label>
+                    <select id="purposeFilter" class="form-select filters">
+                        <option value="">All Purposes</option>
+                        <?php
+                            $purposeQuery = "SELECT DISTINCT reason FROM visitors ORDER BY reason ASC";
+                            $purposeResult = $conn->query($purposeQuery);
+                            while ($purposeRow = $purposeResult->fetch_assoc()) {
+                                echo "<option value='" . htmlspecialchars($purposeRow['reason'], ENT_QUOTES, 'UTF-8') . "'>" . htmlspecialchars($purposeRow['reason'], ENT_QUOTES, 'UTF-8') . "</option>";
+                            }
+                        ?>
+                    </select>
+                </div>
+            </div>
             <input type="text" id="customSearchBox" class="form-control mb-3 search-box" placeholder="Search visitors...">
             <table id="visitorTable" class="table table-bordered text-center">
                 <thead class="bg-dark text-white">
