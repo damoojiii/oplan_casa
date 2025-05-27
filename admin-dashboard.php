@@ -339,7 +339,7 @@
                                                     elseif ($status === 'upcoming') $statusClass = 'text-warning';
                                                     elseif ($status === 'cancelled') $statusClass = 'text-danger';
                                                 ?>
-                                                <li class="mb-3 d-flex align-items-center justify-content-evenly upcom">
+                                                <li class="mb-3 d-flex align-items-center justify-content-between upcom">
                                                     <div class="">
                                                         <div class="fw-semibold"><?= htmlspecialchars($row['name']) ?></div>
                                                         <small class="text-muted"><?= $dateFormatted ?></small>

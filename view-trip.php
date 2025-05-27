@@ -6,6 +6,16 @@
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
 
+    $sql_name = "SELECT name FROM scheduled_tbl WHERE scheduled_id = ?";
+    $stmt = $conn->prepare($sql_name);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $school_result = $stmt->get_result();
+    $school_name = '';
+    if ($row = $school_result->fetch_assoc()) {
+        $school_name = $row['name'];
+    }
+
     $sql_fetch = "SELECT * FROM student_tbl WHERE scheduled_id = ? ORDER BY lastname ASC";
     $stmt = $conn->prepare($sql_fetch);
     $stmt->bind_param("i", $id);
@@ -212,7 +222,7 @@ if (isset($_GET['id'])) {
             <div class="tab-content mt-3" id="dataTabsContent">
                 <!-- Students Tab -->
                 <div class="tab-pane fade show active" id="students" role="tabpanel">
-                    <h4 class="text-center">Students List</h4>
+                    <h4 class="text-center"><?php echo htmlspecialchars($school_name); ?>'s Students List</h4>
                     <a href="export_students_pdf.php?id=<?php echo $id?>" class="btn btn-danger"><i class="fa fa-file-pdf"></i> Export to PDF</a>
                     <?php if ($student_result->num_rows > 0): ?>
                         <table class="table table-bordered">
@@ -246,7 +256,7 @@ if (isset($_GET['id'])) {
 
                 <!-- Supervisors Tab -->
                 <div class="tab-pane fade" id="supervisors" role="tabpanel">
-                    <h4 class="text-center">Supervisors List</h4>
+                    <h4 class="text-center"><?php echo htmlspecialchars($school_name); ?>'s Supervisors List</h4>
                     <?php if ($supervisor_result->num_rows > 0): ?>
                         <table class="table table-bordered">
                             <thead class="table-secondary">

@@ -60,6 +60,12 @@
             color: white;
         }
 
+        #historyTable tbody tr:hover {
+            background-color:rgb(51, 109, 160) !important; /* Light blue highlight on hover */
+            cursor: pointer;
+        }   
+
+
         .btn-success {
             --bs-btn-bg: #5D9C59 !important;
             --bs-btn-border-color: #5D9C59 !important;
@@ -154,7 +160,7 @@
         <h3 class="header-title">Field Trip History</h3>
         <!-- Table Section -->
         <div id="table-container" class="container-fluid">
-            <table class="table table-bordered text-center" id="historyTable">
+            <table class="table table-bordered table-hover text-center" id="historyTable">
                 <thead class="table-header">
                     <tr>
                         <th>School/Company Name</th>
@@ -187,7 +193,7 @@
                             $formattedDate = date("F j, Y", strtotime($row['date']));
                             $formattedTime = date("h:i A", strtotime($row['time']));
                     ?>
-                    <tr onclick="window.location.href='view-trip.php?id=<?php echo $row['scheduled_id']; ?>'" style="cursor: pointer;">
+                    <tr onclick="window.location.href='view-trip.php?id=<?php echo $row['scheduled_id']; ?>'">
                         <td><?php echo $row['name'] ?></td>
                         <td><?php echo $formattedDate ?></td>
                         <td><?php echo $formattedTime ?></td>

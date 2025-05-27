@@ -483,9 +483,9 @@
                     </tbody>
                 </table>
                 <div id="paginationControls" class="d-flex justify-content-center mt-3">
-                    <button id="prevPage" class="btn btn-primary me-2">Previous</button>
+                    <button id="prevPage" class="btn btn-primary me-2"><i class="fa-solid fa-chevron-left"></i></button>
                     <span id="pageNumber" class="align-self-center mx-2">Page 1</span>
-                    <button id="nextPage" class="btn btn-primary ms-2">Next</button>
+                    <button id="nextPage" class="btn btn-primary ms-2"><i class="fa-solid fa-chevron-right"></i></button>
                 </div>
             </div>
         </div>
@@ -590,7 +590,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="editNumBus" class="form-label">No. of Bus(es)</label>
-                    <input type="number" class="form-control" name="num_bus" id="editNumBus" required>
+                    <input type="number" class="form-control" name="num_bus" min="1" max="5" id="editNumBus" required>
                 </div>
                 </div>
                 <div class="modal-footer">
@@ -611,31 +611,74 @@
     <script>
         // Disable specific dates based on the database data
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('date').setAttribute('min', '<?php echo $today; ?>');
-            document.getElementById('editDate').setAttribute('min', '<?php echo $today; ?>');
+            const today = '<?php echo $today; ?>';
             const blockedDates = <?php echo json_encode($blocked_dates); ?>;
             
-            const dateInput = document.getElementById('date');
-            const editDateInput = document.getElementById('editDate');
-            
-            function disableBlockedDates() {
-                const blockedSet = new Set(blockedDates); // Create a Set for faster lookup
-                const date = dateInput.value; // Get the currently selected date
-                const editDate = editDateInput.value; // Get the currently selected date
-                
-                // Check if the selected date is blocked
-                if (blockedSet.has(date)) {
-                    alert("This date is already booked. Please choose another date.");
-                    dateInput.value = ''; // Reset the date input if blocked
-                }
-                if (blockedSet.has(editDate)) {
-                    alert("This date is already booked. Please choose another date.");
-                    dateInput.value = ''; // Reset the date input if blocked
-                }
+            const addDateInput = document.getElementById('date');      // For Add Schedule
+            const editDateInput = document.getElementById('editDate'); // For Edit Schedule
+            const editForm = document.getElementById('editForm');
+
+            let currentEditDate = null; // store the original date being edited
+
+            // Set minimum dates
+            if (addDateInput) addDateInput.setAttribute('min', today);
+            if (editDateInput) editDateInput.setAttribute('min', today);
+
+            // Blocked date logic
+            function isDateBlocked(date, excludeDate = null) {
+                return blockedDates.includes(date) && date !== excludeDate;
             }
 
-            // Disable specific blocked dates visually and in the input
-            dateInput.addEventListener('input', disableBlockedDates);
+            // Add form date blocking
+            if (addDateInput) {
+                addDateInput.addEventListener('input', function () {
+                    const selected = this.value;
+                    if (isDateBlocked(selected)) {
+                        alert("This date is already booked. Please choose another date.");
+                        this.value = '';
+                    }
+                });
+            }
+
+            // Edit form date blocking
+            if (editDateInput) {
+                editDateInput.addEventListener('input', function () {
+                    const selected = this.value;
+                    if (isDateBlocked(selected, currentEditDate)) {
+                        alert("This date is already booked. Please choose another date.");
+                        this.value = '';
+                    }
+                });
+            }
+
+            // Handle edit button click and fetch existing data
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const id = this.getAttribute('data-id');
+
+                    fetch('getSchedule.php?id=' + id)
+                        .then(response => response.json())
+                        .then(data => {
+                            // Populate modal inputs
+                            document.getElementById('editScheduledId').value = data.scheduled_id;
+                            document.getElementById('editName').value = data.name;
+                            document.getElementById('editDate').value = data.date;
+                            document.getElementById('editTime').value = data.time.slice(0, 5);
+                            document.getElementById('editNumBus').value = data.num_bus;
+
+                            // Store original date for blocking exception
+                            currentEditDate = data.date;
+
+                            // Show modal
+                            const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+                            editModal.show();
+                        })
+                        .catch(error => {
+                            alert('Error fetching schedule data.');
+                            console.error(error);
+                        });
+                });
+            });
             
             // This is an additional enhancement to show blocked dates visually
             const blockedDatesString = blockedDates.join(',');
@@ -785,32 +828,7 @@
             });
         });
 
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.edit-btn').forEach(button => {
-                button.addEventListener('click', function () {
-                    const id = this.getAttribute('data-id');
-
-                    fetch('getSchedule.php?id=' + id)
-                        .then(response => response.json())
-                        .then(data => {
-                            // Populate modal inputs
-                            document.getElementById('editScheduledId').value = data.scheduled_id;
-                            document.getElementById('editName').value = data.name;
-                            document.getElementById('editDate').value = data.date;
-                            document.getElementById('editTime').value = data.time.slice(0, 5);
-                            document.getElementById('editNumBus').value = data.num_bus;
-
-                            // Show modal
-                            const editModal = new bootstrap.Modal(document.getElementById('editModal'));
-                            editModal.show();
-                        })
-                        .catch(error => {
-                            alert('Error fetching schedule data.');
-                            console.error(error);
-                        });
-                });
-            });
-        });
+        
     </script>
 </body>
 
