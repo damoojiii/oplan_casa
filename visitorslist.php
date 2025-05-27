@@ -78,6 +78,11 @@
             width: 10px;
             text-align: center;
         }
+
+        .search-box {
+            border: 1px solid #5D9C59;
+            width: 500px;
+        }
     </style>
 </head>
 <body>
@@ -227,6 +232,7 @@
 
         <!-- Table Section -->
         <div id="table-container" class="container-fluid">
+            <input type="text" id="customSearchBox" class="form-control mb-3 search-box" placeholder="Search visitors...">
             <table id="visitorTable" class="table table-bordered text-center">
                 <thead class="bg-dark text-white">
                     <tr>
@@ -394,14 +400,24 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="vendor/datables/datatables.min.js"></script>
     <script>
+        function getOrdinalSuffix(day) {
+            if (day > 3 && day < 21) return 'th';
+            switch (day % 10) {
+                case 1: return 'st';
+                case 2: return 'nd';
+                case 3: return 'rd';
+                default: return 'th';
+            }
+        }
+
         $(document).ready(function () {
             setTimeout(function () {
                 let table = $('#visitorTable').DataTable({
                     "paging": true,
-                    "searching": true, // Keep DataTables' built-in search
+                    "searching": true,
                     "lengthChange": false,
                     "pageLength": 10,
-                    "ordering": false, // Allow sorting
+                    "ordering": false,
                     "info": false,
                     "language": {
                         "paginate": {
@@ -409,7 +425,11 @@
                             "next": "<i class='fas fa-chevron-right'></i>"
                         }
                     },
-                    "dom": '<"top"f>rt<"bottom"p><"clear">'
+                    dom: 'rt<"bottom"p><"clear">'
+                });
+
+                $('#customSearchBox').on('keyup', function () {
+                    table.search(this.value).draw();
                 });
 
                 // Custom filtering function
@@ -478,6 +498,12 @@
         $("#generateCertificateBtn").click(function () {
             var visitorName = $(this).attr("data-visitor-name");
             var rawDate = $(this).attr("data-visitor-date");
+            var date = new Date(rawDate);
+            var day = date.getDate();
+            var suffix = getOrdinalSuffix(day);
+            var month = date.toLocaleString('default', { month: 'long' });
+            var year = date.getFullYear();
+            var formattedDate = `${day}${suffix} of ${month}, ${year}`;
 
             if (!visitorName) {
                 alert("Visitor name is missing!");
@@ -496,14 +522,14 @@
             printWindow.document.write('.certificate { position: relative; width: 100%; height: 100vh; overflow: hidden; }');
             printWindow.document.write('img { width: 100%; height: 100vh; object-fit: cover; }');
             printWindow.document.write('.name { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 70px; font-weight: bold; white-space: nowrap; }');
-            printWindow.document.write('.date { position: absolute; top: 69%; left: 50%; transform: translateX(-50%); font-size: 25px; font-family: Nova; font-weight: normal; }');
+            printWindow.document.write('.date { position: absolute; top: 69%; left: 55%; transform: translateX(-50%); font-size: 25px; font-family: Nova; font-weight: normal; }');
             printWindow.document.write('</style></head><body>');
 
             // Certificate layout
             printWindow.document.write('<div class="certificate">');
-            printWindow.document.write('<img src="img/certificate.png" alt="Certificate Background">');
+            printWindow.document.write('<img src="img/cert.png" alt="Certificate Background">');
             printWindow.document.write('<div class="name">' + visitorName + '</div>');
-            printWindow.document.write('<div class="date">' + rawDate + '</div>');
+            printWindow.document.write('<div class="date">' + formattedDate + '</div>');
             printWindow.document.write('</div>');
 
             printWindow.document.write('</body></html>');
