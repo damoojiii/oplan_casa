@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="vendor/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="vendor/fontawesome-free/css/fontawesome.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="css/style.css">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="icon" href="img/rosariologo.png">
@@ -201,7 +202,7 @@
             <form method="POST" action="#">
                 <div class="mb-3">
                     <label for="email" class="form-label">Email or Username</label>
-                    <input type="text" class="form-control" id="email" name="email" required>
+                    <input type="text" class="form-control input-box" id="email" name="email" required>
                 </div>
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center">
@@ -209,7 +210,7 @@
                     </div>
                     <!-- Password field with toggle visibility -->
                     <div class="password-wrapper">
-                        <input type="password" class="form-control" id="password" name="password" required>
+                        <input type="password" class="form-control input-box" id="password" name="password" required>
                         <i class="bi bi-eye" id="togglePassword"></i>
                     </div>
                     <p class="text-end list-unstyle forgot"><a href="forgot_password.php" style="text-decoration: none; color: #FFFF;">Forgot Password</a></p>

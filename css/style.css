@@ -1,0 +1,13 @@
+.input-box:focus {
+    border: 2px solid green;
+    box-shadow: 0 0 10px green;
+}
+
+.filters {
+    border: 2px solid #5D9C59;
+}
+
+.filters:focus {
+    border: 2px solid green;
+    box-shadow: 0 0 10px green;
+}

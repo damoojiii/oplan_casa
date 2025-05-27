@@ -12,6 +12,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="css/style.css">
     <link rel="icon" href="img/rosariologo.png">
     
     <style>
@@ -261,7 +262,7 @@
                 
                 <form action="update_logo.php" method="post" enctype="multipart/form-data" class="mt-3">
                     <div class="mb-3 text-center">
-                        <input type="file" class="form-control" id="logoFile" name="logoFile" accept="image/*" required>
+                        <input type="file" class="form-control input-box filters" id="logoFile" name="logoFile" accept="image/*" required>
                     </div>
                     <div class="text-center mt-3">
                         <button type="submit" class="btn btn-primary">Update Logo</button>
@@ -294,13 +295,13 @@
 
                             <div class="mb-3">
                                 <label for="username" class="form-label fw-bold">Username</label>
-                                <input type="text" class="form-control" id="username" value="<?php echo htmlspecialchars($username); ?>" readonly>
+                                <input type="text" class="form-control input-box filters" id="username" value="<?php echo htmlspecialchars($username); ?>" readonly>
                                 <small class="form-text text-muted">Username cannot be changed</small>
                             </div>
 
                             <div class="mb-3">
                                 <label for="email" class="form-label fw-bold">Email Address</label>
-                                <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($adminEmail); ?>" required>
+                                <input type="email" class="form-control input-box filters" id="email" name="email" value="<?php echo htmlspecialchars($adminEmail); ?>" required>
                             </div>
 
                             <div class="text-center mt-4">
@@ -388,7 +389,7 @@
                                         <form id="addReasonForm" method="post">
                                             <input type="hidden" name="action" value="add">
                                             <div class="input-group mb-3">
-                                                <input type="text" class="form-control" name="newReason" placeholder="New visit purpose" required>
+                                                <input type="text" class="form-control input-box filters" name="newReason" placeholder="New visit purpose" required>
                                                 <button class="btn btn-primary" type="submit">
                                                     <i class="fas fa-plus"></i> Add
                                                 </button>
@@ -407,7 +408,7 @@
                                     <div class="card-body">
                                         <div class="form-group mb-3">
                                             <label for="purposeSelect" class="form-label">Select a purpose to manage:</label>
-                                            <select id="purposeSelect" class="form-select" onchange="showPurpose(this.value)">
+                                            <select id="purposeSelect" class="form-select input-box filters" onchange="showPurpose(this.value)">
                                                 <option value="">-- Select a purpose --</option>
                                                 <?php
                                                 $result = $conn->query("SELECT * FROM purpose_tbl ORDER BY purpose_id DESC");
@@ -418,7 +419,7 @@
                                             </select>
                                         </div>
 
-                                        <div id="purposeDetails" class="mt-3 p-3 border rounded bg-white"></div>
+                                        <div id="purposeDetails" class="mt-3 p-3 filters rounded bg-white"></div>
                                     </div>
                                 </div>
                             </div>
@@ -492,7 +493,7 @@
                                         <form id="addCityForm" method="post">
                                             <input type="hidden" name="action" value="add">
                                             <div class="input-group mb-3">
-                                                <input type="text" class="form-control" name="newCity" placeholder="Add New City" required>
+                                                <input type="text" class="form-control input-box filters" name="newCity" placeholder="Add New City" required>
                                                 <button class="btn btn-primary" type="submit">
                                                     <i class="fas fa-plus"></i> Add
                                                 </button>
@@ -510,7 +511,7 @@
                                     <div class="card-body">
                                         <div class="form-group mb-3">
                                             <label for="purposeSelect" class="form-label">Select a City to manage:</label>
-                                            <select id="purposeSelect" class="form-select" onchange="showCities(this.value)">
+                                            <select id="purposeSelect" class="form-select input-box filters" onchange="showCities(this.value)">
                                                 <option value="">-- Select a city --</option>
                                                 <?php
                                                 $result = $conn->query("SELECT * FROM cities ORDER BY cityID DESC");
@@ -521,7 +522,7 @@
                                             </select>
                                         </div>
 
-                                        <div id="cityDetails" class="mt-3 p-3 border rounded bg-white"></div>
+                                        <div id="cityDetails" class="mt-3 p-3 rounded bg-white filters"></div>
                                     </div>
                                 </div>
                             </div>

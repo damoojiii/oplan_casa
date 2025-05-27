@@ -64,6 +64,7 @@
     <link rel="stylesheet" href="vendor/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="vendor/fontawesome-free/css/fontawesome.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="css/style.css">
     <link rel="icon" href="img/rosariologo.png">
 
     <!-- Script -->
@@ -313,7 +314,7 @@
                 <div class="row g-3">
                     <div class="col-md-3">
                         <label for="fullName" class="form-label input-label">Name</label>
-                        <input type="text" id="fullName" name="fullName" class="form-control"
+                        <input type="text" id="fullName" name="fullName" class="form-control filters input-box"
                             placeholder="Enter your Name" required>
                         <div id="fullNameError" class="text-danger" style="display: none;">
                             Please enter a valid name (letters only)
@@ -324,7 +325,7 @@
 
                     <div class="col-md-2">
                         <label for="city" class="form-label input-label">City/Municipality</label>
-                        <select id="city" name="city" class="form-select" required>
+                        <select id="city" name="city" class="form-select filters input-box" required>
                             <option value="" disabled selected hidden>Select City/Municipality</option>
 
                             <?php
@@ -347,7 +348,7 @@
 
                     <div class="col-md-3">
                         <label for="visitReason" class="form-label input-label">Purpose for Visit</label>
-                        <select name="reason" id="purpose" class="form-select" required>
+                        <select name="reason" id="purpose" class="form-select filters input-box" required>
                             <option value="" disabled selected hidden>Select purpose</option>
                             <?php
                         
@@ -369,7 +370,7 @@
 
                     <div class="col-md-2">
                         <label for="gender" class="form-label input-label">Gender</label>
-                        <select id="gender" name="gender" class="form-select" required>
+                        <select id="gender" name="gender" class="form-select filters input-box" required>
                             <option value="" disabled selected hidden>Select Gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>

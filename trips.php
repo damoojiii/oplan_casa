@@ -41,6 +41,7 @@
     <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="vendor/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="vendor/fontawesome-free/css/fontawesome.min.css">
+    <link rel="stylesheet" href="css/style.css">
     <link rel="icon" href="img/rosariologo.png">
 
     <style>
@@ -359,17 +360,17 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <label>Enter School/Company Name</label>
-                                    <input type="text" name="name" class="form-control" required>
+                                    <input type="text" name="name" class="form-control input-box filters" required>
                                     <label>Choose Date</label>
-                                    <input type="date" name="date" class="form-control" id="date" required>
+                                    <input type="date" name="date" class="form-control input-box filters" id="date" required>
                                     <label for="time">Choose Time</label>
-                                    <select id="time" name="time" class="form-control" required>
+                                    <select id="time" name="time" class="form-control input-box filters" required>
                                         <option value="" hidden selected>Select a time</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
                                     <label>Enter Number of Bus(es)</label>
-                                    <input type="number" name="num_bus" class="form-control" min="1" max="5" required>
+                                    <input type="number" name="num_bus" class="form-control input-box filters" min="1" max="5" required>
                                 </div>
                             </div>
                             <button class="btn btn-primary mt-3" type="submit" name="create">Submit</button>
@@ -418,7 +419,7 @@
 
                 <!-- Schedule Table -->
                 <h3 class="header-title">View Schedule</h3>
-                <input type="text" id="searchInput" placeholder="Search by name, date, time, etc." class="form-control mb-3">
+                <input type="text" id="searchInput" placeholder="Search by name, date, time, etc." class="form-control mb-3 input-box filters">
                 <table class="table table-bordered text-center">
                     <thead class="table-header">
                         <tr>

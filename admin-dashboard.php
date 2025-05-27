@@ -92,6 +92,7 @@
     <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="vendor/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="vendor/fontawesome-free/css/fontawesome.min.css">
+    <link rel="stylesheet" href="css/style.css">
     
     <link rel="icon" type="image/png" href="img/rosariologo.png">
 
@@ -360,7 +361,7 @@
                             <div class="card mt-3">
                                 <div class="card-header header-title">Visitor Chart</div>
                                     <div class="d-flex justify-content-between align-items-center px-3 py-2">
-                                        <select name="year" id="yearSelect" class="form-select w-50 me-2">
+                                        <select name="year" id="yearSelect" class="form-select w-50 me-2 input-box filters">
                                             <?php
                                             $selectedYear = isset($_GET['year']) ? $_GET['year'] : '';
                                             $query = "SELECT DISTINCT YEAR(time) AS year FROM visitors ORDER BY year DESC";
@@ -385,7 +386,7 @@
                             <div class="card mt-3">
                                 <div class="card-header header-title">Appointed Field Trips</div>
                                 <div class="d-flex justify-content-between align-items-center px-3 py-2">
-                                    <select name="apptYear" id="apptYearSelect" class="form-select w-50 me-2">
+                                    <select name="apptYear" id="apptYearSelect" class="form-select w-50 me-2 input-box filters">
                                         <?php
                                         $selectedYear = isset($_GET['apptYear']) ? $_GET['apptYear'] : '';
                                         $query = "SELECT DISTINCT YEAR(date) AS year FROM scheduled_tbl ORDER BY year DESC";
@@ -417,7 +418,7 @@
                     <div class="card">
                         <div class="card-header header-title">Reason for Visit</div>
                         <div class="d-flex justify-content-between align-items-center px-3 py-2">
-                            <select name="reasonYear" id="reasonYearSelect" class="form-select w-50 me-2">
+                            <select name="reasonYear" id="reasonYearSelect" class="form-select w-50 me-2 input-box filters">
                                 <?php
                                 $selectedReasonYear = isset($_GET['reasonYear']) ? $_GET['reasonYear'] : '';
                                 $query = "SELECT DISTINCT YEAR(time) AS year FROM visitors ORDER BY year DESC";

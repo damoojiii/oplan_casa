@@ -263,7 +263,9 @@
                                         <td><?= $row['guardian'] ?></td>
                                         <td><?= $row['contact'] ?></td>
                                         <td class="d-flex justify-content-evenly">
-                                            <a href="#" class="btn btn-info btn-sm"><i class='fa-solid fa-print'></i></a>
+                                            <a href="#" class="btn btn-info btn-sm" onclick="printStudentCertificate('<?= $row['student_id'] ?>')">
+                                                <i class='fa-solid fa-print'></i>
+                                            </a>
                                             <a href="#" class="btn btn-warning btn-sm edit-btn" data-bs-toggle='modal' 
                                             data-bs-target='#editStudentModal'
                                             data-studentid='<?= htmlspecialchars($row['student_id'], ENT_QUOTES, 'UTF-8') ?>'
@@ -311,7 +313,9 @@
                                         <td><?= $row['contact'] ?></td>
                                         <td><?= $row['gender'] ?></td>
                                         <td class="d-flex justify-content-evenly">
-                                            <a href="#" class="btn btn-info btn-sm"><i class='fa-solid fa-print'></i></a>
+                                            <a href="#" class="btn btn-info btn-sm" onclick="printSupervisorCertificate('<?= $row['supervisor_id'] ?>')">
+                                                <i class='fa-solid fa-print'></i>
+                                            </a>
                                             <a href="#" class="btn btn-warning btn-sm edit-btn1"
                                             data-bs-toggle='modal' 
                                             data-bs-target='#editSuperVisorModal'
@@ -586,7 +590,72 @@
                 });
             });
         });
+
+        function getOrdinalSuffix(day) {
+            if (day > 3 && day < 21) return 'th'; // covers 11th–13th
+            switch (day % 10) {
+                case 1:  return 'st';
+                case 2:  return 'nd';
+                case 3:  return 'rd';
+                default: return 'th';
+            }
+        }
+
+        function formatDateWithSuffix(dateStr) {
+            const date = new Date(dateStr);
+            const day = date.getDate();
+            const suffix = getOrdinalSuffix(day);
+            const month = date.toLocaleString('default', { month: 'long' });
+            const year = date.getFullYear();
+            return `${day}${suffix} of ${month}, ${year}`;
+        }
         
+        function printStudentCertificate(studentId) {
+            fetch('fetchStudentData.php?id=' + studentId)
+                .then(response => response.json())
+                .then(data => {
+                    const fullName = data.firstname + ' ' + data.lastname;
+                    const scheduledDate = formatDateWithSuffix(data.date);
+
+                    openPrintWindow(fullName, scheduledDate);
+                });
+        }
+
+        function printSupervisorCertificate(supervisorid) {
+            fetch('fetchSupervisorData.php?id=' + supervisorid)
+                .then(response => response.json())
+                .then(data => {
+                    const fullName = data.firstname + ' ' + data.lastname;
+                    const scheduledDate = formatDateWithSuffix(data.date);
+
+                    openPrintWindow(fullName, scheduledDate);
+                });
+        }
+
+        function openPrintWindow(fullName, scheduledDate) {
+            const printWindow = window.open('', '', 'width=1200,height=850');
+            printWindow.document.write('<html><head><title>Student Certificate</title>');
+            printWindow.document.write('<style>');
+            printWindow.document.write('@font-face { font-family: "Nova"; src: url("fonts/Nova/Arial-Nova.ttf") format("truetype"); }');
+            printWindow.document.write('@page { size: A4 landscape; margin: 0; }');
+            printWindow.document.write('body { margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }');
+            printWindow.document.write('.certificate { position: relative; width: 100%; height: 100vh; overflow: hidden; }');
+            printWindow.document.write('img { width: 100%; height: 100vh; object-fit: cover; }');
+            printWindow.document.write('.name { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 70px; font-weight: bold; white-space: nowrap; }');
+            printWindow.document.write('.date { position: absolute; top: 69%; left: 55%; transform: translateX(-50%); font-size: 25px; font-family: Nova; font-weight: normal; }');
+            printWindow.document.write('</style></head><body>');
+            printWindow.document.write('<div class="certificate">');
+            printWindow.document.write('<img src="img/cert.png" alt="Certificate Background">');
+            printWindow.document.write('<div class="name">' + fullName + '</div>');
+            printWindow.document.write('<div class="date">' + scheduledDate + '</div>');
+            printWindow.document.write('</div></body></html>');
+
+            printWindow.document.close();
+            printWindow.onload = function () {
+                printWindow.print();
+                printWindow.close();
+            };
+        }
     </script>
 </body>
 

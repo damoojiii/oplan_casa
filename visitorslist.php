@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="vendor/datables/datatables.min.css">
+    <link rel="stylesheet" href="css/style.css">
     <link rel="icon" href="img/rosariologo.png">
     
     <style>
@@ -85,15 +86,6 @@
         }
 
         .search-box:focus {
-            border: 2px solid green;
-            box-shadow: 0 0 10px green;
-        }
-
-        .filters {
-            border: 2px solid #5D9C59;
-        }
-
-        .filters:focus {
             border: 2px solid green;
             box-shadow: 0 0 10px green;
         }
