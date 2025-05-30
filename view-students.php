@@ -244,7 +244,6 @@
                         <table id="studentTable" class="table table-bordered text-center">
                             <thead class="table-dark">
                                 <tr>
-                                    <th>ID</th>
                                     <th>Last Name</th>
                                     <th>First Name</th>
                                     <th>Grade Level</th>
@@ -256,7 +255,6 @@
                             <tbody>
                                 <?php while ($row = $student_result->fetch_assoc()): ?>
                                     <tr>
-                                        <td><?= $row['student_id'] ?></td>
                                         <td><?= $row['lastname'] ?></td>
                                         <td><?= $row['firstname'] ?></td>
                                         <td><?= $row['grade_level'] ?></td>
@@ -294,7 +292,6 @@
                         <table id="supervisorTable" class="table table-bordered text-center">
                             <thead class="table-secondary">
                                 <tr>
-                                    <th>ID</th>
                                     <th>First Name</th>
                                     <th>Last Name</th>
                                     <th>Position</th>
@@ -306,7 +303,6 @@
                             <tbody>
                                 <?php while ($row = $supervisor_result->fetch_assoc()): ?>
                                     <tr>
-                                        <td><?= $row['supervisor_id'] ?></td>
                                         <td><?= $row['firstname'] ?></td>
                                         <td><?= $row['lastname'] ?></td>
                                         <td><?= $row['position'] ?></td>

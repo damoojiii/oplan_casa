@@ -533,7 +533,7 @@
 
             // Certificate layout
             printWindow.document.write('<div class="certificate">');
-            printWindow.document.write('<img src="img/cert.png" alt="Certificate Background">');
+            printWindow.document.write('<img src="img/cert1.png" alt="Certificate Background">');
             printWindow.document.write('<div class="name">' + visitorName + '</div>');
             printWindow.document.write('<div class="date">' + formattedDate + '</div>');
             printWindow.document.write('</div>');

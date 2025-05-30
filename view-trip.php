@@ -1,7 +1,6 @@
 <?php
     include "session.php";
     include("connection.php");
-    include "loader.php";
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];

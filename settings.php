@@ -372,6 +372,55 @@
                                             </script>";
                                     }
                                 }
+                                
+                                if (isset($_POST['edit_city_id']) && isset($_POST['edit_city_name'])) {
+                                    $id = (int)$_POST['edit_city_id'];
+                                    $city_name = $conn->real_escape_string($_POST['edit_city_name']);
+                                    if ($conn->query("UPDATE cities SET city_name = '$city_name' WHERE cityID = $id")) {
+                                        echo "<script>
+                                                Swal.fire({
+                                                    title: 'Updated!',
+                                                    text: 'City updated successfully.',
+                                                    icon: 'success',
+                                                    confirmButtonText: 'Okay'
+                                                });
+                                            </script>";
+                                    } else {
+                                        echo "<script>
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: 'Failed to update city.',
+                                                    icon: 'error',
+                                                    confirmButtonText: 'Okay'
+                                                });
+                                            </script>";
+                                    }
+                                }
+
+                                if (isset($_POST['edit_purpose_id']) && isset($_POST['edit_purpose_name'])) {
+                                    $id = (int)$_POST['edit_purpose_id'];
+                                    $purpose = $conn->real_escape_string($_POST['edit_purpose_name']);
+                                    if ($conn->query("UPDATE purpose_tbl SET purpose = '$purpose' WHERE purpose_id = $id")) {
+                                        echo "<script>
+                                                Swal.fire({
+                                                    title: 'Updated!',
+                                                    text: 'Purpose updated successfully.',
+                                                    icon: 'success',
+                                                    confirmButtonText: 'Okay'
+                                                });
+                                            </script>";
+                                    } else {
+                                        echo "<script>
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: 'Failed to update purpose.',
+                                                    icon: 'error',
+                                                    confirmButtonText: 'Okay'
+                                                });
+                                            </script>";
+                                    }
+                                }
+
                             }
                         ?>
 
@@ -511,7 +560,7 @@
                                     <div class="card-body">
                                         <div class="form-group mb-3">
                                             <label for="purposeSelect" class="form-label">Select a City to manage:</label>
-                                            <select id="purposeSelect" class="form-select input-box filters" onchange="showCities(this.value)">
+                                            <select id="citySelect" class="form-select input-box filters" onchange="showCities(this.value)">
                                                 <option value="">-- Select a city --</option>
                                                 <?php
                                                 $result = $conn->query("SELECT * FROM cities ORDER BY cityID DESC");
@@ -594,22 +643,56 @@
                 document.getElementById('purposeDetails').innerHTML = "";
                 return;
             }
-            
-            const purposeText = document.querySelector(`option[value='${id}']`).innerText;
+
+            const selectElement = document.getElementById('purposeSelect');
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const purposeName = selectedOption.text;
+
             document.getElementById('purposeDetails').innerHTML = `
                 <div class='purpose-item'>
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">${purposeText}</h5>
-                        <form method='POST' style='display:inline;'>
-                            <input type='hidden' name='id' value='${id}'>
-                            <button type='submit' name='delete_purpose' class='btn btn-danger btn-sm'>
-                                <i class="fas fa-trash"></i> Delete
+                        <h5 class="mb-0">${purposeName}</h5>
+                        <div>
+                            <button class="btn btn-warning btn-sm me-2" onclick="editPurpose(${id}, '${purposeName.replace(/'/g, "\\'")}')">
+                                <i class="fas fa-edit"></i> Edit
                             </button>
-                        </form>
+                            <form method='POST' style='display:inline;'>
+                                <input type='hidden' name='id' value='${id}'>
+                                <button type='submit' name='delete_purpose' class='btn btn-danger btn-sm'>
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             `;
         }
+
+        function editPurpose(id, oldName) {
+            const newName = prompt("Edit Purpose Name:", oldName);
+            if (newName && newName.trim() !== "") {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.style.display = 'none';
+
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'edit_purpose_id';
+                idInput.value = id;
+                form.appendChild(idInput);
+
+                const nameInput = document.createElement('input');
+                nameInput.type = 'hidden';
+                nameInput.name = 'edit_purpose_name';
+                nameInput.value = newName;
+                form.appendChild(nameInput);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+
 
         // Function to show city details
         function showCities(id) {
@@ -617,22 +700,55 @@
                 document.getElementById('cityDetails').innerHTML = "";
                 return;
             }
-            
-            const purposeText = document.querySelector(`option[value='${id}']`).innerText;
+
+            const selectElement = document.getElementById('citySelect');
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const cityName = selectedOption.text;
+
             document.getElementById('cityDetails').innerHTML = `
                 <div class='purpose-item'>
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">${purposeText}</h5>
-                        <form method='POST' style='display:inline;'>
-                            <input type='hidden' name='id' value='${id}'>
-                            <button type='submit' name='delete_city' class='btn btn-danger btn-sm'>
-                                <i class="fas fa-trash"></i> Delete
+                        <h5 class="mb-0" id="cityNameDisplay">${cityName}</h5>
+                        <div>
+                            <button class="btn btn-warning btn-sm me-2" onclick="editCity(${id}, '${cityName.replace(/'/g, "\\'")}')">
+                                <i class="fas fa-edit"></i> Edit
                             </button>
-                        </form>
+                            <form method='POST' style='display:inline;'>
+                                <input type='hidden' name='id' value='${id}'>
+                                <button type='submit' name='delete_city' class='btn btn-danger btn-sm'>
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             `;
         }
+        function editCity(id, oldName) {
+            const newName = prompt("Edit City Name:", oldName);
+            if (newName && newName.trim() !== "") {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.style.display = 'none';
+
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'edit_city_id';
+                idInput.value = id;
+                form.appendChild(idInput);
+
+                const nameInput = document.createElement('input');
+                nameInput.type = 'hidden';
+                nameInput.name = 'edit_city_name';
+                nameInput.value = newName;
+                form.appendChild(nameInput);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+
 
         // Error Success Message
         document.addEventListener('DOMContentLoaded', function() {

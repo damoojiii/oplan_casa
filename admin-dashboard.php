@@ -356,6 +356,7 @@
                                 </div>
                             </div>
                         </div>
+                    
                         <!-- Right Inner Column (Charts) -->
                         <div class="col-md-7">
                             <div class="card mt-3">
@@ -475,7 +476,12 @@
                             <div class="dates" id="dates"></div>
                         </div>
                     </div>
-                    
+                    <div class="text-center mt-4">
+    <button type="button" class="btn btn-success" id="printAllChartsBtn">
+        <i class="fa-solid fa-print"></i> Print Summary Report
+    </button>
+</div>
+
                 </div>
             </div>
         </div>
@@ -487,6 +493,116 @@
     <script src="vendor/fontawesome-free/js/fontawesome.min.js"></script>
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('printAllChartsBtn').addEventListener('click', function () {
+    const visitorCanvas = document.getElementById('visitorChart');
+    const fieldTripsCanvas = document.getElementById('fieldTripsChart');
+    const reasonCanvas = document.getElementById('reasonChart');
+
+    const visitorDataUrl = visitorCanvas.toDataURL();
+    const fieldTripsDataUrl = fieldTripsCanvas.toDataURL();
+    const reasonDataUrl = reasonCanvas.toDataURL();
+
+    const selectedVisitorYear = document.getElementById('yearSelect').value;
+    const selectedApptYear = document.getElementById('apptYearSelect').value;
+    const selectedReasonYear = document.getElementById('reasonYearSelect').value;
+
+    const today = new Date().toLocaleDateString();
+    const logoUrl = 'img/logo.png'; // ✅ Replace with your actual logo path
+
+    const printWindow = window.open('', '', 'width=900,height=700');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Visitor Summary Report</title>
+            <style>
+                @media print {
+                    body {
+                        margin: 0;
+                        padding: 0;
+                    }
+                }
+                body {
+                    font-family: Arial, sans-serif;
+                    padding: 40px;
+                    background-color: white;
+                    color: #333;
+                    max-width: 900px;
+                    margin: auto;
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 30px;
+                }
+                .header img {
+                    max-width: 100px;
+                    margin-bottom: 10px;
+                }
+                .header h1 {
+                    margin: 10px 0 5px;
+                    font-size: 2em;
+                }
+                .header p {
+                    margin: 0;
+                    font-size: 0.95em;
+                }
+                .chart-section {
+                    margin-bottom: 25px;
+                }
+                .chart-section h2 {
+                    font-size: 1.2em;
+                    margin-bottom: 10px;
+                    text-align: center;
+                }
+                .chart-section img {
+                    display: block;
+                    margin: 0 auto;
+                    max-width: 95%;
+                    height: auto;
+                    border: 1px solid #ccc;
+                    padding: 6px;
+                    background: #f9f9f9;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <img src="${logoUrl}" alt="Logo">
+                <h1>Visitor Summary Report</h1>
+                <p><strong>Date Generated:</strong> ${today}</p>
+            </div>
+
+            <div class="chart-section">
+                <h2>Visitors Per Month (${selectedVisitorYear})</h2>
+                <img src="${visitorDataUrl}" alt="Visitor Chart">
+            </div>
+
+            <div class="chart-section">
+                <h2>Appointed Field Trips (${selectedApptYear})</h2>
+                <img src="${fieldTripsDataUrl}" alt="Field Trips Chart">
+            </div>
+
+            <div class="chart-section">
+                <h2>Reasons for Visit (${selectedReasonYear})</h2>
+                <img src="${reasonDataUrl}" alt="Reason Chart">
+            </div>
+
+            <script>
+                window.onload = function () {
+                    window.print();
+                    window.onafterprint = function () {
+                        window.close();
+                    };
+                };
+            <\/script>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+});
+
+
+    </script>
     <script>
         const monthYearElement = document.getElementById('monthYear');
         const datesElement = document.getElementById('dates');

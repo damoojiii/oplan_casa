@@ -1,7 +1,6 @@
 <?php
 ob_start();
 include "connection.php";
-include "loader.php";
 session_start();
 
 use PHPMailer\PHPMailer\PHPMailer;

@@ -1,7 +1,6 @@
 <?php
     include "session.php";
     include("connection.php");
-    include("loader.php");
 
     date_default_timezone_set("Asia/Manila");
     $today = date('Y-m-d');
@@ -370,7 +369,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label>Enter Number of Bus(es)</label>
-                                    <input type="number" name="num_bus" class="form-control input-box filters" min="1" max="5" required>
+                                    <input type="number" name="num_bus" class="form-control input-box filters" min="1" max="4" required>
                                 </div>
                             </div>
                             <button class="btn btn-primary mt-3" type="submit" name="create">Submit</button>
@@ -435,7 +434,12 @@
                     <tbody>
                         <?php 
                             $sql = "SELECT s.*, 
-                                    COALESCE(COUNT(st.student_id), 0) AS num_visitors
+                                    (
+                                        SELECT COUNT(*) FROM student_tbl st WHERE st.scheduled_id = s.scheduled_id
+                                    ) +
+                                    (
+                                        SELECT COUNT(*) FROM supervisor_tbl sv WHERE sv.scheduled_id = s.scheduled_id
+                                    ) AS num_visitors
                             FROM scheduled_tbl s
                             LEFT JOIN student_tbl st ON s.scheduled_id = st.scheduled_id
                             WHERE s.status = 'Upcoming'
@@ -470,13 +474,13 @@
                             </td>
                             <td>
                                 <button class="btn btn-success btn-sm approve-btn" data-id="<?php echo $row['scheduled_id']; ?>">
-                                    <i class="fa-solid fa-check"></i>
+                                    <i class="fa-solid fa-check"></i> Approve
                                 </button>
                                 <button class="btn btn-warning btn-sm edit-btn" data-id="<?php echo $row['scheduled_id']; ?>">
-                                    <i class="fa-solid fa-pen"></i>
+                                    <i class="fa-solid fa-pen"></i> Edit
                                 </button>
                                 <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['scheduled_id']; ?>">
-                                    <i class="fa-solid fa-x"></i>
+                                    <i class="fa-solid fa-x"></i> Delete
                                 </button>
                             </td>
                         </tr>
